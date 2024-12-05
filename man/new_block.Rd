@@ -3,11 +3,26 @@
 \name{new_block}
 \alias{new_block}
 \alias{is_block}
+\alias{block_uid}
+\alias{block_ns}
+\alias{block_state}
+\alias{block_expr}
+\alias{block_splice}
 \title{Blocks}
 \usage{
-new_block(expr, class, ...)
+new_block(expr, class, state = list(), splice = FALSE, uid = rand_names(), ...)
 
 is_block(x)
+
+block_uid(x, prefix = character())
+
+block_ns(x, input_id = character(), prefix = character())
+
+block_state(x, selection = character())
+
+block_expr(x)
+
+block_splice(x)
 }
 \arguments{
 \item{expr}{A quoted expression (compatible with partial substitution as
@@ -16,9 +31,21 @@ of the fields)}
 
 \item{class}{Block subclass}
 
+\item{state}{List of values defining the block state}
+
+\item{splice}{See \code{\link[base:bquote]{base::bquote()}}}
+
+\item{uid}{Unique block ID}
+
 \item{...}{Further (metadata) attributes}
 
 \item{x}{An object inheriting from \code{"block"}}
+
+\item{prefix}{UID prefix (for module ID generation)}
+
+\item{input_id}{Input ID (for ns generation)}
+
+\item{selection}{State attribute to return}
 }
 \description{
 Blocks consist of an expression that defines what the block produces (given
