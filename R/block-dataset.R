@@ -25,11 +25,11 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
   }
 
   new_block(
-    as.call(c(as.symbol("::"), quote(.(package)), quote(.(dataset)))),
+    quote(`::`(as.name(.(package)), as.name(.(dataset)))),
     class = c("dataset_block", "data_block"),
     state = list(
-      selected = dataset,
-      datasets = list_datasets(package),
+      dataset = dataset,
+      options = list_datasets(package),
       package = package
     ),
     ...
@@ -55,7 +55,7 @@ fields_ui.dataset_block <- function(x, ...) {
   selectInput(
     inputId = block_ns(x, "dataset", prefix = "fields"),
     label = "Dataset",
-    choices = block_state(x, "datasets"),
-    selected = block_state(x, "selected")
+    choices = block_state(x, "options"),
+    selected = block_state(x, "dataset")
   )
 }

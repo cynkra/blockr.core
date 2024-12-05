@@ -97,14 +97,18 @@ block_splice <- function(x) {
 #' @param values Block field values
 #'
 #' @export
-interpolate_expr <- function(x, input = list(), values = block_state(x)) {
+interpolate_expr <- function(x, input = list(), values = list()) {
   UseMethod("interpolate_expr")
 }
 
 #' @rdname interpolate_expr
 #' @export
-interpolate_expr.block <- function(x, input = list(), values = block_state(x)) {
-  args <- c(lapply(input, as.name), values)
+interpolate_expr.block <- function(x, input = list(), values = list()) {
+
+  args <- block_state(x)
+  args[names(values)] <- values
+  args <- c(lapply(input, as.name), args)
+
   do.call(bquote, list(block_expr(x), where = args, splice = block_splice(x)))
 }
 
