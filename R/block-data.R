@@ -8,17 +8,7 @@ block_server.data_block <- function(x, input = list(), ...) {
       fields <- fields_server(x, input)
       result <- reactive(evaluate_block(x, values = lapply(fields, reval)))
 
-      output$result <- DT::renderDT(
-        DT::datatable(
-          result(),
-          selection = "none",
-          options = list(
-            pageLength = 5L,
-            processing = FALSE
-          )
-        ),
-        server = TRUE
-      )
+      output$result <- block_output(x, result)
 
       list(
         result = result,

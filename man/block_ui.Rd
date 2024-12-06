@@ -5,6 +5,8 @@
 \alias{fields_ui.dataset_block}
 \alias{block_ui}
 \alias{fields_ui}
+\alias{block_output}
+\alias{block_output.block}
 \title{Generics for UI generation}
 \usage{
 \method{block_ui}{data_block}(x, ...)
@@ -14,11 +16,17 @@
 block_ui(x, ...)
 
 fields_ui(x, ...)
+
+block_output(x, result)
+
+\method{block_output}{block}(x, result)
 }
 \arguments{
-\item{x}{Object for which to generate a UI container.}
+\item{x}{Object for which to generate a UI container}
 
 \item{...}{Generic consistency}
+
+\item{result}{Reactive block result}
 }
 \description{
 Generics for creating fields and block UI containers.
