@@ -9,9 +9,9 @@
 \alias{block_output.block}
 \title{Generics for UI generation}
 \usage{
-\method{block_ui}{data_block}(x, ...)
+\method{block_ui}{data_block}(x, id, ...)
 
-\method{fields_ui}{dataset_block}(x, ...)
+\method{fields_ui}{dataset_block}(x, id, ...)
 
 block_ui(x, ...)
 

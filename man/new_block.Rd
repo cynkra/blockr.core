@@ -4,7 +4,6 @@
 \alias{new_block}
 \alias{is_block}
 \alias{block_uid}
-\alias{block_ns}
 \alias{block_state}
 \alias{block_expr}
 \alias{block_splice}
@@ -15,8 +14,6 @@ new_block(expr, class, state = list(), splice = FALSE, uid = rand_names(), ...)
 is_block(x)
 
 block_uid(x)
-
-block_ns(x, ...)
 
 block_state(x, selection = character())
 

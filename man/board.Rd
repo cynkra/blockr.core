@@ -15,7 +15,7 @@ dashboard_server(id)
 
 network_ui(id)
 
-network_server(id, rv_nodes)
+network_server(id)
 
 board_ui(id)
 
@@ -23,10 +23,6 @@ board_server(id)
 }
 \arguments{
 \item{id}{Unique id.}
-
-\item{rv_nodes}{Data frame of nodes. Each time new block is added,
-a row is appended to this dataframe so the graph is updated via a proxy
-(avoids to redraw the entire graph)}
 }
 \description{
 The board is composed of 2 views pointing to the network module

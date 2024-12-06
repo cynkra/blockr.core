@@ -59,19 +59,43 @@ dashboard_server <- function(id) {
 #' @export
 network_ui <- function(id) {
   ns <- NS(id)
-  visNetworkOutput(ns("network"))
+  # Note: semantic ordering so that
+  # elements can be used in the board in different places.
+  list(
+    action_bar = tagList(
+      actionButton(
+        ns("add_block"),
+        "New block",
+        icon = icon("circle-plus"),
+        class = "btn-light"
+      ),
+      scoutbar(
+        ns("scoutbar"),
+        placeholder = "Search for a block",
+       actions = blk_choices()
+      )
+    ),
+    sidebar = div(
+      class = "btn-group",
+      role = "group",
+      actionButton(ns("add_block_to"), "New block", icon = icon("circle-plus"), class = "btn-light"),
+      actionButton(ns("remove"), "Remove block", icon = icon("trash"), class = "btn-light"),
+    ),
+    canvas = visNetworkOutput(ns("network"))
+  )
 }
 
-#' @param rv_nodes Data frame of nodes. Each time new block is added,
-#' a row is appended to this dataframe so the graph is updated via a proxy
-#' (avoids to redraw the entire graph)
 #' @rdname board
 #' @export
-network_server <- function(id, rv_nodes) {
+network_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    rv_edges <- reactiveVal(data.frame())
+    rv <- reactiveValues(
+      edges = data.frame(),
+      nodes = data.frame(),
+      new_block = NULL
+    )
 
     output$network <- renderVisNetwork({
       # Initialized as empty, we'll update with the proxy
@@ -87,10 +111,59 @@ network_server <- function(id, rv_nodes) {
         )
     })
 
-    # Add nodes when needed
-    observeEvent(rv_nodes(), {
+    # Trigger add block
+    observeEvent(input$add_block, {
+      update_scoutbar(
+        session,
+        "scoutbar",
+        revealScoutbar = TRUE
+      )
+    })
+
+    # Adding a block, we need to instantiate the block
+    # server module + update the vals$node so the graph is updated
+    observeEvent(input$scoutbar, {
+      # Construct block with empty defaults
+      # TBD: maybe we want to provide more choices
+      # but that would require more UI elements
+      rv$new_block <- available_blocks()[[input$scoutbar]]()
+
+      # Update node vals for the network rendering
+      id <- attr(rv$new_block, "uid")
+      tmp_network_data <- data.frame(
+        id = id,
+        label = attr(rv$new_block, "class")[1],
+        # color = "red",
+        title = NA,
+        shape = "circle",
+        stack = NA,
+        icon.code = NA
+      )
+      if (nrow(rv$nodes) == 0) {
+        rv$nodes <- tmp_network_data
+      } else {
+        rv$nodes <- rbind(
+          rv$nodes,
+          tmp_network_data
+        )
+      }
+
       visNetworkProxy(ns("network")) |>
-        visUpdateNodes(rv_nodes())
+        visUpdateNodes(rv$nodes)
+    })
+
+    # TBD: implement add_block_to -> add a block after the selected one
+    # We need a contextual registry and update the scoutbar with relevant
+    # choices. I think we can use the same scoutbar as for the classic
+    # add block with all choices.
+
+    # Remove a block
+    # TBD: how do we handle multi block removal?
+    observeEvent(input$remove, {
+      row_to_remove <- which(rv$nodes$id == input$network_selected)
+      rv$nodes <- rv$nodes[-row_to_remove, ]
+      visNetworkProxy(ns("network")) |>
+        visRemoveNodes(input$network_selected)
     })
 
     # TBD implement edge creation
@@ -100,8 +173,15 @@ network_server <- function(id, rv_nodes) {
     # as well as the selected items such as current node and/or edge.
     return(
       list(
-        connections = rv_edges,
-        selected_node = reactive(input$network_selected)
+        edges = reactive(rv$edges),
+        nodes = reactive(rv$nodes),
+        selected_node = reactive(input$network_selected),
+        added_block = reactive(rv$new_block),
+        removed_block = eventReactive(input$remove, {
+          # Contains the UID of the block module to remove from
+          # the board
+          input$network_selected
+        })
       )
     )
   })
@@ -116,18 +196,16 @@ network_server <- function(id, rv_nodes) {
 #' @export
 board_ui <- function(id) {
   ns <- NS(id)
+
+  network_ui <- network_ui(ns("dag"))
+
   tagList(
     div(
       class = "d-flex justify-content-center align-items-center",
       div(
         class = "btn-group",
         role = "group",
-        actionButton(
-          ns("add_block"),
-          "New block",
-          icon = icon("circle-plus"),
-          class = "btn-light"
-        ),
+        network_ui$action_bar,
         shinyWidgets::switchInput(
           ns("board_mode"),
           onLabel = "Network",
@@ -152,20 +230,9 @@ board_ui <- function(id) {
             position = "right",
             # Node module (ui filters + output)
             uiOutput(ns("node_ui")),
-            # Remove and add next block are not part of the block module.
-            div(
-              class = "btn-group",
-              role = "group",
-              actionButton(ns("add_block_to"), "New block", icon = icon("circle-plus"), class = "btn-light"),
-              actionButton(ns("remove"), "Remove block", icon = icon("trash"), class = "btn-light"),
-            )
+            network_ui$sidebar
           ),
-          scoutbar(
-            ns("scoutbar"),
-            placeholder = "Search for a block",
-            actions = blk_choices()
-          ),
-          network_ui(ns("dag"))
+          network_ui$canvas
         )
       ),
       tabPanelBody(
@@ -184,21 +251,12 @@ board_server <- function(id) {
     function(input, output, session) {
       ns <- session$ns
 
-      # The board must know about the blocks and nodes
-      vals <- reactiveValues(
-        blocks = list(),
-        nodes = data.frame()
-      )
+      # The board must know about the blocks
+      rv <- reactiveValues(blocks = list())
 
       # DAG representation
       # network_out$connections: dataframe of connected node ids.
-      network_out <- network_server(
-        "dag",
-        rv_nodes = reactive({
-          req(nrow(vals$nodes) > 0)
-          vals$nodes
-        })
-      )
+      network_out <- network_server("dag")
 
       # Dashboard mode
       dashboard_server("dash")
@@ -206,72 +264,55 @@ board_server <- function(id) {
       # Switch between dashboard and network view
       # TBD: ideally we create a toggle input with 2 values
       observeEvent(input$board_mode, {
+        tab <- if (input$board_mode) "network" else "dashboard"
         updateTabsetPanel(
           session,
           "board_tabs",
-          selected = sprintf("%s_tab", input$board_mode)
+          selected = sprintf("%s_tab", tab)
         )
       })
 
-      # Remove a block
-      # We update reactives which will propagate to the
-      # network module to update the visuals
-      observeEvent(input$remove, {
-        vals$blocks[[network_out$selected()]] <- NULL
-        vals$nodes <- vals$nodes[-network_out$selected(), ]
-      })
-
-      # TBD: implement add_block_to -> add a block after the selected one
-
-      # Adding a block, we need to instantiate the block
-      # server module + update the vals$node so the graph is updated
-      observeEvent(input$add_block, {
-        update_scoutbar(
-          session,
-          "scoutbar",
-          revealScoutbar = TRUE
+      # Call block server module when node is added or removed
+      observeEvent(network_out$added_block(), {
+        blk <- network_out$added_block()
+        rv$blocks[[attr(blk, "uid")]] <- list(
+          # We need the block object to render the UI
+          block = blk,
+          # The server is the module from which we can
+          # extract data, ...
+          server = block_server(blk)
         )
       })
-
-      observeEvent(input$scoutbar, {
-        # Construct block with empty defaults
-        # TBD: maybe we want to provide more choices
-        # but that would require more UI elements
-        tmp_block <- available_blocks()[[input$scoutbar]]()
-
-        # Update node vals for the network rendering
-        tmp_network_data <- data.frame(
-          id = attr(tmp_block, "uid"),
-          label = attr(tmp_block, "class")[1],
-          # color = "red",
-          title = NA,
-          shape = "circle",
-          stack = NA,
-          icon.code = NA
-        )
-        if (nrow(vals$nodes) == 0) {
-          vals$nodes <- tmp_network_data
-        } else {
-          vals$nodes <- rbind(
-            vals$nodes,
-            tmp_network_data
-          )
-        }
-
-        # TBD maybe we want to store the block object + its server returned values...
-        vals$blocks[[attr(tmp_block, "uid")]] <- list(
-          block = tmp_block,
-          server = block_server(tmp_block)
-        )
+      
+      observeEvent(network_out$removed_block(), {
+        removeUI(sprintf("#%s", ns(network_out$removed_block())))
+        rv$blocks[[network_out$removed_block()]] <- NULL
       })
 
       # When a node is selected, we need to display
       # sidebar with node UI module.
-      # FIXME: with render UI, we lost input values choices
-      # when a node get unselected. Is this a real issue?
-      output$node_ui <- renderUI({
-        req(nchar(network_out$selected()) > 0)
-        block_ui(vals$blocks[[network_out$selected()]]$block)
+      # FIXME: at the moment, rv$blocks[[network_out$selected()]]$block
+      # contains the block state when it was created, so UI inputs
+      # are not synced with the server part.
+      observeEvent({
+        req(
+          nchar(network_out$selected()) > 0,
+          rv$blocks[[network_out$selected()]]
+        )
+      }, {
+        # TBD: find a way to restore the block state
+        # where is was on the server.
+        blk <- rv$blocks[[network_out$selected()]]$block
+        id <- ns(attr(blk, "uid"))
+        removeUI(sprintf("#%s", id))
+        insertUI(
+          sprintf("#%s .sidebar-content", ns("sidebar")),
+          where = "afterBegin",
+          ui = block_ui(
+            blk,
+            id = ns(attr(blk, "uid"))
+          )
+        )
       })
 
       observeEvent(network_out$selected(),

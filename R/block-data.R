@@ -20,9 +20,12 @@ block_server.data_block <- function(x, data = list(), ...) {
 
 #' @rdname block_ui
 #' @export
-block_ui.data_block <- function(x, ...) {
-  tagList(
-    fields_ui(x),
-    DT::dataTableOutput(block_ns(x, "result"))
+block_ui.data_block <- function(x, id, ...) {
+  ns <- NS(id)
+
+  div(
+    id = id,
+    fields_ui(x, id = ns("fields")),
+    DT::dataTableOutput(ns("result"))
   )
 }

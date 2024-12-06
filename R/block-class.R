@@ -37,27 +37,6 @@ block_uid <- function(x) {
   attr(x, "uid")
 }
 
-#' @rdname new_block
-#' @export
-block_ns <- function(x, ...) {
-
-  ns <- NS(block_uid(x))
-
-  len <- ...length()
-
-  if (len > 1L) {
-    for (i in seq_len(len - 1L)) {
-      ns <- NS(ns(...elt(i)))
-    }
-  }
-
-  if (len > 0L) {
-    return(ns(...elt(len)))
-  }
-
-  ns
-}
-
 #' @param selection State attribute to return
 #' @rdname new_block
 #' @export
@@ -144,7 +123,7 @@ evaluate_block.block <- function(x, env = list(), ...) {
 #' @export
 serve.block <- function(x, data = list(), ...) {
 
-  ui <- bslib::page_fluid(block_ui(x))
+  ui <- bslib::page_fluid(block_ui(x, attr(x, "uid")))
 
   server <- function(input, output, session) {
     block_server(x, data)

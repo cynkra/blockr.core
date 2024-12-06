@@ -51,9 +51,12 @@ fields_server.dataset_block <- function(x, data = list(), ...) {
 
 #' @rdname block_ui
 #' @export
-fields_ui.dataset_block <- function(x, ...) {
+fields_ui.dataset_block <- function(x, id, ...) {
+
+  ns <- NS(id)
+
   selectInput(
-    inputId = block_ns(x, "fields", "dataset"),
+    inputId = ns("dataset"),
     label = "Dataset",
     choices = block_state(x, "options"),
     selected = block_state(x, "dataset")
