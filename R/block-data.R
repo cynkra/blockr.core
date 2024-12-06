@@ -2,7 +2,7 @@
 #' @export
 block_server.data_block <- function(x, input = list(), ...) {
   moduleServer(
-    block_uid(x, prefix = "block"),
+    block_uid(x),
     function(input, output, session) {
 
       fields <- fields_server(x, input)
@@ -33,6 +33,6 @@ block_server.data_block <- function(x, input = list(), ...) {
 block_ui.data_block <- function(x, ...) {
   tagList(
     fields_ui(x),
-    DT::dataTableOutput(block_ns(x, "result", prefix = "block"))
+    DT::dataTableOutput(block_ns(x, "result"))
   )
 }

@@ -14,9 +14,9 @@ new_block(expr, class, state = list(), splice = FALSE, uid = rand_names(), ...)
 
 is_block(x)
 
-block_uid(x, prefix = character())
+block_uid(x)
 
-block_ns(x, input_id = character(), prefix = character())
+block_ns(x, ...)
 
 block_state(x, selection = character())
 
@@ -40,10 +40,6 @@ of the fields)}
 \item{...}{Further (metadata) attributes}
 
 \item{x}{An object inheriting from \code{"block"}}
-
-\item{prefix}{UID prefix (for module ID generation)}
-
-\item{input_id}{Input ID (for ns generation)}
 
 \item{selection}{State attribute to return}
 }

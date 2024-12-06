@@ -25,7 +25,7 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
   }
 
   new_block(
-    quote(`::`(as.name(.(package)), as.name(.(dataset)))),
+    quote(`::`(.(package), .(dataset))),
     class = c("dataset_block", "data_block"),
     state = list(
       dataset = dataset,
@@ -40,7 +40,7 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
 #' @export
 fields_server.dataset_block <- function(x, input = list(), ...) {
   moduleServer(
-    block_uid(x, prefix = "fields"),
+    "fields",
     function(input, output, session) {
       list(
         dataset = reactive(input$dataset)
@@ -53,7 +53,7 @@ fields_server.dataset_block <- function(x, input = list(), ...) {
 #' @export
 fields_ui.dataset_block <- function(x, ...) {
   selectInput(
-    inputId = block_ns(x, "dataset", prefix = "fields"),
+    inputId = block_ns(x, "fields", "dataset"),
     label = "Dataset",
     choices = block_state(x, "options"),
     selected = block_state(x, "dataset")

@@ -9,9 +9,9 @@
 \alias{evaluate_block.block}
 \title{Interpolate block expression}
 \usage{
-interpolate_expr(x, input = list(), values = block_state(x))
+interpolate_expr(x, input = list(), values = list())
 
-\method{interpolate_expr}{block}(x, input = list(), values = block_state(x))
+\method{interpolate_expr}{block}(x, input = list(), values = list())
 
 generate_code(x, ...)
 

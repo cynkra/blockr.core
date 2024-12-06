@@ -31,30 +31,28 @@ is_block <- function(x) {
   inherits(x, "block")
 }
 
-#' @param prefix UID prefix (for module ID generation)
 #' @rdname new_block
 #' @export
-block_uid <- function(x, prefix = character()) {
-
-  res <- attr(x, "uid")
-
-  if (length(prefix)) {
-    stopifnot(is_string(prefix))
-    return(paste0(prefix, "_", res))
-  }
-
-  res
+block_uid <- function(x) {
+  attr(x, "uid")
 }
 
-#' @param input_id Input ID (for ns generation)
 #' @rdname new_block
 #' @export
-block_ns <- function(x, input_id = character(), prefix = character()) {
+block_ns <- function(x, ...) {
 
-  ns <- NS(block_uid(x, prefix))
+  ns <- NS(block_uid(x))
 
-  if (length(input_id)) {
-    return(ns(input_id))
+  len <- ...length()
+
+  if (len > 1L) {
+    for (i in seq_len(len - 1L)) {
+      ns <- NS(ns(...elt(i)))
+    }
+  }
+
+  if (len > 0L) {
+    return(ns(...elt(len)))
   }
 
   ns
