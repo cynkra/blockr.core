@@ -5,14 +5,14 @@
 \alias{serve}
 \title{Serve object}
 \usage{
-\method{serve}{block}(x, input = list(), ...)
+\method{serve}{block}(x, data = list(), ...)
 
 serve(x, ...)
 }
 \arguments{
 \item{x}{Object}
 
-\item{input}{Data input}
+\item{data}{Data input}
 }
 \description{
 Start up shiny app.

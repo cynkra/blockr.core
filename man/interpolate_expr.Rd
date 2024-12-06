@@ -9,9 +9,9 @@
 \alias{evaluate_block.block}
 \title{Interpolate block expression}
 \usage{
-interpolate_expr(x, input = list(), values = list())
+interpolate_expr(x, data = list(), values = list())
 
-\method{interpolate_expr}{block}(x, input = list(), values = list())
+\method{interpolate_expr}{block}(x, data = list(), values = list())
 
 generate_code(x, ...)
 
@@ -24,7 +24,7 @@ evaluate_block(x, env = list(), ...)
 \arguments{
 \item{x}{An object inheriting from \code{block}}
 
-\item{input}{Data input}
+\item{data}{Data input}
 
 \item{values}{Block field values}
 

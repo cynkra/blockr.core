@@ -1,11 +1,11 @@
 #' @rdname block_server
 #' @export
-block_server.data_block <- function(x, input = list(), ...) {
+block_server.data_block <- function(x, data = list(), ...) {
   moduleServer(
     block_uid(x),
     function(input, output, session) {
 
-      fields <- fields_server(x, input)
+      fields <- fields_server(x, data)
       result <- reactive(evaluate_block(x, values = lapply(fields, reval)))
 
       output$result <- block_output(x, result)

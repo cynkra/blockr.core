@@ -38,7 +38,7 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
 
 #' @rdname block_server
 #' @export
-fields_server.dataset_block <- function(x, input = list(), ...) {
+fields_server.dataset_block <- function(x, data = list(), ...) {
   moduleServer(
     "fields",
     function(input, output, session) {

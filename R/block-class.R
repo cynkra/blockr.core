@@ -91,21 +91,21 @@ block_splice <- function(x) {
 #' interpolating using [base::bquote()].
 #'
 #' @param x An object inheriting from `block`
-#' @param input Data input
+#' @param data Data input
 #' @param values Block field values
 #'
 #' @export
-interpolate_expr <- function(x, input = list(), values = list()) {
+interpolate_expr <- function(x, data = list(), values = list()) {
   UseMethod("interpolate_expr")
 }
 
 #' @rdname interpolate_expr
 #' @export
-interpolate_expr.block <- function(x, input = list(), values = list()) {
+interpolate_expr.block <- function(x, data = list(), values = list()) {
 
   args <- block_state(x)
   args[names(values)] <- values
-  args <- c(lapply(input, as.name), args)
+  args <- c(lapply(data, as.name), args)
 
   do.call(bquote, list(block_expr(x), where = args, splice = block_splice(x)))
 }
@@ -139,17 +139,15 @@ evaluate_block.block <- function(x, env = list(), ...) {
   eval(interpolate_expr(x, ...), env)
 }
 
-#' @param input Data input
+#' @param data Data input
 #' @rdname serve
 #' @export
-serve.block <- function(x, input = list(), ...) {
+serve.block <- function(x, data = list(), ...) {
 
   ui <- bslib::page_fluid(block_ui(x))
 
-  data_input <- input
-
   server <- function(input, output, session) {
-    block_server(x, data_input)
+    block_server(x, data)
   }
 
   shinyApp(ui, server)

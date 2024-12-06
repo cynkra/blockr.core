@@ -8,18 +8,18 @@
 \alias{fields_server}
 \title{Generics for server generation}
 \usage{
-\method{block_server}{data_block}(x, input = list(), ...)
+\method{block_server}{data_block}(x, data = list(), ...)
 
-\method{fields_server}{dataset_block}(x, input = list(), ...)
+\method{fields_server}{dataset_block}(x, data = list(), ...)
 
-block_server(x, input = list(), ...)
+block_server(x, data = list(), ...)
 
-fields_server(x, input = list(), ...)
+fields_server(x, data = list(), ...)
 }
 \arguments{
 \item{x}{Object for which to generate a \code{\link[=moduleServer]{moduleServer()}}}
 
-\item{input}{Data input (list of reactive values)}
+\item{data}{Data input (list of reactive values)}
 
 \item{...}{Generic consistency}
 }

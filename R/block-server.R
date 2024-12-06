@@ -3,16 +3,16 @@
 #' Calls shiny modules for the given element (block, fields).
 #'
 #' @param x Object for which to generate a [moduleServer()]
-#' @param input Data input (list of reactive values)
+#' @param data Data input (list of reactive values)
 #' @param ... Generic consistency
 #'
 #' @export
-block_server <- function(x, input = list(), ...) {
+block_server <- function(x, data = list(), ...) {
   UseMethod("block_server")
 }
 
 #' @rdname block_server
 #' @export
-fields_server <- function(x, input = list(), ...) {
+fields_server <- function(x, data = list(), ...) {
   UseMethod("fields_server")
 }
