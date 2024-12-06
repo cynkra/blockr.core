@@ -1,0 +1,39 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# blockr2
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+Designed to democratize data analysis, `blockr2` provides a flexible, intuitive, and __code-free__ approach to building data pipelines.
+
+## Installation
+
+You can install the development version of blockr2 from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("cynkra/blockr2")
+```
+
+## Example
+
+A single block server instance can be spun up as
+
+```{r eval = FALSE}
+library(blockr2)
+serve(new_dataset_block("iris"))
+```
