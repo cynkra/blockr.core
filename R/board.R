@@ -170,6 +170,7 @@ network_server <- function(id) {
 
     # Trigger add block
     observeEvent(input$add_block, {
+      rv$new_block <- NULL
       update_scoutbar(
         session,
         "scoutbar",
@@ -240,17 +241,18 @@ board_ui <- function(id) {
   tagList(
     div(
       class = "d-flex justify-content-center align-items-center",
+      shinyWidgets::switchInput(
+        ns("board_mode"),
+        onStatus = "default",
+        onLabel = icon("network-wired"),
+        offLabel = icon("table-columns"),
+        value = TRUE,
+        size = "mini"
+      ),
       div(
         class = "btn-group",
         role = "group",
-        network_ui$action_bar,
-        shinyWidgets::switchInput(
-          ns("board_mode"),
-          onLabel = "Network",
-          offLabel = "Dashboard",
-          value = TRUE,
-          size = "mini"
-        )
+        network_ui$action_bar
       )
     ),
     tabsetPanel(
@@ -325,6 +327,7 @@ board_server <- function(id) {
       observeEvent(network_out$removed_block(), {
         removeUI(sprintf("#%s", ns(network_out$removed_block())))
         rv$blocks[[network_out$removed_block()]] <- NULL
+        bslib::toggle_sidebar("sidebar", open = FALSE)
       })
 
       # When a node is selected, we need to display
