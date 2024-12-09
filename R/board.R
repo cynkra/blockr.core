@@ -85,6 +85,63 @@ network_ui <- function(id) {
   )
 }
 
+#' Add a node
+#' 
+#' Update dataframe for visNetwork graph
+#' 
+#' @param new New block to insert. Must be a valid
+#' block registry entry
+#' @param nodes dataframe representing network data.
+#' @keywords internal
+add_node <- function(new, nodes) {
+
+  stopifnot(
+    is_block(new),
+    is.data.frame(nodes)
+  )
+
+  node_data <- data.frame(
+    id = block_uid(new),
+    label = attr(new, "class")[1],
+    # color = "red",
+    title = NA,
+    shape = "circle",
+    stack = NA,
+    icon.code = NA
+  )
+
+  if (nrow(nodes) == 0) {
+    node_data
+  } else {
+    rbind(
+      nodes,
+      node_data
+    )
+  }
+}
+
+#' Remove a node
+#' 
+#' Update dataframe for visNetwork graph
+#' 
+#' @param selected UID (character string) of node to remove.
+#' @param nodes dataframe representing network data.
+#' @keywords internal
+remove_node <- function(selected, nodes) {
+  stopifnot(
+    is.data.frame(nodes),
+    nrow(nodes) > 0,
+    is.character(selected),
+    nchar(selected) > 0
+  )
+
+  to_remove <- which(nodes$id == selected)
+  if (length(to_remove) == 0) {
+    stop(sprintf("Can't find node with id %s in the data", selected))
+  }
+  nodes[-to_remove, ]
+}
+
 #' @rdname board
 #' @export
 network_server <- function(id) {
@@ -120,8 +177,7 @@ network_server <- function(id) {
       )
     })
 
-    # Adding a block, we need to instantiate the block
-    # server module + update the vals$node so the graph is updated
+    # Adding a block, we update the rv$nodes so the graph is updated
     observeEvent(input$scoutbar, {
       # Construct block with empty defaults
       # TBD: maybe we want to provide more choices
@@ -129,24 +185,7 @@ network_server <- function(id) {
       rv$new_block <- available_blocks()[[input$scoutbar]]()
 
       # Update node vals for the network rendering
-      id <- attr(rv$new_block, "uid")
-      tmp_network_data <- data.frame(
-        id = id,
-        label = attr(rv$new_block, "class")[1],
-        # color = "red",
-        title = NA,
-        shape = "circle",
-        stack = NA,
-        icon.code = NA
-      )
-      if (nrow(rv$nodes) == 0) {
-        rv$nodes <- tmp_network_data
-      } else {
-        rv$nodes <- rbind(
-          rv$nodes,
-          tmp_network_data
-        )
-      }
+      rv$nodes <- add_node(rv$new_block, rv$nodes)
 
       visNetworkProxy(ns("network")) |>
         visUpdateNodes(rv$nodes)
@@ -160,8 +199,7 @@ network_server <- function(id) {
     # Remove a block
     # TBD: how do we handle multi block removal?
     observeEvent(input$remove, {
-      row_to_remove <- which(rv$nodes$id == input$network_selected)
-      rv$nodes <- rv$nodes[-row_to_remove, ]
+      rv$nodes <- remove_node(input$network_selected, rv$nodes)
       visNetworkProxy(ns("network")) |>
         visRemoveNodes(input$network_selected)
     })
@@ -275,7 +313,7 @@ board_server <- function(id) {
       # Call block server module when node is added or removed
       observeEvent(network_out$added_block(), {
         blk <- network_out$added_block()
-        rv$blocks[[attr(blk, "uid")]] <- list(
+        rv$blocks[[block_uid(blk)]] <- list(
           # We need the block object to render the UI
           block = blk,
           # The server is the module from which we can
@@ -303,14 +341,14 @@ board_server <- function(id) {
         # TBD: find a way to restore the block state
         # where is was on the server.
         blk <- rv$blocks[[network_out$selected()]]$block
-        id <- ns(attr(blk, "uid"))
+        id <- ns(block_uid(blk))
         removeUI(sprintf("#%s", id))
         insertUI(
           sprintf("#%s .sidebar-content", ns("sidebar")),
           where = "afterBegin",
           ui = block_ui(
             blk,
-            id = ns(attr(blk, "uid"))
+            id = id
           )
         )
       })
