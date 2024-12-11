@@ -29,7 +29,7 @@ block_server.data_block <- function(x, ...) {
 #' @export
 block_ui.data_block <- function(x, ...) {
   tagList(
-    expr_ui(x),
+    expr_ui(x, ...),
     DT::dataTableOutput(block_ns(x, "result"))
   )
 }
