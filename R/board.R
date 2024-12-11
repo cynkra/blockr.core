@@ -192,6 +192,8 @@ network_server <- function(id) {
         visUpdateNodes(rv$nodes)
     })
 
+    # TBD handle node update: change of color due to block validity change ...
+
     # TBD: implement add_block_to -> add a block after the selected one
     # We need a contextual registry and update the scoutbar with relevant
     # choices. I think we can use the same scoutbar as for the classic
