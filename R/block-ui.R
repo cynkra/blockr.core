@@ -19,7 +19,8 @@ expr_ui <- function(x, ...) {
 #' @rdname block_ui
 #' @export
 expr_ui.dataset_block <- function(x, ...) {
-  x[["expr_ui"]]
+  fun <- block_expr_ui(x)
+  eval(fun(block_ns(x)), envir = list(...), enclos = environment(fun))
 }
 
 #' @param result Reactive block result

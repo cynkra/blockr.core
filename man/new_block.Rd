@@ -5,9 +5,8 @@
 \alias{is_block}
 \alias{block_uid}
 \alias{block_ns}
-\alias{block_state}
-\alias{block_expr}
-\alias{block_splice}
+\alias{block_expr_server}
+\alias{block_expr_ui}
 \alias{new_data_block}
 \title{Blocks}
 \usage{
@@ -19,15 +18,18 @@ block_uid(x)
 
 block_ns(x, ...)
 
-block_state(x, selection = character())
+block_expr_server(x)
 
-block_expr(x)
-
-block_splice(x)
+block_expr_ui(x)
 
 new_data_block(expr_server, expr_ui, class, ...)
 }
 \arguments{
+\item{expr_server}{A function returning \code{\link[shiny:moduleServer]{shiny::moduleServer()}}}
+
+\item{expr_ui}{A function with a single argument (\code{ns}) returning a
+\code{shiny.tag}}
+
 \item{class}{Block subclass}
 
 \item{uid}{Unique block ID}
@@ -35,16 +37,6 @@ new_data_block(expr_server, expr_ui, class, ...)
 \item{...}{Further (metadata) attributes}
 
 \item{x}{An object inheriting from \code{"block"}}
-
-\item{selection}{State attribute to return}
-
-\item{expr}{A quoted expression (compatible with partial substitution as
-implemented in \code{\link[base:bquote]{base::bquote()}} and intended for evaluation in the context
-of the fields)}
-
-\item{state}{List of values defining the block state}
-
-\item{splice}{See \code{\link[base:bquote]{base::bquote()}}}
 }
 \description{
 Blocks consist of an expression that defines what the block produces (given

@@ -9,7 +9,7 @@
 #'
 #' @export
 new_dataset_block <- function(dataset = character(), package = "datasets",
-                              uid = rand_names(), ...) {
+                              ...) {
 
   is_dataset_eligible <- function(x, pkg) {
     inherits(do.call("::", list(pkg = pkg, name = x)), "data.frame")
@@ -29,11 +29,10 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
       moduleServer(
         "expression",
         function(input, output, session) {
-
           list(
             expr = reactive(
               bquote(
-                `::`(.(pkg), .(dat)),
+                as.call(c(as.symbol("::"), quote(.(pkg)), quote(.(dat)))),
                 list(pkg = as.name(package), dat = as.name(input$dataset))
               )
             ),
@@ -45,12 +44,12 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
         }
       )
     },
-    function(dat = dataset, pkg = package) {
+    function(ns) {
       selectInput(
-        inputId = block_ns(x, "fields", "dataset"),
+        inputId = ns("expression", "dataset"),
         label = "Dataset",
-        choices = list_datasets(pkg),
-        selected = dat
+        choices = list_datasets(package),
+        selected = dataset
       )
     },
     class = "dataset_block",

@@ -6,20 +6,20 @@ new_data_block <- function(expr_server, expr_ui, class, ...) {
 
 #' @rdname block_server
 #' @export
-block_server.data_block <- function(x, data = list(), ...) {
+block_server.data_block <- function(x, ...) {
   moduleServer(
     block_uid(x),
     function(input, output, session) {
 
-      fields <- expr_server(x)
+      expr <- expr_server(x)
 
-      result <- reactive(evaluate_block(x, values = lapply(fields, reval)))
+      result <- reactive(eval(expr$expr()))
 
       output$result <- block_output(x, result)
 
-      list(
-        result = result,
-        code = reactive(generate_code(x, values = lapply(fields, reval)))
+      c(
+        list(result = result),
+        expr
       )
     }
   )
@@ -29,7 +29,7 @@ block_server.data_block <- function(x, data = list(), ...) {
 #' @export
 block_ui.data_block <- function(x, ...) {
   tagList(
-    expr_ui(x)(...),
+    expr_ui(x),
     DT::dataTableOutput(block_ns(x, "result"))
   )
 }
