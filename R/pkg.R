@@ -7,3 +7,5 @@
 #' @import shinyWidgets
 #' @import bslib
 NULL
+
+utils::globalVariables(c(".(pkg))"))

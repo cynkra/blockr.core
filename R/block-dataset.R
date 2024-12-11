@@ -24,41 +24,35 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
     options[lgl_ply(options, is_dataset_eligible, package)]
   }
 
-  new_block(
-    quote(`::`(.(package), .(dataset))),
-    class = c("dataset_block", "data_block"),
-    state = list(
-      dataset = dataset,
-      options = list_datasets(package),
-      package = package
-    ),
-    ...
-  )
-}
-
-#' @rdname block_server
-#' @export
-fields_server.dataset_block <- function(x, data = list(), ...) {
-  moduleServer(
-    "fields",
-    function(input, output, session) {
-      list(
-        dataset = reactive(input$dataset)
+  new_data_block(
+    function() {
+      moduleServer(
+        "expression",
+        function(input, output, session) {
+          list(
+            expr = reactive(
+              bquote(
+                as.call(c(as.symbol("::"), quote(.(pkg)), quote(.(dat)))),
+                list(pkg = as.name(package), dat = as.name(input$dataset))
+              )
+            ),
+            state = list(
+              dataset = reactive(input$dataset),
+              package = package
+            )
+          )
+        }
       )
-    }
-  )
-}
-
-#' @rdname block_ui
-#' @export
-fields_ui.dataset_block <- function(x, id, ...) {
-
-  ns <- NS(id)
-
-  selectInput(
-    inputId = ns("dataset"),
-    label = "Dataset",
-    choices = block_state(x, "options"),
-    selected = block_state(x, "dataset")
+    },
+    function(ns) {
+      selectInput(
+        inputId = ns("expression", "dataset"),
+        label = "Dataset",
+        choices = list_datasets(package),
+        selected = dataset
+      )
+    },
+    class = "dataset_block",
+    ...
   )
 }

@@ -13,6 +13,8 @@ serve(x, ...)
 \item{x}{Object}
 
 \item{data}{Data input}
+
+\item{...}{Generic consistency}
 }
 \description{
 Start up shiny app.

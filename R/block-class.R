@@ -4,24 +4,27 @@
 #' the result of the previous block combined with user input), plus a class
 #' attribute
 #'
-#' @param expr A quoted expression (compatible with partial substitution as
-#' implemented in [base::bquote()] and intended for evaluation in the context
-#' of the fields)
+#' @param expr_server A function returning [shiny::moduleServer()]
+#' @param expr_ui A function with a single argument (`ns`) returning a
+#'   `shiny.tag`
 #' @param class Block subclass
-#' @param state List of values defining the block state
-#' @param splice See [base::bquote()]
 #' @param uid Unique block ID
 #' @param ... Further (metadata) attributes
 #'
 #' @export
-new_block <- function(expr, class, state = list(), splice = FALSE,
-                      uid = rand_names(), ...) {
+new_block <- function(expr_server, expr_ui, class, uid = rand_names(), ...) {
 
-  stopifnot(is.language(expr), is.character(class), length(class) > 0L,
-            is.list(state))
+  stopifnot(
+    is.function(expr_server), is.function(expr_ui),
+    is.character(class), length(class) > 0L, is_string(uid)
+  )
 
-	structure(expr, state = state, splice = splice, ..., uid = uid,
-            class = c(class, "block"))
+	structure(
+    list(expr_server = expr_server, expr_ui = expr_ui),
+    ...,
+    uid = uid,
+    class = c(class, "block")
+  )
 }
 
 #' @param x An object inheriting from `"block"`
@@ -37,85 +40,46 @@ block_uid <- function(x) {
   attr(x, "uid")
 }
 
-#' @param selection State attribute to return
 #' @rdname new_block
 #' @export
-block_state <- function(x, selection = character()) {
+block_ns <- function(x, ...) {
 
-  res <- attr(x, "state")
+  fun <- function(...) {
 
-  if (length(selection)) {
-    return(res[[selection]])
+    ns <- NS(block_uid(x))
+
+    len <- ...length()
+
+    if (len > 1L) {
+      for (i in seq_len(len - 1L)) {
+        ns <- NS(ns(...elt(i)))
+      }
+    }
+
+    if (len > 0L) {
+      return(ns(...elt(len)))
+    }
+
+    ns
   }
 
-  res
+  if (...length()) {
+    return(fun(...))
+  }
+
+  fun
 }
 
 #' @rdname new_block
 #' @export
-block_expr <- function(x) {
-  attributes(x) <- NULL
-  x
+block_expr_server <- function(x) {
+  x[["expr_server"]]
 }
 
 #' @rdname new_block
 #' @export
-block_splice <- function(x) {
-  attr(x, "splice")
-}
-
-#' Interpolate block expression
-#'
-#' For a given block, generate the code using the block expression by
-#' interpolating using [base::bquote()].
-#'
-#' @param x An object inheriting from `block`
-#' @param data Data input
-#' @param values Block field values
-#'
-#' @export
-interpolate_expr <- function(x, data = list(), values = list()) {
-  UseMethod("interpolate_expr")
-}
-
-#' @rdname interpolate_expr
-#' @export
-interpolate_expr.block <- function(x, data = list(), values = list()) {
-
-  args <- block_state(x)
-  args[names(values)] <- values
-  args <- c(lapply(data, as.name), args)
-
-  do.call(bquote, list(block_expr(x), where = args, splice = block_splice(x)))
-}
-
-#' @param ... Forwarded to [interpolate_expr()]
-#' @rdname interpolate_expr
-#' @export
-generate_code <- function(x, ...) {
-  UseMethod("generate_code")
-}
-
-#' @rdname interpolate_expr
-#' @export
-generate_code.block <- function(x, ...) {
-  bquote(
-    .(lhs) <- .(rhs),
-    list(lhs = as.name(block_uid(x)), rhs = interpolate_expr(x, ...))
-  )
-}
-
-#' @param env Data envrionment
-#' @rdname interpolate_expr
-#' @export
-evaluate_block <- function(x, env = list(), ...) {
-  UseMethod("evaluate_block")
-}
-
-#' @rdname interpolate_expr
-#' @export
-evaluate_block.block <- function(x, env = list(), ...) {
-  eval(interpolate_expr(x, ...), env)
+block_expr_ui <- function(x) {
+  x[["expr_ui"]]
 }
 
 #' @param data Data input

@@ -33,6 +33,17 @@ is_number <- function(x) {
   is.numeric(x) && is_scalar(x) && !is.na(x) && !is.nan(x) && is.finite(x)
 }
 
+#' Random IDs
+#'
+#' Generate random unique IDs.
+#'
+#' @param old_names Disallowed IDs
+#' @param n Number of IDs to generate
+#' @param length ID length
+#' @param chars Allowed characters
+#' @param prefix,suffix ID pre-/suffix
+#'
+#' @export
 rand_names <- function(old_names = character(0L), n = 1L, length = 15L,
                        chars = letters, prefix = "", suffix = "") {
   stopifnot(
@@ -68,6 +79,7 @@ rand_names <- function(old_names = character(0L), n = 1L, length = 15L,
 #' Start up shiny app.
 #'
 #' @param x Object
+#' @param ... Generic consistency
 #'
 #' @export
 serve <- function(x, ...) {
@@ -102,5 +114,3 @@ dbl_xtr <- function(x, i, ...) dbl_ply(x, `[[`, i, ...)
 lst_xtr <- function(x, i) lapply(x, `[[`, i)
 
 map <- function(f, ..., use_names = FALSE) Map(f, ..., USE.NAMES = use_names)
-
-reval <- function(x) x()
