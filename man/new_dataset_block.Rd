@@ -4,7 +4,12 @@
 \alias{new_dataset_block}
 \title{Data block constructor}
 \usage{
-new_dataset_block(dataset = character(), package = "datasets", ...)
+new_dataset_block(
+  dataset = character(),
+  package = "datasets",
+  uid = rand_names(),
+  ...
+)
 }
 \arguments{
 \item{dataset}{Selected dataset}

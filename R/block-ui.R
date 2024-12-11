@@ -12,8 +12,14 @@ block_ui <- function(x, ...) {
 
 #' @rdname block_ui
 #' @export
-fields_ui <- function(x, ...) {
-  UseMethod("fields_ui")
+expr_ui <- function(x, ...) {
+  UseMethod("expr_ui")
+}
+
+#' @rdname block_ui
+#' @export
+expr_ui.dataset_block <- function(x, ...) {
+  x[["expr_ui"]]
 }
 
 #' @param result Reactive block result

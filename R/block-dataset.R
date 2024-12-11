@@ -9,7 +9,7 @@
 #'
 #' @export
 new_dataset_block <- function(dataset = character(), package = "datasets",
-                              ...) {
+                              uid = rand_names(), ...) {
 
   is_dataset_eligible <- function(x, pkg) {
     inherits(do.call("::", list(pkg = pkg, name = x)), "data.frame")
@@ -24,38 +24,36 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
     options[lgl_ply(options, is_dataset_eligible, package)]
   }
 
-  new_block(
-    quote(`::`(.(package), .(dataset))),
-    class = c("dataset_block", "data_block"),
-    state = list(
-      dataset = dataset,
-      options = list_datasets(package),
-      package = package
-    ),
-    ...
-  )
-}
+  new_data_block(
+    function() {
+      moduleServer(
+        "expression",
+        function(input, output, session) {
 
-#' @rdname block_server
-#' @export
-fields_server.dataset_block <- function(x, data = list(), ...) {
-  moduleServer(
-    "fields",
-    function(input, output, session) {
-      list(
-        dataset = reactive(input$dataset)
+          list(
+            expr = reactive(
+              bquote(
+                `::`(.(pkg), .(dat)),
+                list(pkg = as.name(package), dat = as.name(input$dataset))
+              )
+            ),
+            state = list(
+              dataset = reactive(input$dataset),
+              package = package
+            )
+          )
+        }
       )
-    }
-  )
-}
-
-#' @rdname block_ui
-#' @export
-fields_ui.dataset_block <- function(x, ...) {
-  selectInput(
-    inputId = block_ns(x, "fields", "dataset"),
-    label = "Dataset",
-    choices = block_state(x, "options"),
-    selected = block_state(x, "dataset")
+    },
+    function(dat = dataset, pkg = package) {
+      selectInput(
+        inputId = block_ns(x, "fields", "dataset"),
+        label = "Dataset",
+        choices = list_datasets(pkg),
+        selected = dat
+      )
+    },
+    class = "dataset_block",
+    ...
   )
 }

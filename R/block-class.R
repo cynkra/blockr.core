@@ -14,14 +14,16 @@
 #' @param ... Further (metadata) attributes
 #'
 #' @export
-new_block <- function(expr, class, state = list(), splice = FALSE,
-                      uid = rand_names(), ...) {
+new_block <- function(expr_server, expr_ui, class, uid = rand_names(), ...) {
 
-  stopifnot(is.language(expr), is.character(class), length(class) > 0L,
-            is.list(state))
+  stopifnot(is.character(class), length(class) > 0L, is_string(uid))
 
-	structure(expr, state = state, splice = splice, ..., uid = uid,
-            class = c(class, "block"))
+	structure(
+    list(expr_server = expr_server, expr_ui = expr_ui),
+    ...,
+    uid = uid,
+    class = c(class, "block")
+  )
 }
 
 #' @param x An object inheriting from `"block"`

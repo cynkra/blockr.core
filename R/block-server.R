@@ -13,6 +13,13 @@ block_server <- function(x, data = list(), ...) {
 
 #' @rdname block_server
 #' @export
-fields_server <- function(x, data = list(), ...) {
-  UseMethod("fields_server")
+expr_server <- function(x, data = list(), ...) {
+  UseMethod("expr_server")
 }
+
+#' @rdname block_server
+#' @export
+expr_server.block <- function(x, ...) {
+  x[["expr_server"]](...)
+}
+
