@@ -322,7 +322,7 @@ board_server <- function(id) {
           block = blk,
           # The server is the module from which we can
           # extract data, ...
-          server = block_server(blk)
+          server = block_server(blk, data = list())
         )
       })
       
@@ -341,9 +341,10 @@ board_server <- function(id) {
         )
         tmp <- rv$blocks[[selected]]
         isolate({
-          state <- lapply(tmp$server$state, reval)
-          #do.call(block_ui, c(list(x = tmp$block, id = id), state))
-          block_ui(tmp$block, id, state)
+          state <- lapply(tmp$server$state, \(el) {
+            if (is.reactive(el)) el() else el
+          })
+          do.call(block_ui, c(list(x = tmp$block, id = id), state))
         })
       })
 
