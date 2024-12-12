@@ -334,13 +334,17 @@ board_server <- function(id) {
       # When a node is selected, we need to display
       # sidebar with node UI module.
       output$node_ui <- renderUI({
+        selected <- network_out$selected()
         req(
-          nchar(network_out$selected()) > 0,
-          rv$blocks[[network_out$selected()]]
+          nchar(selected) > 0,
+          rv$blocks[[selected]]
         )
-        state <- rv$blocks[[network_out$selected()]]$server$state
-        blk <- rv$blocks[[network_out$selected()]]$block
-        block_ui(blk, id, state)
+        tmp <- rv$blocks[[selected]]
+        isolate({
+          state <- lapply(tmp$server$state, reval)
+          #do.call(block_ui, c(list(x = tmp$block, id = id), state))
+          block_ui(tmp$block, id, state)
+        })
       })
 
       observeEvent(network_out$selected(),
