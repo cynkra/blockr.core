@@ -36,6 +36,18 @@ is_block <- function(x) {
 
 #' @rdname new_block
 #' @export
+new_data_block <- function(expr_server, expr_ui, class, ...) {
+  new_block(expr_server, expr_ui, c(class, "data_block"), ...)
+}
+
+#' @rdname new_block
+#' @export
+new_transform_block <- function(expr_server, expr_ui, class, ...) {
+  new_block(expr_server, expr_ui, c(class, "transform_block"), ...)
+}
+
+#' @rdname new_block
+#' @export
 block_uid <- function(x) {
   attr(x, "uid")
 }
@@ -88,18 +100,8 @@ serve.block <- function(x, data, ...) {
 
   ui <- bslib::page_fluid(block_ui(x))
 
-  if (missing(data)) {
-
-    server <- function(input, output, session) {
-      block_server(x)
-    }
-
-  } else {
-
-    server <- function(input, output, session) {
-      block_server(x, lapply(data, reactiveVal))
-    }
-
+  server <- function(input, output, session) {
+    block_server(x, lapply(data, reactiveVal))
   }
 
   shinyApp(ui, server)
