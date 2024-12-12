@@ -4,27 +4,33 @@
 #' the result of the previous block combined with user input), plus a class
 #' attribute
 #'
-#' @param expr_server A function returning [shiny::moduleServer()]
-#' @param expr_ui A function with a single argument (`ns`) returning a
-#'   `shiny.tag`
+#' @param server A function returning [shiny::moduleServer()]
+#' @param ui A function with a single argument (`ns`) returning a `shiny.tag`
 #' @param class Block subclass
 #' @param uid Unique block ID
 #' @param ... Further (metadata) attributes
 #'
 #' @export
-new_block <- function(expr_server, expr_ui, class, uid = rand_names(), ...) {
+new_block <- function(server, ui, class, uid = rand_names(), ...) {
 
   stopifnot(
-    is.function(expr_server), is.function(expr_ui),
+    is.function(server), is.function(ui),
+    identical(names(formals(ui)), "ns"),
     is.character(class), length(class) > 0L, is_string(uid)
   )
 
-	structure(
-    list(expr_server = expr_server, expr_ui = expr_ui),
+	res <- structure(
+    list(expr_server = server, expr_ui = ui),
     ...,
     uid = uid,
     class = c(class, "block")
   )
+
+  stopifnot(
+    inherits(expr_ui(res), "shiny.tag")
+  )
+
+  res
 }
 
 #' @param x An object inheriting from `"block"`

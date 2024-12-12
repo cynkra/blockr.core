@@ -31,7 +31,8 @@ expr_ui <- function(x, ns = block_ns(x), ...) {
 #' @export
 expr_ui.block <- function(x, ns = block_ns(x), ...) {
   fun <- block_expr_ui(x)
-  eval(fun(ns), envir = list(...), enclos = environment(fun))
+  environment(fun) <- list2env(list(...), parent = environment(fun))
+  fun(ns)
 }
 
 #' @param result Reactive block result
