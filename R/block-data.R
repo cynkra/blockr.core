@@ -34,3 +34,10 @@ block_ui.data_block <- function(x, id = NULL, ...) {
     DT::dataTableOutput(block_ns(x, "result", namespace = id))
   )
 }
+
+#' @rdname block_server
+#' @export
+expr_server.data_block <- function(x, ...) {
+  server <- block_expr_server(x)
+  server(...)
+}

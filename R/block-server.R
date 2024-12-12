@@ -18,8 +18,6 @@ expr_server <- function(x, ...) {
 
 #' @rdname block_server
 #' @export
-expr_server.block <- function(x, ...) {
-  server <- block_expr_server(x)
-  server(...)
+expr_server.block <- function(x, data, ...) {
+  do.call(block_expr_server(x), data)
 }
-

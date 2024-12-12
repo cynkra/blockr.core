@@ -24,7 +24,8 @@ RoxygenNote: 7.3.1
 Imports:
     shiny (>= 1.5.0),
     DT,
-    bslib
+    bslib,
+    dplyr
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

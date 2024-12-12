@@ -84,13 +84,29 @@ block_expr_ui <- function(x) {
 #' @param data Data input
 #' @rdname serve
 #' @export
-serve.block <- function(x, data = list(), ...) {
+serve.block <- function(x, data, ...) {
 
   ui <- bslib::page_fluid(block_ui(x))
 
-  server <- function(input, output, session) {
-    block_server(x, data)
+  if (missing(data)) {
+
+    server <- function(input, output, session) {
+      block_server(x)
+    }
+
+  } else {
+
+    server <- function(input, output, session) {
+      block_server(x, lapply(data, reactiveVal))
+    }
+
   }
 
   shinyApp(ui, server)
+}
+
+#' @rdname new_block
+#' @export
+block_inputs <- function(x) {
+  formals(block_expr_server(x))
 }
