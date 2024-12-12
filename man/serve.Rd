@@ -2,10 +2,13 @@
 % Please edit documentation in R/block-class.R, R/utils.R
 \name{serve.block}
 \alias{serve.block}
+\alias{serve.data_block}
 \alias{serve}
 \title{Serve object}
 \usage{
 \method{serve}{block}(x, data, ...)
+
+\method{serve}{data_block}(x, ...)
 
 serve(x, ...)
 }

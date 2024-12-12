@@ -107,6 +107,12 @@ serve.block <- function(x, data, ...) {
   shinyApp(ui, server)
 }
 
+#' @rdname serve
+#' @export
+serve.data_block <- function(x, ...) {
+  NextMethod(data = list())
+}
+
 #' @rdname new_block
 #' @export
 block_inputs <- function(x) {
