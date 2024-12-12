@@ -3,11 +3,14 @@
 \name{serve.block}
 \alias{serve.block}
 \alias{serve}
+\alias{serve.character}
 \title{Serve object}
 \usage{
 \method{serve}{block}(x, data = list(), ...)
 
 serve(x, ...)
+
+\method{serve}{character}(x, ...)
 }
 \arguments{
 \item{x}{Object}

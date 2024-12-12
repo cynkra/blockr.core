@@ -86,6 +86,19 @@ serve <- function(x, ...) {
   UseMethod("serve")
 }
 
+#' @rdname serve
+#' @export
+serve.character <- function(x, ...) {
+
+  stopifnot(is_string(x))
+
+  server <- function(input, output, session) {
+    board_server(x)
+  }
+
+  shinyApp(board_ui(x), server)
+}
+
 chr_ply <- function(x, fun, ..., length = 1L, use_names = FALSE) {
   vapply(x, fun, character(length), ..., USE.NAMES = use_names)
 }

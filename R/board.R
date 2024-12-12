@@ -340,7 +340,7 @@ board_server <- function(id) {
         )
         state <- rv$blocks[[network_out$selected()]]$server$state
         blk <- rv$blocks[[network_out$selected()]]$block
-        block_ui(blk, id = "block", state)
+        block_ui(blk, id, state)
       })
 
       observeEvent(network_out$selected(),
