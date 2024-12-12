@@ -108,5 +108,5 @@ serve.block <- function(x, data, ...) {
 #' @rdname new_block
 #' @export
 block_inputs <- function(x) {
-  formals(block_expr_server(x))
+  names(formals(block_expr_server(x)))
 }
