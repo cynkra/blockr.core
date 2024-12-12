@@ -327,35 +327,19 @@ board_server <- function(id) {
       })
       
       observeEvent(network_out$removed_block(), {
-        removeUI(sprintf("#%s", ns(network_out$removed_block())))
         rv$blocks[[network_out$removed_block()]] <- NULL
         bslib::toggle_sidebar("sidebar", open = FALSE)
       })
 
       # When a node is selected, we need to display
       # sidebar with node UI module.
-      # FIXME: at the moment, rv$blocks[[network_out$selected()]]$block
-      # contains the block state when it was created, so UI inputs
-      # are not synced with the server part.
-      observeEvent({
+      output$node_ui <- renderUI({
         req(
           nchar(network_out$selected()) > 0,
           rv$blocks[[network_out$selected()]]
         )
-      }, {
-        # TBD: find a way to restore the block state
-        # where is was on the server.
-        blk <- rv$blocks[[network_out$selected()]]$block
-        id <- ns(block_uid(blk))
-        removeUI(sprintf("#%s", id))
-        insertUI(
-          sprintf("#%s .sidebar-content", ns("sidebar")),
-          where = "afterBegin",
-          ui = block_ui(
-            blk,
-            id = id
-          )
-        )
+        state <- rv$blocks[[network_out$selected()]]$server$state
+        block_ui(rv$blocks[[network_out$selected()]]$block, state)
       })
 
       observeEvent(network_out$selected(),
