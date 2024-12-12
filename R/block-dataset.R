@@ -31,9 +31,11 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
         function(input, output, session) {
           list(
             expr = reactive(
-              bquote(
-                as.call(c(as.symbol("::"), quote(.(pkg)), quote(.(dat)))),
-                list(pkg = as.name(package), dat = as.name(input$dataset))
+              eval(
+                bquote(
+                  as.call(c(as.symbol("::"), quote(.(pkg)), quote(.(dat)))),
+                  list(pkg = as.name(package), dat = as.name(input$dataset))
+                )
               )
             ),
             state = list(

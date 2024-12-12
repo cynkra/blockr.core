@@ -12,16 +12,14 @@ block_server.transform_block <- function(x, data, ...) {
     block_uid(x),
     function(input, output, session) {
 
-      exp_srv <- expr_server(x, data)
-      res <- reactive({
-        eval(exp_srv$expr(), lapply(data, function(x) x()))
-      })
+      exp <- expr_server(x, data)
+      res <- reactive(eval(exp$expr(), lapply(data, reval)))
 
       output$result <- block_output(x, res)
 
       c(
         list(result = res),
-        exp_srv
+        exp
       )
     }
   )

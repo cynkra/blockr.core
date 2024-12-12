@@ -11,16 +11,14 @@ block_server.data_block <- function(x, ...) {
     block_uid(x),
     function(input, output, session) {
 
-      exp_srv <- expr_server(x)
-
-      expr <- reactive(eval(exp_srv$expr()))
-      res <- reactive(eval(expr()))
+      exp <- expr_server(x)
+      res <- reactive(eval(exp$expr()))
 
       output$result <- block_output(x, res)
 
       c(
         list(result = res),
-        exp_srv
+        exp
       )
     }
   )
