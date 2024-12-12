@@ -244,7 +244,7 @@ board_ui <- function(id) {
     div(
       class = "d-flex justify-content-center align-items-center",
       shinyWidgets::switchInput(
-        ns("board_mode"),
+        ns("mode"),
         onStatus = "default",
         onLabel = icon("network-wired"),
         offLabel = icon("table-columns"),
@@ -305,8 +305,8 @@ board_server <- function(id) {
 
       # Switch between dashboard and network view
       # TBD: ideally we create a toggle input with 2 values
-      observeEvent(input$board_mode, {
-        tab <- if (input$board_mode) "network" else "dashboard"
+      observeEvent(input$mode, {
+        tab <- if (input$mode) "network" else "dashboard"
         updateTabsetPanel(
           session,
           "board_tabs",
@@ -339,7 +339,8 @@ board_server <- function(id) {
           rv$blocks[[network_out$selected()]]
         )
         state <- rv$blocks[[network_out$selected()]]$server$state
-        block_ui(rv$blocks[[network_out$selected()]]$block, state)
+        blk <- rv$blocks[[network_out$selected()]]$block
+        block_ui(blk, id = "block", state)
       })
 
       observeEvent(network_out$selected(),

@@ -86,7 +86,7 @@ block_expr_ui <- function(x) {
 #' @export
 serve.block <- function(x, data = list(), ...) {
 
-  ui <- bslib::page_fluid(block_ui(x, attr(x, "uid")))
+  ui <- bslib::page_fluid(block_ui(x, block_uid(x)))
 
   server <- function(input, output, session) {
     block_server(x, data)
