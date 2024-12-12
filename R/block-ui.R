@@ -11,6 +11,15 @@ block_ui <- function(x, id = NULL, ...) {
   UseMethod("block_ui")
 }
 
+#' @rdname block_ui
+#' @export
+block_ui.block <- function(x, id = NULL, ...) {
+  tagList(
+    expr_ui(x, block_ns(x, namespace = id), ...),
+    DT::dataTableOutput(block_ns(x, "result", namespace = id))
+  )
+}
+
 #' @param ns A function for constructing shiny module namespaces
 #' @rdname block_ui
 #' @export

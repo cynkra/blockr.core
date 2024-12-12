@@ -36,6 +36,18 @@ is_block <- function(x) {
 
 #' @rdname new_block
 #' @export
+new_data_block <- function(expr_server, expr_ui, class, ...) {
+  new_block(expr_server, expr_ui, c(class, "data_block"), ...)
+}
+
+#' @rdname new_block
+#' @export
+new_transform_block <- function(expr_server, expr_ui, class, ...) {
+  new_block(expr_server, expr_ui, c(class, "transform_block"), ...)
+}
+
+#' @rdname new_block
+#' @export
 block_uid <- function(x) {
   attr(x, "uid")
 }
@@ -84,13 +96,25 @@ block_expr_ui <- function(x) {
 #' @param data Data input
 #' @rdname serve
 #' @export
-serve.block <- function(x, data = list(), ...) {
+serve.block <- function(x, data, ...) {
 
   ui <- bslib::page_fluid(block_ui(x, block_uid(x)))
 
   server <- function(input, output, session) {
-    block_server(x, data)
+    block_server(x, lapply(data, reactiveVal))
   }
 
   shinyApp(ui, server)
+}
+
+#' @rdname serve
+#' @export
+serve.data_block <- function(x, ...) {
+  NextMethod(data = list())
+}
+
+#' @rdname new_block
+#' @export
+block_inputs <- function(x) {
+  names(formals(block_expr_server(x)))
 }

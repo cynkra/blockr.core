@@ -28,7 +28,8 @@ Imports:
     scoutbaR,
     visNetwork,
     shinyWidgets,
-    bslib
+    bslib,
+    dplyr
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
