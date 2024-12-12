@@ -12,7 +12,7 @@
 \alias{block_inputs}
 \title{Blocks}
 \usage{
-new_block(expr_server, expr_ui, class, uid = rand_names(), ...)
+new_block(server, ui, class, uid = rand_names(), ...)
 
 is_block(x)
 
@@ -31,10 +31,9 @@ block_expr_ui(x)
 block_inputs(x)
 }
 \arguments{
-\item{expr_server}{A function returning \code{\link[shiny:moduleServer]{shiny::moduleServer()}}}
+\item{server}{A function returning \code{\link[shiny:moduleServer]{shiny::moduleServer()}}}
 
-\item{expr_ui}{A function with a single argument (\code{ns}) returning a
-\code{shiny.tag}}
+\item{ui}{A function with a single argument (\code{ns}) returning a \code{shiny.tag}}
 
 \item{class}{Block subclass}
 
