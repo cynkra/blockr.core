@@ -114,3 +114,7 @@ dbl_xtr <- function(x, i, ...) dbl_ply(x, `[[`, i, ...)
 lst_xtr <- function(x, i) lapply(x, `[[`, i)
 
 map <- function(f, ..., use_names = FALSE) Map(f, ..., USE.NAMES = use_names)
+
+not_null <- Negate(is.null)
+
+reval <- function(x) if (inherits(x, "reactive")) x() else x

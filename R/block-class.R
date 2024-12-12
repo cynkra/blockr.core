@@ -40,34 +40,33 @@ block_uid <- function(x) {
   attr(x, "uid")
 }
 
+#' @param namespace (Optional) parent namespace
 #' @rdname new_block
 #' @export
-block_ns <- function(x, ...) {
+block_ns <- function(x, ..., namespace = NULL) {
+
+  prefix <- paste(c(namespace, block_uid(x)), collapse = ns.sep)
 
   fun <- function(...) {
 
-    ns <- NS(block_uid(x))
-
-    len <- ...length()
-
-    if (len > 1L) {
-      for (i in seq_len(len - 1L)) {
-        ns <- NS(ns(...elt(i)))
-      }
+    if (...length() == 0L) {
+      return(prefix)
     }
 
-    if (len > 0L) {
-      return(ns(...elt(len)))
+    id <- paste(c(...), collapse = ns.sep)
+
+    if (length(prefix) == 0) {
+      return(id)
     }
 
-    ns
+    paste(prefix, id, sep = ns.sep)
   }
 
-  if (...length()) {
-    return(fun(...))
+  if (...length() == 0L) {
+    return(fun)
   }
 
-  fun
+  fun(...)
 }
 
 #' @rdname new_block
