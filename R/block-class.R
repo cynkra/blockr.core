@@ -19,12 +19,18 @@ new_block <- function(server, ui, class, uid = rand_names(), ...) {
     is.character(class), length(class) > 0L, is_string(uid)
   )
 
-	structure(
+	res <- structure(
     list(expr_server = server, expr_ui = ui),
     ...,
     uid = uid,
     class = c(class, "block")
   )
+
+  stopifnot(
+    inherits(expr_ui(res), "shiny.tag")
+  )
+
+  res
 }
 
 #' @param x An object inheriting from `"block"`
