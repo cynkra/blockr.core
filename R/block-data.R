@@ -11,15 +11,16 @@ block_server.data_block <- function(x, ...) {
     block_uid(x),
     function(input, output, session) {
 
-      expr <- expr_server(x)
+      exp_srv <- expr_server(x)
 
-      result <- reactive(eval(expr$expr()))
+      expr <- reactive(eval(exp_srv$expr()))
+      res <- reactive(eval(expr()))
 
-      output$result <- block_output(x, result)
+      output$result <- block_output(x, res)
 
       c(
-        list(result = result),
-        expr
+        list(result = res),
+        exp_srv
       )
     }
   )
@@ -27,9 +28,9 @@ block_server.data_block <- function(x, ...) {
 
 #' @rdname block_ui
 #' @export
-block_ui.data_block <- function(x, ...) {
+block_ui.data_block <- function(x, id = NULL, ...) {
   tagList(
-    expr_ui(x, ...),
-    DT::dataTableOutput(block_ns(x, "result"))
+    expr_ui(x, block_ns(x, namespace = id), ...),
+    DT::dataTableOutput(block_ns(x, "result", namespace = id))
   )
 }

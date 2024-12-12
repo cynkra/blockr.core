@@ -16,7 +16,7 @@ is_block(x)
 
 block_uid(x)
 
-block_ns(x, ...)
+block_ns(x, ..., namespace = NULL)
 
 block_expr_server(x)
 
@@ -37,6 +37,8 @@ new_data_block(expr_server, expr_ui, class, ...)
 \item{...}{Further (metadata) attributes}
 
 \item{x}{An object inheriting from \code{"block"}}
+
+\item{namespace}{(Optional) parent namespace}
 }
 \description{
 Blocks consist of an expression that defines what the block produces (given

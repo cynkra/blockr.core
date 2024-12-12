@@ -4,18 +4,18 @@
 \alias{block_ui.data_block}
 \alias{block_ui}
 \alias{expr_ui}
-\alias{expr_ui.dataset_block}
+\alias{expr_ui.block}
 \alias{block_output}
 \alias{block_output.block}
 \title{Generics for UI generation}
 \usage{
-\method{block_ui}{data_block}(x, ...)
+\method{block_ui}{data_block}(x, id = NULL, ...)
 
-block_ui(x, ...)
+block_ui(x, id = NULL, ...)
 
-expr_ui(x, ...)
+expr_ui(x, ns = block_ns(x), ...)
 
-\method{expr_ui}{dataset_block}(x, ...)
+\method{expr_ui}{block}(x, ns = block_ns(x), ...)
 
 block_output(x, result)
 
@@ -24,7 +24,11 @@ block_output(x, result)
 \arguments{
 \item{x}{Object for which to generate a UI container}
 
+\item{id}{(Optional) parent namespace}
+
 \item{...}{Generic consistency}
+
+\item{ns}{A function for constructing shiny module namespaces}
 
 \item{result}{Reactive block result}
 }
