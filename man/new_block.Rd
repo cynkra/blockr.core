@@ -16,9 +16,9 @@ new_block(server, ui, class, uid = rand_names(), ...)
 
 is_block(x)
 
-new_data_block(expr_server, expr_ui, class, ...)
+new_data_block(server, ui, class, ...)
 
-new_transform_block(expr_server, expr_ui, class, ...)
+new_transform_block(server, ui, class, ...)
 
 block_uid(x)
 

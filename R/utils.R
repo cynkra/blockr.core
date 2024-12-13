@@ -118,3 +118,14 @@ map <- function(f, ..., use_names = FALSE) Map(f, ..., USE.NAMES = use_names)
 not_null <- Negate(is.null)
 
 reval <- function(x) x()
+
+inherits <- function(x, ..., agg = NULL) {
+
+  res <- lgl_ply(c(...), function(y) base::inherits(x, y))
+
+  if (is.null(agg)) {
+    return(res)
+  }
+
+  agg(res)
+}

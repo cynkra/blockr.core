@@ -27,8 +27,7 @@ new_block <- function(server, ui, class, uid = rand_names(), ...) {
   )
 
   stopifnot(
-    inherits(expr_ui(res), "shiny.tag") ||
-      inherits(expr_ui(res), "shiny.tag.list")
+    inherits(expr_ui(res), "shiny.tag", "shiny.tag.list", agg = any)
   )
 
   res
@@ -43,14 +42,14 @@ is_block <- function(x) {
 
 #' @rdname new_block
 #' @export
-new_data_block <- function(expr_server, expr_ui, class, ...) {
-  new_block(expr_server, expr_ui, c(class, "data_block"), ...)
+new_data_block <- function(server, ui, class, ...) {
+  new_block(server, ui, c(class, "data_block"), ...)
 }
 
 #' @rdname new_block
 #' @export
-new_transform_block <- function(expr_server, expr_ui, class, ...) {
-  new_block(expr_server, expr_ui, c(class, "transform_block"), ...)
+new_transform_block <- function(server, ui, class, ...) {
+  new_block(server, ui, c(class, "transform_block"), ...)
 }
 
 #' @rdname new_block
