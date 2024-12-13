@@ -15,7 +15,7 @@ new_block <- function(server, ui, class, uid = rand_names(), ...) {
 
   stopifnot(
     is.function(server), is.function(ui),
-    identical(names(formals(ui)), "ns"),
+    "ns" == names(formals(ui))[1L],
     is.character(class), length(class) > 0L, is_string(uid)
   )
 

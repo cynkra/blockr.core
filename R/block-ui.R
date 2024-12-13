@@ -30,9 +30,20 @@ expr_ui <- function(x, ns = block_ns(x), ...) {
 #' @rdname block_ui
 #' @export
 expr_ui.block <- function(x, ns = block_ns(x), ...) {
+
   fun <- block_expr_ui(x)
-  environment(fun) <- list2env(list(...), parent = environment(fun))
-  fun(ns)
+
+  if (...length()) {
+    return(fun(ns = ns, ...))
+  }
+
+  args <- mget(
+    setdiff(names(formals(fun)), "ns"),
+    envir = environment(fun),
+    inherits = TRUE
+  )
+
+  do.call(fun, c(list(ns = ns), args))
 }
 
 #' @param result Reactive block result
