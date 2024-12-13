@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(blockr2)
+library(blockr.core)
 
-test_check("blockr2")
+test_check("blockr.core")

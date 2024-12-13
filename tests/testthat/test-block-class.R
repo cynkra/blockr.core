@@ -22,6 +22,6 @@ test_that("block constructor", {
 
   expect_s3_class(
     new_identity_block(),
-    c("dataset_block", "data_block", "block")
+    c("identity_block", "transform_block", "block")
   )
 })

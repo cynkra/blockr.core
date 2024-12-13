@@ -1,4 +1,4 @@
-Package: blockr2
+Package: blockr.core
 Title: A block-based framework for data manipulation and visualization
 Version: 0.0.0.9000
 Authors@R: 
@@ -24,8 +24,7 @@ RoxygenNote: 7.3.1
 Imports:
     shiny (>= 1.5.0),
     DT,
-    bslib,
-    dplyr
+    bslib
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
