@@ -152,7 +152,7 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
 ```
 
 Note that both `server` and `ui` are closures and therfore may refer to
-names bount in the constructor scope (e.g. `dataset` and `choices`). The
+names bound in the constructor scope (e.g. `dataset` and `choices`). The
 `state` entry returned by the server module contains the static value
 `package` and this is needed for ser/deser.
 
