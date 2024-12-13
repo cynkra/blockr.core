@@ -1,23 +1,24 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# blockr2
+# blockr.core
 
 <!-- badges: start -->
 
 <!-- badges: end -->
 
-Designed to democratize data analysis, `blockr2` provides a flexible,
-intuitive, and **code-free** approach to building data pipelines.
+Designed to democratize data analysis, `blockr.core` provides a
+flexible, intuitive, and **code-free** approach to building data
+pipelines.
 
 ## Installation
 
-You can install the development version of blockr2 from
+You can install the development version of blockr.core from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("cynkra/blockr2")
+devtools::install_github("cynkra/blockr.core")
 ```
 
 ## Example
@@ -25,6 +26,6 @@ devtools::install_github("cynkra/blockr2")
 A single block server instance can be spun up as
 
 ``` r
-library(blockr2)
+library(blockr.core)
 serve(new_dataset_block("iris"))
 ```
