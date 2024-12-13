@@ -27,7 +27,8 @@ new_block <- function(server, ui, class, uid = rand_names(), ...) {
   )
 
   stopifnot(
-    inherits(expr_ui(res), "shiny.tag")
+    inherits(expr_ui(res), "shiny.tag") ||
+      inherits(expr_ui(res), "shiny.tag.list")
   )
 
   res
