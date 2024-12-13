@@ -37,8 +37,10 @@ expr_ui.block <- function(x, ns = block_ns(x), ...) {
     return(fun(ns = ns, ...))
   }
 
+  form <- formals(fun)
+
   args <- mget(
-    setdiff(names(formals(fun)), "ns"),
+    setdiff(names(form[lgl_ply(form, is.symbol)]), "ns"),
     envir = environment(fun),
     inherits = TRUE
   )
