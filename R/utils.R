@@ -129,3 +129,8 @@ inherits <- function(x, ..., agg = NULL) {
 
   agg(res)
 }
+
+set_names <- function(object = nm, nm) {
+  names(object) <- nm
+  object
+}

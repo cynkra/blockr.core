@@ -1,2 +1,2 @@
 ^LICENSE\.md$
-^README\.Rmd$
+^README\.(Rmd|html)$
