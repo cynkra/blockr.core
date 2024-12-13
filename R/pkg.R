@@ -3,5 +3,3 @@
 
 #' @import shiny
 NULL
-
-utils::globalVariables(c(".(pkg))"))
