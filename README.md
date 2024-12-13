@@ -54,6 +54,8 @@ and `ui` both expect closures with a specific structure.
   `state`.
 - The block expression is a quoted reactive value that contains
   user-supplied components and is updated whenever user values change.
+  Data names should match between expressio and the top-level function
+  arguments.
 - Block state is defined by the `state` entry which again is a list of
   reactives. This is a superset of the constructor arguments (and
   variable names should be aligned such that the constructor can be
@@ -74,6 +76,9 @@ function(data) {
   )
 }
 ```
+
+Note that `data` is the same name in the expression and the top-level
+function signature.
 
 ### Block `ui`
 
