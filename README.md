@@ -157,5 +157,5 @@ The block can then be manipulated via UI as
 serve(new_dataset_block("iris"))
 ```
 
-For more examples, refer to \[blockr.dplyr::new_select_block()\] or
-\[blockr.dplyr::new_join_block()\].
+For more examples, refer to `blockr.dplyr::new_select_block()` or
+`blockr.dplyr::new_join_block()`.
