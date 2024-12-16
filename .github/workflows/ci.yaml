@@ -34,6 +34,12 @@ jobs:
 
     uses: ./.github/workflows/coverage.yaml
 
+  revdep:
+
+    needs: smoke
+
+    uses: ./.github/workflows/revdep.yaml
+
     secrets: inherit
 
   pkgdown:
