@@ -9,7 +9,7 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    name: revdep ${{ matrix.config.pkg }}
+    name: ${{ matrix.config.pkg }}
 
     strategy:
       fail-fast: false
@@ -43,7 +43,7 @@ jobs:
         with:
           extra-packages: |
             any::rcmdcheck
-            local::dep
+            local::../dep
           working-directory: core
 
       - uses: r-lib/actions/check-r-package@v2
