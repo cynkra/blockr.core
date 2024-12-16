@@ -17,8 +17,6 @@ jobs:
 
   prepare:
 
-    name: Prepare dependencies
-
     runs-on: ubuntu-latest
 
     container: ghcr.io/r-devel/recheck
@@ -46,7 +44,7 @@ jobs:
       - name: build source package
         run: |
           mkdir newpkg
-          R CMD build ${{env.PKG_SOURCE_DIR}}
+          R CMD build source
           mv *.tar.gz newpkg/
           rm -Rf source
 
