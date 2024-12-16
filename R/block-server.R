@@ -19,6 +19,9 @@ block_server.block <- function(x, data, ...) {
     function(input, output, session) {
 
       exp <- expr_server(x, data)
+
+      check_expr_server_return_value(x, exp)
+
       res <- reactive(eval(exp$expr(), lapply(data, reval)))
 
       output$result <- block_output(x, res)
@@ -43,4 +46,35 @@ expr_server.block <- function(x, data, ...) {
   res <- do.call(block_expr_server(x), data)
   stopifnot(setequal(names(res), c("expr", "state")))
   res
+}
+
+check_expr_server_return_value <- function(x, ret) {
+
+  observeEvent(
+    ret,
+    {
+      if (!setequal(names(ret), c("expr", "state"))) {
+        stop("The block server for ", class(x)[1L],
+             " is expected to return values `expr` and `state`.")
+      }
+
+      if (!is.reactive(ret[["expr"]])) {
+        stop("The `expr` component of the return value for ", class(x)[1L],
+             " is expected to be a reactive.")
+      }
+
+      expected <- union(block_inputs(x), block_ui_inputs(x))
+      current <- names(ret[["state"]])
+
+      if (!setequal(current, expected)) {
+        browser()
+        stop("The `state` component of the return value for ", class(x)[1L],
+             " is expected to return ",
+             paste0("`", setdiff(expected, current), "`", collapse = ", "))
+      }
+    },
+    once = TRUE
+  )
+
+  invisible()
 }
