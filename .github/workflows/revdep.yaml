@@ -24,12 +24,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        path: core
+        with:
+          path: core
 
       - uses: actions/checkout@v4
-        with: cynkra/${{ matrix.config.pkg }}
-        token: ${{ secrets.BLOCKR_PAT }}
-        path: dep
+        with:
+          repository: cynkra/${{ matrix.config.pkg }}
+          token: ${{ secrets.BLOCKR_PAT }}
+          path: dep
 
       - uses: r-lib/actions/setup-pandoc@v2
 
