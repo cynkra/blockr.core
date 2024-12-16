@@ -19,7 +19,7 @@ new_block <- function(server, ui, class, uid = rand_names(), ...) {
     is.character(class), length(class) > 0L, is_string(uid)
   )
 
-	res <- structure(
+  res <- structure(
     list(expr_server = server, expr_ui = ui),
     ...,
     uid = uid,
