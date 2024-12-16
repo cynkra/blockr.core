@@ -13,7 +13,6 @@ jobs:
       GITHUB_PAT: ${{ secrets.BLOCKR_PAT }}
 
     steps:
-
-      uses: r-devel/recheck/.github/workflows/recheck.yml@v1
-      with:
-        which: 'strong'
+      - uses: r-devel/recheck/.github/workflows/recheck.yml@v1
+        with:
+          which: 'strong'
