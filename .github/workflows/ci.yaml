@@ -12,11 +12,15 @@ jobs:
 
     uses: ./.github/workflows/lint.yaml
 
+    secrets: inherit
+
   smoke:
 
     needs: lint
 
     uses: ./.github/workflows/smoke.yaml
+
+    secrets: inherit
 
   check:
 
@@ -33,6 +37,8 @@ jobs:
     needs: smoke
 
     uses: ./.github/workflows/coverage.yaml
+
+    secrets: inherit
 
   revdep:
 
