@@ -3,139 +3,51 @@ on:
 
 name: revdep
 
-env:
-  GITHUB_PAT: ${{ secrets.BLOCKR_PAT }}
-  R_LIBS_USER: ${{github.workspace}}/pkglib
-  _R_CHECK_FORCE_SUGGESTS_: 'FALSE'
-  _R_CHECK_CRAN_INCOMING_: 'FALSE'
-  _R_CHECK_VIGNETTES_SKIP_RUN_MAYBE_: 'TRUE' #remove for R-4.4
-  _R_CHECK_ELAPSED_TIMEOUT_: 3600
-  GITHUB_ACTIONS: ''
-  CI: ''
-
 jobs:
 
-  prepare:
+  check:
 
     runs-on: ubuntu-latest
 
-    container: ghcr.io/r-devel/recheck
+    name: revdep ${{ matrix.config.pkg }}
 
-    outputs:
-      oldfile: ${{ steps.filenames.outputs.oldfile }}
-      newfile: ${{ steps.filenames.outputs.newfile }}
-
-    steps:
-
-      - name: prepare
-        run: |
-          mkdir -p $R_LIBS_USER
-          R -e ".libPaths()"
-
-      - name: checkout
-        uses: actions/checkout@v4
-        with:
-          path: source
-
-      - name: download dependencies
-        run: rechecktools::install_recheck_deps('source', 'strong')
-        shell: Rscript {0}
-
-      - name: build source package
-        run: |
-          mkdir newpkg
-          R CMD build source
-          mv *.tar.gz newpkg/
-          rm -Rf source
-
-      - name: Get old version of package
-        shell: Rscript {0}
-        run: |
-          dir.create("oldpkg")
-          pkg <- sub("_.*", "", list.files("newpkg"))
-          download.packages(pkg, "oldpkg", repos = "https://cran.r-project.org")
-
-      - name: Get file names
-        id: filenames
-        run: |
-          echo "oldfile=$(cd oldpkg; echo *.tar.gz)" >> "$GITHUB_OUTPUT"
-          echo "newfile=$(cd newpkg; echo *.tar.gz)" >> "$GITHUB_OUTPUT"
-
-      - name: Save package and library
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            pkglib
-            newpkg
-            oldpkg
-          key: ${{ runner.os }}-${{ github.run_id }}-${{github.run_attempt}}
-
-  checks:
-    needs: prepare
-    runs-on: ubuntu-latest
-    name: Recheck ${{matrix.check == 'oldpkg' && needs.prepare.outputs.oldfile || needs.prepare.outputs.newfile}} (${{matrix.check}})
-    container: ghcr.io/r-devel/recheck
-    timeout-minutes: 600
     strategy:
+      fail-fast: false
       matrix:
-        check: [ 'oldpkg', 'newpkg' ]
+        config:
+          - {pkg: 'blockr.dplyr'}
+          - {pkg: 'blockr.ui'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.BLOCKR_PAT }}
+      R_KEEP_PKG_SOURCE: yes
+
     steps:
+      - uses: actions/checkout@v4
+        path: core
 
-      - name: Download package and library
-        uses: actions/cache/restore@v4
+      - uses: actions/checkout@v4
+        with: cynkra/${{ matrix.config.pkg }}
+        token: ${{ secrets.BLOCKR_PAT }}
+        path: dep
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
         with:
-          path: |
-            pkglib
-            newpkg
-            oldpkg
-          key: ${{ runner.os }}-${{ github.run_id }}-${{github.run_attempt}}
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
 
-      - name: Run checks
-        shell: Rscript {0}
-        run: |
-          checkdir <- "${{matrix.check}}"
-          options(repos = c(CRAN = 'https://cloud.r-project.org'))
-          reverse <- list(repos = 'https://cloud.r-project.org', which = "strong")
-          Sys.setenv(R_PROFILE="nothing") # do not set binary p3m mirror in child proc
-          tools::check_packages_in_dir(checkdir, reverse = reverse, Ncpus = parallel::detectCores())
-          details <- tools::check_packages_in_dir_details(checkdir)
-          write.csv(details, file.path(checkdir, 'check-details.csv'))
-          writeLines(paste(format(details), collapse = "\n\n"), file.path(checkdir, 'check-details.txt'))
-          tools::summarize_check_packages_in_dir_results(checkdir)
-
-      - uses: actions/upload-artifact@v4
+      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          name: ${{matrix.check}}-checklogs
-          path: |
-            ${{matrix.check}}/*/*.log
-            ${{matrix.check}}/*/*.out
-            ${{matrix.check}}/*/*.Rout
-            ${{matrix.check}}/*/*.fail
-            ${{matrix.check}}/Outputs
-            ${{matrix.check}}/check-details.*
+          extra-packages: |
+            any::rcmdcheck
+            local::dep
+          working-directory: core
 
-  results:
-    name: Show results
-    needs: checks
-    runs-on: ubuntu-latest
-    container: ghcr.io/r-hub/r-minimal/r-minimal:latest
-    steps:
-      - name: Download log files
-        uses: actions/download-artifact@v4
-
-      - name: Get results
-        shell: Rscript {0}
-        run: |
-          cat("\n------- Check results summary ------\n")
-          tools::summarize_check_packages_in_dir_results("newpkg-checklogs")
-
-          # Check for regressions
-          cat("\n------- Check for regressions ------\n")
-          changes <- tools::check_packages_in_dir_changes("newpkg-checklogs", "oldpkg-checklogs")
-          if(nrow(changes)){
-            cat("Changes:\n")
-            print(changes)
-            stop("Found potential problems")
-          } else {
-            cat("No changes between old and new version\n")
-          }
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          working-directory: dep
+          upload-snapshots: true
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
