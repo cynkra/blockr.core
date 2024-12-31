@@ -67,7 +67,6 @@ check_expr_server_return_value <- function(x, ret) {
       current <- names(ret[["state"]])
 
       if (!setequal(current, expected)) {
-        browser()
         stop("The `state` component of the return value for ", class(x)[1L],
              " is expected to return ",
              paste0("`", setdiff(expected, current), "`", collapse = ", "))
