@@ -15,27 +15,7 @@ new_subset_block <- function(subset = "", select = "", ...) {
         function(input, output, session) {
           list(
             expr = reactive({
-              if (nzchar(input$subset) && nzchar(input$select)) {
-                bquote(
-                  subset(data, .(sub), .(sel)),
-                  list(
-                    sub = parse(text = input$subset)[[1L]],
-                    sel = parse(text = input$select)[[1L]]
-                  )
-                )
-              } else if (nzchar(input$select)) {
-                bquote(
-                  subset(data, select = .(sel)),
-                  list(sel = parse(text = input$select)[[1L]])
-                )
-              } else if (nzchar(input$subset)) {
-                bquote(
-                  subset(data, .(sub)),
-                  list(sub = parse(text = input$subset)[[1L]])
-                )
-              } else {
-                quote(subset(data))
-              }
+              subset_expr(input$subset, input$select)
             }),
             state = list(
               subset = reactive(input$subset),
@@ -62,4 +42,30 @@ new_subset_block <- function(subset = "", select = "", ...) {
     class = "subset_block",
     ...
   )
+}
+
+subset_expr <- function(sub, sel) {
+
+  pasrse_first <- function(x) {
+    parse(text = x)[[1L]]
+  }
+
+  if (nzchar(sub) && nzchar(sel)) {
+    bquote(
+      subset(data, .(sub), .(sel)),
+      list(sub = pasrse_first(sub), sel = pasrse_first(sel))
+    )
+  } else if (nzchar(sel)) {
+    bquote(
+      subset(data, select = .(sel)),
+      list(sel = pasrse_first(sel))
+    )
+  } else if (nzchar(sub)) {
+    bquote(
+      subset(data, .(sub)),
+      list(sub = pasrse_first(sub))
+    )
+  } else {
+    quote(subset(data))
+  }
 }
