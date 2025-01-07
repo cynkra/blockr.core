@@ -7,11 +7,14 @@
 #' @param server A function returning [shiny::moduleServer()]
 #' @param ui A function with a single argument (`ns`) returning a `shiny.tag`
 #' @param class Block subclass
+#' @param ctor Constructor name (or function/frame number)
+#' @param ctor_pkg Package name (or `NULL`)
 #' @param uid Unique block ID
 #' @param ... Further (metadata) attributes
 #'
 #' @export
-new_block <- function(server, ui, class, uid = rand_names(), ...) {
+new_block <- function(server, ui, class, ctor, ctor_pkg,
+                      uid = rand_names(), ...) {
 
   stopifnot(
     is.function(server), is.function(ui),
@@ -19,10 +22,27 @@ new_block <- function(server, ui, class, uid = rand_names(), ...) {
     is.character(class), length(class) > 0L, is_string(uid)
   )
 
+  if (is.numeric(ctor)) {
+
+    if (missing(ctor_pkg)) {
+      ctor_pkg <- utils::packageName(sys.frame(ctor))
+    }
+
+    ctor <- deparse(sys.call(ctor)[[1L]])
+  }
+
+  if (is.null(ctor_pkg)) {
+    stopifnot(is.function(ctor))
+  } else {
+    stopifnot(is_string(ctor), is_string(ctor_pkg))
+  }
+
   res <- structure(
     list(expr_server = server, expr_ui = ui),
     ...,
     uid = uid,
+    ctor = ctor,
+    ctor_pkg = ctor_pkg,
     class = c(class, "block")
   )
 
@@ -42,20 +62,41 @@ is_block <- function(x) {
 
 #' @rdname new_block
 #' @export
-new_data_block <- function(server, ui, class, ...) {
-  new_block(server, ui, c(class, "data_block"), ...)
+new_data_block <- function(server, ui, class, ctor = sys.parent(), ...) {
+
+  new_block(server, ui, c(class, "data_block"), ctor, ...)
 }
 
 #' @rdname new_block
 #' @export
-new_transform_block <- function(server, ui, class, ...) {
-  new_block(server, ui, c(class, "transform_block"), ...)
+new_transform_block <- function(server, ui, class,
+                                ctor = sys.parent(), ...) {
+
+  new_block(server, ui, c(class, "transform_block"), ctor, ...)
 }
 
 #' @rdname new_block
 #' @export
 block_uid <- function(x) {
+  stopifnot(is_block(x))
   attr(x, "uid")
+}
+
+#' @rdname new_block
+#' @export
+block_ctor <- function(x) {
+
+  stopifnot(is_block(x))
+
+  fun <- attr(x, "ctor")
+
+  if (is.function(fun)) {
+    return(fun)
+  }
+
+  pkg <- attr(x, "ctor_pkg")
+
+  get(fun, asNamespace(pkg), mode = "function")
 }
 
 #' @param namespace (Optional) parent namespace

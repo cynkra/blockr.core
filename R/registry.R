@@ -4,8 +4,9 @@ block_registry <- new.env()
 #'
 #' Register, list and retrieve available blocks.
 #'
-#' @param constructor Block constructor
+#' @param ctor Block constructor
 #' @param name,description Metadata describing the block
+#' @param ctor_pkg Package where constructor is defined (or `NULL`)
 #' @param classes Block classes
 #' @param uid Unique ID for a registry entry
 #' @param category Useful to sort blocks by topics. If not specified,
@@ -13,18 +14,38 @@ block_registry <- new.env()
 #' @param overwrite Overwrite existing entry
 #'
 #' @export
-register_block <- function(constructor, name, description,
-                           classes = class(constructor()),
-                           uid = classes[1L],
-                           category = "uncategorized",
-                           overwrite = FALSE) {
+register_block <- function(ctor, name, description, ctor_pkg = NULL,
+                           classes = NULL, uid = NULL,
+                           category = "uncategorized", overwrite = FALSE) {
+
+  if (is.function(ctor)) {
+    ctor_pkg <- utils::packageName(environment(ctor))
+  }
+
+  ctor_name <- NULL
+
+  if (is_string(ctor)) {
+    stopifnot(is_string(ctor_pkg))
+    ctor_name <- ctor
+    ctor <- get(ctor, asNamespace(ctor_pkg), mode = "function")
+  }
+
+  if (is.null(classes)) {
+    stopifnot(is_string(ctor_name), is_string(ctor_pkg))
+    obj <- ctor(ctor = ctor_name, ctor_pkg = ctor_pkg)
+    classes <- class(obj)
+  }
+
+  if (is.null(uid)) {
+    uid <- classes[1L]
+  }
 
   if (uid %in% list_blocks() && !isTRUE(overwrite)) {
     stop("block ", uid, " already exists. Try removing or `overwrite = FALSE`")
   }
 
   entry <- new_registry_entry(
-    constructor,
+    ctor,
     name = name,
     description = description,
     classes = classes,
@@ -34,8 +55,8 @@ register_block <- function(constructor, name, description,
   assign(uid, entry, envir = block_registry)
 }
 
-new_registry_entry <- function(constructor, ...) {
-  structure(constructor, ..., class = "registry_entry")
+new_registry_entry <- function(ctor, ...) {
+  structure(ctor, ..., class = "registry_entry")
 }
 
 is_registry_entry <- function(x) inherits(x, "registry_entry")
@@ -55,17 +76,17 @@ unregister_block <- function(uid) {
 #' @export
 register_blocks <- function(...) {
 
-  arg_processor <- function(constructor, ...) {
+  arg_processor <- function(ctor, ...) {
 
     wrap_list <- function(x) {
       if (length(x) > 1L) list(x) else x
     }
 
-    if (length(constructor) > 1L) {
-      return(c(list(constructor), list(...)))
+    if (length(ctor) > 1L) {
+      return(c(list(ctor), list(...)))
     }
 
-    c(list(constructor), lapply(list(...), wrap_list))
+    c(list(ctor), lapply(list(...), wrap_list))
   }
 
   invisible(
@@ -87,17 +108,18 @@ available_blocks <- function() {
 
 register_core_blocks <- function() {
   register_blocks(
-    constructor = c(
-      new_dataset_block
+    ctor = c(
+      "new_dataset_block", "new_subset_block"
     ),
     name = c(
-      "dataset block"
+      "dataset block", "subset block"
     ),
     description = c(
-      "Choose a dataset from a package"
+      "Choose a dataset from a package", "Row and column subsetting"
     ),
+    ctor_pkg = utils::packageName(),
     category = c(
-      "data"
+      "data", "transform"
     )
   )
 }

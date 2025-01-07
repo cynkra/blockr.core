@@ -6,21 +6,24 @@
 \alias{new_data_block}
 \alias{new_transform_block}
 \alias{block_uid}
+\alias{block_ctor}
 \alias{block_ns}
 \alias{block_expr_server}
 \alias{block_expr_ui}
 \alias{block_inputs}
 \title{Blocks}
 \usage{
-new_block(server, ui, class, uid = rand_names(), ...)
+new_block(server, ui, class, ctor, ctor_pkg, uid = rand_names(), ...)
 
 is_block(x)
 
-new_data_block(server, ui, class, ...)
+new_data_block(server, ui, class, ctor = sys.parent(), ...)
 
-new_transform_block(server, ui, class, ...)
+new_transform_block(server, ui, class, ctor = sys.parent(), ...)
 
 block_uid(x)
+
+block_ctor(x)
 
 block_ns(x, ..., namespace = NULL)
 
@@ -36,6 +39,10 @@ block_inputs(x)
 \item{ui}{A function with a single argument (\code{ns}) returning a \code{shiny.tag}}
 
 \item{class}{Block subclass}
+
+\item{ctor}{Constructor name (or function/frame number)}
+
+\item{ctor_pkg}{Package name (or \code{NULL})}
 
 \item{uid}{Unique block ID}
 

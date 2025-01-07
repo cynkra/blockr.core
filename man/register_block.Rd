@@ -8,11 +8,12 @@
 \title{Block registry}
 \usage{
 register_block(
-  constructor,
+  ctor,
   name,
   description,
-  classes = class(constructor()),
-  uid = classes[1L],
+  ctor_pkg = NULL,
+  classes = NULL,
+  uid = NULL,
   category = "uncategorized",
   overwrite = FALSE
 )
@@ -24,9 +25,11 @@ register_blocks(...)
 available_blocks()
 }
 \arguments{
-\item{constructor}{Block constructor}
+\item{ctor}{Block constructor}
 
 \item{name, description}{Metadata describing the block}
+
+\item{ctor_pkg}{Package where constructor is defined (or \code{NULL})}
 
 \item{classes}{Block classes}
 
