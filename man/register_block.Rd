@@ -11,10 +11,10 @@ register_block(
   ctor,
   name,
   description,
-  ctor_pkg = NULL,
   classes = NULL,
   uid = NULL,
   category = "uncategorized",
+  package = NULL,
   overwrite = FALSE
 )
 
@@ -29,14 +29,14 @@ available_blocks()
 
 \item{name, description}{Metadata describing the block}
 
-\item{ctor_pkg}{Package where constructor is defined (or \code{NULL})}
-
 \item{classes}{Block classes}
 
 \item{uid}{Unique ID for a registry entry}
 
 \item{category}{Useful to sort blocks by topics. If not specified,
 blocks are uncategorized.}
+
+\item{package}{Package where constructor is defined (or \code{NULL})}
 
 \item{overwrite}{Overwrite existing entry}
 

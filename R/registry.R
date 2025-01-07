@@ -6,33 +6,33 @@ block_registry <- new.env()
 #'
 #' @param ctor Block constructor
 #' @param name,description Metadata describing the block
-#' @param ctor_pkg Package where constructor is defined (or `NULL`)
 #' @param classes Block classes
 #' @param uid Unique ID for a registry entry
 #' @param category Useful to sort blocks by topics. If not specified,
 #'   blocks are uncategorized.
+#' @param package Package where constructor is defined (or `NULL`)
 #' @param overwrite Overwrite existing entry
 #'
 #' @export
-register_block <- function(ctor, name, description, ctor_pkg = NULL,
-                           classes = NULL, uid = NULL,
-                           category = "uncategorized", overwrite = FALSE) {
+register_block <- function(ctor, name, description, classes = NULL, uid = NULL,
+                           category = "uncategorized", package = NULL,
+                           overwrite = FALSE) {
 
   if (is.function(ctor)) {
-    ctor_pkg <- utils::packageName(environment(ctor))
+    package <- utils::packageName(environment(ctor))
   }
 
   ctor_name <- NULL
 
   if (is_string(ctor)) {
-    stopifnot(is_string(ctor_pkg))
+    stopifnot(is_string(package))
     ctor_name <- ctor
-    ctor <- get(ctor, asNamespace(ctor_pkg), mode = "function")
+    ctor <- get(ctor, asNamespace(package), mode = "function")
   }
 
   if (is.null(classes)) {
-    stopifnot(is_string(ctor_name), is_string(ctor_pkg))
-    obj <- ctor(ctor = ctor_name, ctor_pkg = ctor_pkg)
+    stopifnot(is_string(ctor_name), is_string(package))
+    obj <- ctor(ctor = ctor_name, ctor_pkg = package)
     classes <- class(obj)
   }
 
@@ -108,18 +108,23 @@ available_blocks <- function() {
 
 register_core_blocks <- function() {
   register_blocks(
-    ctor = c(
-      "new_dataset_block", "new_subset_block"
+    c(
+      "new_dataset_block",
+      "new_subset_block"
     ),
     name = c(
-      "dataset block", "subset block"
+      "dataset block",
+      "subset block"
     ),
     description = c(
-      "Choose a dataset from a package", "Row and column subsetting"
+      "Choose a dataset from a package",
+      "Row and column subsetting"
     ),
-    ctor_pkg = utils::packageName(),
     category = c(
-      "data", "transform"
-    )
+      "data",
+      "transform"
+    ),
+    package = utils::packageName(),
+    overwrite = TRUE
   )
 }
