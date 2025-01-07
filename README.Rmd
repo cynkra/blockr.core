@@ -207,4 +207,19 @@ new_select_block <- function(columns = character(), ...) {
 
 Here, the state return value contains entries `columns` (required by the constructor) and `choices`, which is not an argument of the constructor, but an argument of the UI function. The value for `choices` can be inferred by the server function but is not available when first drawing the UI. Consequently the signature of the UI function requires a default value (for the initial UI rendering) and the server function contains a call to `shiny::updateSelectInput()` to populate the selec choices as soon as the corresponding value is available. As the UI function can be used to re-draw the UI from scratch, `choices` also is required to be included in `state` for correctly re-drawing the block UI.
 
-For an example with multiple data inputs, refer to `blockr.dplyr::new_join_block()`.
+An app containing such a select block can be spun up as
+
+```{r, eval = FALSE}
+serve(new_select_block(c("mpg", "cyl")), list(data = mtcars))
+```
+
+For an example with multiple data inputs, refer to `blockr.dplyr::new_join_block()`, which can be explored in a standalone app as
+
+```{r, eval = FALSE}
+serve(
+  blockr.dplyr::new_join_block(by = "name"),
+  data = list(x = dplyr::band_members, y = dplyr::band_instruments)
+)
+```
+
+The `data` argument to `serve()` expects a list with names components that match the server function signature, i.e. `data` for `blockr.core::new_select_block()` and `x`, `y` for `blockr.dplyr::new_join_block()`. These names can be chosen freely by the block implementer.

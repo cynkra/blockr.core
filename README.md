@@ -243,5 +243,25 @@ soon as the corresponding value is available. As the UI function can be
 used to re-draw the UI from scratch, `choices` also is required to be
 included in `state` for correctly re-drawing the block UI.
 
+An app containing such a select block can be spun up as
+
+``` r
+serve(new_select_block(c("mpg", "cyl")), list(data = mtcars))
+```
+
 For an example with multiple data inputs, refer to
-`blockr.dplyr::new_join_block()`.
+`blockr.dplyr::new_join_block()`, which can be explored in a standalone
+app as
+
+``` r
+serve(
+  blockr.dplyr::new_join_block(by = "name"),
+  data = list(x = dplyr::band_members, y = dplyr::band_instruments)
+)
+```
+
+The `data` argument to `serve()` expects a list with names components
+that match the server function signature, i.e. `data` for
+`blockr.core::new_select_block()` and `x`, `y` for
+`blockr.dplyr::new_join_block()`. These names can be chosen freely by
+the block implementer.
