@@ -166,6 +166,10 @@ block_inputs <- function(x) {
   names(formals(block_expr_server(x)))
 }
 
+block_ctor_inputs <- function(x) {
+  names(formals(block_ctor(x)))
+}
+
 block_ui_inputs <- function(x) {
   setdiff(names(formals(block_expr_ui(x))), "ns")
 }
