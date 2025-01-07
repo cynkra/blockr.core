@@ -48,15 +48,17 @@ attribute</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">new_block</span><span class="op">(</span><span class="va">server</span>, <span class="va">ui</span>, <span class="va">class</span>, uid <span class="op">=</span> <span class="fu"><a href="rand_names.html">rand_names</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">new_block</span><span class="op">(</span><span class="va">server</span>, <span class="va">ui</span>, <span class="va">class</span>, <span class="va">ctor</span>, <span class="va">ctor_pkg</span>, uid <span class="op">=</span> <span class="fu"><a href="rand_names.html">rand_names</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">is_block</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">new_data_block</span><span class="op">(</span><span class="va">server</span>, <span class="va">ui</span>, <span class="va">class</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">new_data_block</span><span class="op">(</span><span class="va">server</span>, <span class="va">ui</span>, <span class="va">class</span>, ctor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">sys.parent</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">new_transform_block</span><span class="op">(</span><span class="va">server</span>, <span class="va">ui</span>, <span class="va">class</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">new_transform_block</span><span class="op">(</span><span class="va">server</span>, <span class="va">ui</span>, <span class="va">class</span>, ctor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">sys.parent</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">block_uid</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">block_ctor</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">block_ns</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, namespace <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
@@ -81,6 +83,14 @@ attribute</p>
 
 <dt id="arg-class">class<a class="anchor" aria-label="anchor" href="#arg-class"></a></dt>
 <dd><p>Block subclass</p></dd>
+
+
+<dt id="arg-ctor">ctor<a class="anchor" aria-label="anchor" href="#arg-ctor"></a></dt>
+<dd><p>Constructor name (or function/frame number)</p></dd>
+
+
+<dt id="arg-ctor-pkg">ctor_pkg<a class="anchor" aria-label="anchor" href="#arg-ctor-pkg"></a></dt>
+<dd><p>Package name (or <code>NULL</code>)</p></dd>
 
 
 <dt id="arg-uid">uid<a class="anchor" aria-label="anchor" href="#arg-uid"></a></dt>
