@@ -48,10 +48,10 @@
 <span>  <span class="va">ctor</span>,</span>
 <span>  <span class="va">name</span>,</span>
 <span>  <span class="va">description</span>,</span>
-<span>  ctor_pkg <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  classes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  uid <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  category <span class="op">=</span> <span class="st">"uncategorized"</span>,</span>
+<span>  package <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -74,10 +74,6 @@
 <dd><p>Metadata describing the block</p></dd>
 
 
-<dt id="arg-ctor-pkg">ctor_pkg<a class="anchor" aria-label="anchor" href="#arg-ctor-pkg"></a></dt>
-<dd><p>Package where constructor is defined (or <code>NULL</code>)</p></dd>
-
-
 <dt id="arg-classes">classes<a class="anchor" aria-label="anchor" href="#arg-classes"></a></dt>
 <dd><p>Block classes</p></dd>
 
@@ -89,6 +85,10 @@
 <dt id="arg-category">category<a class="anchor" aria-label="anchor" href="#arg-category"></a></dt>
 <dd><p>Useful to sort blocks by topics. If not specified,
 blocks are uncategorized.</p></dd>
+
+
+<dt id="arg-package">package<a class="anchor" aria-label="anchor" href="#arg-package"></a></dt>
+<dd><p>Package where constructor is defined (or <code>NULL</code>)</p></dd>
 
 
 <dt id="arg-overwrite">overwrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
