@@ -167,7 +167,7 @@ block_inputs <- function(x) {
 }
 
 block_ctor_inputs <- function(x) {
-  names(formals(block_ctor(x)))
+  setdiff(names(formals(block_ctor(x))), "...")
 }
 
 block_ui_inputs <- function(x) {

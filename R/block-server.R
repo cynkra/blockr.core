@@ -26,9 +26,10 @@ block_server.block <- function(x, data, ...) {
 
       output$result <- block_output(x, res)
 
-      c(
-        list(result = res),
-        exp
+      list(
+        result = res,
+        expr = exp$expr,
+        json = reactive(to_json(x, lapply(exp$state, reval_if)))
       )
     }
   )

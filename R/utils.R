@@ -119,6 +119,8 @@ not_null <- Negate(is.null)
 
 reval <- function(x) x()
 
+reval_if <- function(x) if (is.function(x)) x() else x
+
 inherits <- function(x, ..., agg = NULL) {
 
   res <- lgl_ply(c(...), function(y) base::inherits(x, y))
