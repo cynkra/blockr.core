@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/cynkra/blockr.core/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/cynkra/blockr.core/actions/workflows/R-CMD-check.yaml)
+[![check](https://github.com/cynkra/blockr.core/actions/workflows/check.yaml/badge.svg)](https://github.com/cynkra/blockr.core/actions/workflows/check.yaml)
 <!-- badges: end -->
 
 Designed to democratize data analysis, `blockr.core` provides a
