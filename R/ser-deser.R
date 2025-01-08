@@ -76,4 +76,3 @@ from_json.block <- function(x, data, ...) {
 
   do.call(ctor, args)
 }
-
