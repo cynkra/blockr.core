@@ -12,7 +12,7 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
                               ...) {
 
   is_dataset_eligible <- function(x, pkg) {
-    inherits(do.call("::", list(pkg = pkg, name = x)), "data.frame")
+    inherits(do.call("::", list(pkg, x)), "data.frame")
   }
 
   list_datasets <- function(package) {
