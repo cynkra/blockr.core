@@ -64,7 +64,7 @@ new_board <- function(blocks = list(), links = data.frame(from = character(),
     }
   }
 
-	structure(
+  structure(
     list(blocks = blocks, links = links, ...),
     id = id,
     class = c(class, "board")

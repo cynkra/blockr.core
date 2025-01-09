@@ -36,15 +36,15 @@ to_json.board <- function(x, blocks, ...) {
 
   stopifnot(all(lgl_ply(blocks, inherits, "json")))
 
+  vers <- utils::packageVersion(utils::packageName())
+
   paste0(
     "{",
-      "\"object\":[", paste0("\"", class(x), "\"", collapse = ", "), "],",
-      "\"blocks\":[", paste0(blocks, collapse = ", "), "],",
-      "\"links\":", jsonlite::toJSON(x[["links"]], auto_unbox = TRUE), ",",
-      "\"id\":\"", attr(x, "id"), "\",",
-      "\"version\":\"",
-        as.character(utils::packageVersion(utils::packageName())),
-      "\"",
+    "\"object\":[", paste0("\"", class(x), "\"", collapse = ", "), "],",
+    "\"blocks\":[", paste0(blocks, collapse = ", "), "],",
+    "\"links\":", jsonlite::toJSON(x[["links"]], auto_unbox = TRUE), ",",
+    "\"id\":\"", attr(x, "id"), "\",",
+    "\"version\":\"", as.character(vers), "\"",
     "}"
   )
 }
