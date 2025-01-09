@@ -24,11 +24,30 @@ new_block <- function(server, ui, class, ctor, ctor_pkg,
 
   if (is.numeric(ctor)) {
 
-    if (missing(ctor_pkg)) {
-      ctor_pkg <- utils::packageName(sys.frame(ctor))
-    }
+    call <- deparse(sys.call(ctor)[[1L]])
 
-    ctor <- deparse(sys.call(ctor)[[1L]])
+    if (grepl("::", call, fixed = TRUE)) {
+
+      call <- strsplit(call, "::", fixed = TRUE)[[1L]]
+
+      stopifnot(length(call) == 2L)
+
+      ctor <- call[2L]
+
+      if (missing(ctor_pkg)) {
+        ctor_pkg <- call[1L]
+      } else {
+        stopifnot(identical(ctor_pkg, call[1L]))
+      }
+
+    } else {
+
+      if (missing(ctor_pkg)) {
+        ctor_pkg <- utils::packageName(sys.frame(ctor))
+      }
+
+      ctor <- call
+    }
   }
 
   if (is.null(ctor_pkg)) {

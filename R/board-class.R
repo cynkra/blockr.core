@@ -81,3 +81,16 @@ sort.board <- function(x, decreasing = FALSE, ...) {
 
   blk[match(res, ids)]
 }
+
+#' @rdname serve
+#' @export
+serve.board <- function(x, ...) {
+
+  ui <- bslib::page_fluid(board_ui(x))
+
+  server <- function(input, output, session) {
+    board_server(x)
+  }
+
+  shinyApp(ui, server)
+}
