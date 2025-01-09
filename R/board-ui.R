@@ -13,7 +13,10 @@ board_ui <- function(x) {
 #' @export
 board_ui.board <- function(x) {
 
-  blocks <- lapply(sort(x), block_ui, id = attr(x, "id"))
+  id <- attr(x, "id")
+  ns <- NS(id)
+
+  blocks <- lapply(sort(x), block_ui, id = id)
 
   cards <- lapply(
     lapply(blocks, div, class = "card-body p-1"),
@@ -21,5 +24,18 @@ board_ui.board <- function(x) {
     class = "card shadow-sm p-2 mb-2 border"
   )
 
-  do.call(tagList, cards)
+  tagList(
+    div(
+      class = "d-flex justify-content-center",
+      downloadButton(
+        ns("serialize"),
+        "Save",
+        class = "mx-2"
+      ),
+    ),
+    div(
+      class = "m-2 row",
+      do.call(div, c(class = "d-flex flex-wrap", cards))
+    )
+  )
 }

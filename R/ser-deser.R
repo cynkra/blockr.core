@@ -3,15 +3,17 @@
 #' Object (de)serialization.
 #'
 #' @param x Object to (de)serialize
-#' @param state Object state (as returned from an `expr_server`)
+#' @param state Generic consistency
 #'
 #' @export
-to_json <- function(x, state) {
+to_json <- function(x, ...) {
   UseMethod("to_json")
 }
 
+#' @param state Object state (as returned from an `expr_server`)
+#' @rdname to_json
 #' @export
-to_json.block <- function(x, state) {
+to_json.block <- function(x, state, ...) {
 
   pkg <- attr(x, "ctor_pkg")
 
@@ -21,11 +23,29 @@ to_json.block <- function(x, state) {
     payload = state,
     constructor = attr(x, "ctor"),
     package = pkg,
-    version = as.character(utils::packageVersion(pkg)),
-    core = as.character(utils::packageVersion(utils::packageName()))
+    version = as.character(utils::packageVersion(pkg))
   )
 
-  jsonlite::toJSON(res)
+  jsonlite::toJSON(res, auto_unbox = TRUE)
+}
+
+#' @param blocks JSON-serialized blocks
+#' @rdname to_json
+#' @export
+to_json.board <- function(x, blocks, ...) {
+
+  stopifnot(all(lgl_ply(blocks, inherits, "json")))
+
+  paste0(
+    "{",
+      "\"object\":[", paste0("\"", class(x), "\"", collapse = ", "), "],",
+      "\"blocks\":[", paste0(blocks, collapse = ", "), "],",
+      "\"links\":", jsonlite::toJSON(x[["links"]], auto_unbox = TRUE), ",",
+      "\"version\":\"",
+        as.character(utils::packageVersion(utils::packageName())),
+      "\"",
+    "}"
+  )
 }
 
 #' @rdname to_json

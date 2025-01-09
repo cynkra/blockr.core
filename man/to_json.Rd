@@ -2,13 +2,19 @@
 % Please edit documentation in R/ser-deser.R
 \name{to_json}
 \alias{to_json}
+\alias{to_json.block}
+\alias{to_json.board}
 \alias{from_json}
 \alias{from_json.json}
 \alias{from_json.character}
 \alias{from_json.block}
 \title{Serialization}
 \usage{
-to_json(x, state)
+to_json(x, ...)
+
+\method{to_json}{block}(x, state, ...)
+
+\method{to_json}{board}(x, blocks, ...)
 
 from_json(x, ...)
 
@@ -22,6 +28,8 @@ from_json(x, ...)
 \item{x}{Object to (de)serialize}
 
 \item{state}{Object state (as returned from an \code{expr_server})}
+
+\item{blocks}{JSON-serialized blocks}
 }
 \description{
 Object (de)serialization.

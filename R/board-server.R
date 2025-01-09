@@ -30,6 +30,32 @@ board_server.board <- function(x) {
         },
         once = TRUE
       )
+
+      output$serialize <- downloadHandler(
+        filename = function() {
+          paste0(
+           attr(x, "id"),
+           "_",
+           format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+           ".json"
+         )
+        },
+        content = function(con) {
+
+          blocks <- lapply(
+            lapply(lapply(rv$blocks, `[[`, "server"), `[[`, "json"),
+            reval
+          )
+
+          json <- jsonlite::prettify(
+            to_json(x, blocks)
+          )
+
+          writeLines(json, con)
+        }
+      )
+
+      rv$blocks
     }
   )
 }
