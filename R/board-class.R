@@ -70,3 +70,14 @@ new_board <- function(blocks = list(), links = data.frame(from = character(),
     class = c(class, "board")
   )
 }
+
+#' @export
+sort.board <- function(x, decreasing = FALSE, ...) {
+
+  blk <- x[["blocks"]]
+  ids <- chr_ply(blk, block_uid)
+
+  res <- topo_sort(ids, x[["links"]])
+
+  blk[match(res, ids)]
+}
