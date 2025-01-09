@@ -2,9 +2,10 @@
 % Please edit documentation in R/registry.R
 \name{register_block}
 \alias{register_block}
+\alias{list_blocks}
 \alias{unregister_block}
 \alias{register_blocks}
-\alias{available_blocks}
+\alias{create_block}
 \title{Block registry}
 \usage{
 register_block(
@@ -18,11 +19,13 @@ register_block(
   overwrite = FALSE
 )
 
+list_blocks()
+
 unregister_block(uid)
 
 register_blocks(...)
 
-available_blocks()
+create_block(uid, ...)
 }
 \arguments{
 \item{ctor}{Block constructor}

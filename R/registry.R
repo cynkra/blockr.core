@@ -49,7 +49,9 @@ register_block <- function(ctor, name, description, classes = NULL, uid = NULL,
     name = name,
     description = description,
     classes = classes,
-    category = category
+    category = category,
+    ctor_name = ctor_name,
+    package = package
   )
 
   assign(uid, entry, envir = block_registry)
@@ -61,6 +63,8 @@ new_registry_entry <- function(ctor, ...) {
 
 is_registry_entry <- function(x) inherits(x, "registry_entry")
 
+#' @rdname register_block
+#' @export
 list_blocks <- function() {
   ls(envir = block_registry)
 }
@@ -102,8 +106,9 @@ get_registry_entry <- function(uid) {
 
 #' @rdname register_block
 #' @export
-available_blocks <- function() {
-  lapply(set_names(nm = list_blocks()), get_registry_entry)
+create_block <- function(uid, ...) {
+  ctor <- get_registry_entry(uid)
+  ctor(..., ctor = attr(ctor, "ctor_name"), ctor_pkg = attr(ctor, "package"))
 }
 
 register_core_blocks <- function() {
