@@ -11,6 +11,7 @@
 \alias{block_expr_server}
 \alias{block_expr_ui}
 \alias{block_inputs}
+\alias{block_arity}
 \title{Blocks}
 \usage{
 new_block(server, ui, class, ctor, ctor_pkg, uid = rand_names(), ...)
@@ -32,6 +33,8 @@ block_expr_server(x)
 block_expr_ui(x)
 
 block_inputs(x)
+
+block_arity(x)
 }
 \arguments{
 \item{server}{A function returning \code{\link[shiny:moduleServer]{shiny::moduleServer()}}}

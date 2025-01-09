@@ -136,3 +136,14 @@ set_names <- function(object = nm, nm) {
   names(object) <- nm
   object
 }
+
+paste_enum <- function(x, sep = ", ", conj = " and ") {
+
+  if (length(x) <= 1L) {
+    return(x)
+  }
+
+  paste0(
+    paste0(x[seq_len(length(x) - 1L)], collapse = sep), conj, x[length(x)]
+  )
+}

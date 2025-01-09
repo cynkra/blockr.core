@@ -173,3 +173,16 @@ block_ctor_inputs <- function(x) {
 block_ui_inputs <- function(x) {
   setdiff(names(formals(block_expr_ui(x))), "ns")
 }
+
+#' @rdname new_block
+#' @export
+block_arity <- function(x) {
+
+  args <- block_inputs(x)
+
+  if ("..." %in% args) {
+    return(NA_integer_)
+  }
+
+  length(args)
+}
