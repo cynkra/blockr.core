@@ -27,5 +27,7 @@ Imports:
     bslib,
     utils
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    blockr.dplyr
+Remotes: cynkra/blockr.dplyr
 Config/testthat/edition: 3
