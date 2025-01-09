@@ -18,46 +18,45 @@ board_server.board <- function(x) {
 
       rv <- reactiveValues(
         blocks = list(),
-        inputs = list()
+        inputs = list(),
+        board = x
       )
 
       observeEvent(
         TRUE,
         {
-          for (blk in sort(x)) {
-            rv <- setup_block(blk, rv, x[["links"]])
+          for (blk in sort(rv$board)) {
+            rv <- setup_block(blk, rv, rv$board[["links"]])
           }
         },
         once = TRUE
       )
 
       output$serialize <- downloadHandler(
-        board_filename(x),
-        write_board_to_disk(x, rv)
+        board_filename(rv$board),
+        write_board_to_disk(rv$board, rv)
       )
 
       observeEvent(input$restore, {
 
         removeUI(
-          selector = paste0("#", attr(x, "id"), "_blocks", " > div"),
-          session = session
+          paste0("#", attr(rv$board, "id"), "_blocks", " > div")
         )
 
-        x <<- from_json(
+        rv$board <- from_json(
           readLines(input$restore$datapath)
         )
 
         insertUI(
-          selector = paste0("#", attr(x, "id"), "_blocks"),
-          ui = block_cards(x),
-          session = session
+          paste0("#", attr(rv$board, "id"), "_blocks"),
+          ui = block_cards(rv$board)
         )
 
-        rv$block <- list()
-        rv$input <- list()
+        rv$blocks <- list()
+        rv$inputs <- list()
 
-        for (blk in sort(x)) {
-          rv <- setup_block(blk, rv, x[["links"]])
+        for (blk in sort(rv$board)) {
+          rv <- setup_block(blk, rv, rv$board[["links"]])
         }
       })
 

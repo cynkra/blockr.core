@@ -18,7 +18,7 @@ new_block <- function(server, ui, class, ctor, ctor_pkg,
 
   stopifnot(
     is.function(server), is.function(ui),
-    "ns" == names(formals(ui))[1L],
+    identical(names(formals(ui)), "ns"),
     is.character(class), length(class) > 0L, is_string(uid)
   )
 

@@ -29,14 +29,14 @@ board_ui.board <- function(x) {
         "Restore"
       )
     ),
-    do.call(div, list(id = paste0(id, "_blocks"), block_cards(x)))
+    do.call(div, list(id = paste0(id, "_blocks"), block_cards(x, id)))
   )
 }
 
-block_cards <- function(x) {
+block_cards <- function(x, id = attr(x, "id")) {
   lapply(
     lapply(
-      lapply(sort(x), block_ui, id = attr(x, "id")),
+      lapply(sort(x), block_ui, id = id),
       div,
       class = "card-body p-1"
     ),

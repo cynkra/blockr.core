@@ -23,6 +23,7 @@ block_server.block <- function(x, data, ...) {
       check_expr_server_return_value(x, exp)
 
       res <- reactive({
+        do.call(req, lapply(exp$state, reval_if))
         tryCatch(
           eval(exp$expr(), lapply(data, reval)),
           error = function(e) {
