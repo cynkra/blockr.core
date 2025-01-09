@@ -76,11 +76,35 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">blockr.core</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span><span class="fu"><a href="reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span><span class="st">"iris"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>or for a block that requires input, by additionally passing static data such as</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span></span>
+<span>  <span class="fu">blockr.dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/blockr.dplyr/man/new_join_block.html" class="external-link">new_join_block</a></span><span class="op">(</span>by <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="va"><a href="https://dplyr.tidyverse.org/reference/band_members.html" class="external-link">band_members</a></span>, y <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="va"><a href="https://dplyr.tidyverse.org/reference/band_members.html" class="external-link">band_instruments</a></span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>If previewing multiple connected block is desired, a board can be created and passed to <code><a href="reference/serve.html">serve()</a></code>, e.g.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="reference/new_board.html">new_board</a></span><span class="op">(</span></span>
+<span>    blocks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      <span class="fu">blockr.dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/blockr.dplyr/man/new_join_block.html" class="external-link">new_join_block</a></span><span class="op">(</span>uid <span class="op">=</span> <span class="st">"d"</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span>uid <span class="op">=</span> <span class="st">"a"</span><span class="op">)</span>,</span>
+<span>      <span class="fu">blockr.dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/blockr.dplyr/man/new_select_block.html" class="external-link">new_select_block</a></span><span class="op">(</span>uid <span class="op">=</span> <span class="st">"c"</span><span class="op">)</span>,</span>
+<span>      <span class="fu">blockr.dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/blockr.dplyr/man/new_select_block.html" class="external-link">new_select_block</a></span><span class="op">(</span>uid <span class="op">=</span> <span class="st">"e"</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span>uid <span class="op">=</span> <span class="st">"b"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    links <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>      from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"c"</span>, <span class="st">"b"</span>, <span class="st">"d"</span><span class="op">)</span>,</span>
+<span>      to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"d"</span>, <span class="st">"c"</span>, <span class="st">"e"</span><span class="op">)</span>,</span>
+<span>      input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">""</span>, <span class="st">""</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="how-to-create-a-block">How to create a block<a class="anchor" aria-label="anchor" href="#how-to-create-a-block"></a>
 </h2>
-<p>A block constructor should expose as arguments anything that defines its <em>state</em>, i.e. things the user might set via UI which are not derived from input data. For example in a <code>selectInput()</code>, where the <code>choices</code> are data columns, this should not be a constructor argument (as this value will be computed from the data), whereas the <code>selected</code> value should be exposed.</p>
+<p>A block constructor should expose as arguments anything that defines its <em>state</em>, i.e. things the user might set via UI which are not derived from input data. For example in a <code><a href="https://rdrr.io/pkg/shiny/man/selectInput.html" class="external-link">shiny::selectInput()</a></code>, where the <code>choices</code> are data columns, this should not be a constructor argument (as this value will be computed from the data), whereas the <code>selected</code> value should be exposed.</p>
 <p>The constructor return value should be a call to <code><a href="reference/new_block.html">new_block()</a></code> (or if applicable a call to the more specific <em>virtual</em> constructors <code><a href="reference/new_block.html">new_data_block()</a></code>, <code><a href="reference/new_block.html">new_transform_block()</a></code>, etc.). Arguments <code>server</code> and <code>ui</code> both expect closures with a specific structure.</p>
 <div class="section level3">
 <h3 id="block-server">Block <code>server</code>
@@ -88,12 +112,12 @@
 </h3>
 <ul>
 <li>A signature with as many arguments as data inputs is expected: zero for a data block, one for a transform block such as a select block, two for a join block and <code>...</code> for an <code>rbind</code> block.</li>
-<li>As return value a call to <code>moduleServer()</code> is expected, containing a <code>module</code> function that in turn returns a list with entries <code>expr</code> and <code>state</code>.</li>
+<li>As return value a call to <code><a href="https://rdrr.io/pkg/shiny/man/moduleServer.html" class="external-link">shiny::moduleServer()</a></code> is expected, containing a <code>module</code> function that in turn returns a list with entries <code>expr</code> and <code>state</code>.</li>
 <li>The block expression is a quoted reactive value that contains user-supplied components and is updated whenever user values change. Data names should match between expressio and the top-level function arguments.</li>
 <li>Block state is defined by the <code>state</code> entry which again is a list of reactives. This is a superset of the constructor arguments (and variable names should be aligned such that the constructor can be called again with an appropriately subsetted state).</li>
 </ul>
 <p>The <code>server</code> component of an identity transform block could be formed as</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">moduleServer</span><span class="op">(</span></span>
 <span>    <span class="st">"expression"</span>,</span>
@@ -114,16 +138,16 @@
 <ul>
 <li>The function signature is expected to contain <code>ns</code> in first place, followed by an arbitrary number of arguments that are aligned with <code>state</code> values such that this function can be called with an updated state.</li>
 <li>A call to appropriate shiny UI functions is expected that return <code>shiny.tag</code> or <code>shiny.tag.list</code> objects.</li>
-<li>Namespaces can be constructed using the <code>ns</code> function which should be passed as first argument the <code>moduleServer()</code> ID and as second argument the input ID.</li>
+<li>Namespaces can be constructed using the <code>ns</code> function which should be passed as first argument the <code><a href="https://rdrr.io/pkg/shiny/man/moduleServer.html" class="external-link">shiny::moduleServer()</a></code> ID and as second argument the input ID.</li>
 <li>The initial evaluation of the <code>ui</code> function will be performed in the context of the constructor scope (i.e. if a value of name <code>xyz</code> is bound the the constructor scope or a parent thereof, this value will be passed as <code>xyz</code> argument).</li>
 </ul>
 <p>The <code>ui</code> component of an identity transform block is trivial:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">function</span><span class="op">(</span><span class="va">ns</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">tagList</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Putting this together, a dataset block could be constructed as</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">new_dataset_block</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dataset</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">package</span> <span class="op">=</span> <span class="st">"datasets"</span>,</span>
 <span>                              <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span></span>
@@ -166,11 +190,80 @@
 <span>    <span class="va">...</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>Note that both <code>server</code> and <code>ui</code> are closures and therfore may refer to names bound in the constructor scope (e.g. <code>dataset</code> and <code>choices</code>). The <code>state</code> entry returned by the server module contains the static value <code>package</code> and this is needed for ser/deser.</p>
+<p>Note that both <code>server</code> and <code>ui</code> are closures and therfore may refer to names bound in the constructor scope (e.g. <code>dataset</code> and <code>choices</code>). The <code>state</code> entry returned by the server module contains the static value <code>package</code> and this is needed for ser/deser (alongside the dynamic value <code>dataset</code>).</p>
+<p>The <code>expr</code> return value is here constructed via a call to <code><a href="https://rdrr.io/r/base/bquote.html" class="external-link">base::bquote()</a></code>. Many other options exsist, such as using tools offered by the rlang package or by passing a string to <code><a href="https://rdrr.io/r/base/parse.html" class="external-link">base::parse()</a></code>, e.g.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  expr <span class="op">=</span> <span class="fu">reactive</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/parse.html" class="external-link">parse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">package</span>, <span class="st">"::"</span>, <span class="va">dataset</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>The block can then be manipulated via UI as</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span><span class="fu"><a href="reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span><span class="st">"iris"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>For more examples, refer to <code>blockr.dplyr::new_select_block()</code> or <code>blockr.dplyr::new_join_block()</code>.</p>
+<p>Another example is a <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">dplyr::select()</a></code> block, such as the one offered by the blockr.dplyr extension package:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">new_select_block</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">columns</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span></span>
+<span>  <span class="fu"><a href="reference/new_block.html">new_transform_block</a></span><span class="op">(</span></span>
+<span>    <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="fu">moduleServer</span><span class="op">(</span></span>
+<span>        <span class="st">"expression"</span>,</span>
+<span>        <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span></span>
+<span></span>
+<span>          <span class="va">sels</span> <span class="op">&lt;-</span> <span class="fu">reactiveVal</span><span class="op">(</span><span class="va">columns</span><span class="op">)</span></span>
+<span>          <span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu">reactive</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span>          <span class="fu">observeEvent</span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">columns</span>, <span class="fu">sels</span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">columns</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span>          <span class="fu">observe</span><span class="op">(</span></span>
+<span>            <span class="fu">updateSelectInput</span><span class="op">(</span></span>
+<span>              <span class="va">session</span>,</span>
+<span>              inputId <span class="op">=</span> <span class="st">"columns"</span>,</span>
+<span>              choices <span class="op">=</span> <span class="fu">cols</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>              selected <span class="op">=</span> <span class="fu">sels</span><span class="op">(</span><span class="op">)</span></span>
+<span>            <span class="op">)</span></span>
+<span>          <span class="op">)</span></span>
+<span></span>
+<span>          <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>            expr <span class="op">=</span> <span class="fu">reactive</span><span class="op">(</span></span>
+<span>              <span class="fu"><a href="https://rdrr.io/r/base/bquote.html" class="external-link">bquote</a></span><span class="op">(</span></span>
+<span>                <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">data</span>, <span class="fu">..</span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu">sels</span><span class="op">(</span><span class="op">)</span>, <span class="va">as.name</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                splice <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>              <span class="op">)</span></span>
+<span>            <span class="op">)</span>,</span>
+<span>            state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>              columns <span class="op">=</span> <span class="fu">reactive</span><span class="op">(</span><span class="fu">sels</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>              choices <span class="op">=</span> <span class="fu">reactive</span><span class="op">(</span><span class="fu">cols</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>            <span class="op">)</span></span>
+<span>          <span class="op">)</span></span>
+<span>        <span class="op">}</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">}</span>,</span>
+<span>    <span class="kw">function</span><span class="op">(</span><span class="va">ns</span>, <span class="va">columns</span>, <span class="va">choices</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="fu">selectInput</span><span class="op">(</span></span>
+<span>        inputId <span class="op">=</span> <span class="fu">ns</span><span class="op">(</span><span class="st">"expression"</span>, <span class="st">"columns"</span><span class="op">)</span>,</span>
+<span>        label <span class="op">=</span> <span class="st">"Columns"</span>,</span>
+<span>        choices <span class="op">=</span> <span class="va">choices</span>,</span>
+<span>        selected <span class="op">=</span> <span class="va">columns</span>,</span>
+<span>        multiple <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">}</span>,</span>
+<span>    class <span class="op">=</span> <span class="st">"select_block"</span>,</span>
+<span>    <span class="va">...</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Here, the state return value contains entries <code>columns</code> (required by the constructor) and <code>choices</code>, which is not an argument of the constructor, but an argument of the UI function. The value for <code>choices</code> can be inferred by the server function but is not available when first drawing the UI. Consequently the signature of the UI function requires a default value (for the initial UI rendering) and the server function contains a call to <code><a href="https://rdrr.io/pkg/shiny/man/updateSelectInput.html" class="external-link">shiny::updateSelectInput()</a></code> to populate the selec choices as soon as the corresponding value is available. As the UI function can be used to re-draw the UI from scratch, <code>choices</code> also is required to be included in <code>state</code> for correctly re-drawing the block UI.</p>
+<p>An app containing such a select block can be spun up as</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span><span class="fu">new_select_block</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mpg"</span>, <span class="st">"cyl"</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>For an example with multiple data inputs, refer to <code><a href="https://rdrr.io/pkg/blockr.dplyr/man/new_join_block.html" class="external-link">blockr.dplyr::new_join_block()</a></code>, which can be explored in a standalone app as</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span></span>
+<span>  <span class="fu">blockr.dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/blockr.dplyr/man/new_join_block.html" class="external-link">new_join_block</a></span><span class="op">(</span>by <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="va"><a href="https://dplyr.tidyverse.org/reference/band_members.html" class="external-link">band_members</a></span>, y <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="va"><a href="https://dplyr.tidyverse.org/reference/band_members.html" class="external-link">band_instruments</a></span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>The <code>data</code> argument to <code><a href="reference/serve.html">serve()</a></code> expects a list with names components that match the server function signature, i.e. <code>data</code> for <code>blockr.core::new_select_block()</code> and <code>x</code>, <code>y</code> for <code><a href="https://rdrr.io/pkg/blockr.dplyr/man/new_join_block.html" class="external-link">blockr.dplyr::new_join_block()</a></code>. These names can be chosen freely by the block implementer.</p>
 </div>
 </div>
 </div>
@@ -205,7 +298,7 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/cynkra/blockr.core/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/cynkra/blockr.core/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/cynkra/blockr.core/actions/workflows/check.yaml" class="external-link"><img src="https://github.com/cynkra/blockr.core/actions/workflows/check.yaml/badge.svg" alt="check"></a></li>
 </ul>
 </div>
 
