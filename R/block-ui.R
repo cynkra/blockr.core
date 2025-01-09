@@ -30,22 +30,10 @@ expr_ui <- function(x, ns = block_ns(x), ...) {
 #' @rdname block_ui
 #' @export
 expr_ui.block <- function(x, ns = block_ns(x), ...) {
-
-  fun <- block_expr_ui(x)
-
-  if (...length()) {
-    return(fun(ns = ns, ...))
-  }
-
-  form <- formals(fun)
-
-  args <- mget(
-    setdiff(names(form[lgl_ply(form, is.symbol)]), "ns"),
-    envir = environment(fun),
-    inherits = TRUE
+  do.call(
+    block_expr_ui(x),
+    list(ns = ns, ...)
   )
-
-  do.call(fun, c(list(ns = ns), args))
 }
 
 #' @param result Reactive block result

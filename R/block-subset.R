@@ -25,7 +25,7 @@ new_subset_block <- function(subset = "", select = "", ...) {
         }
       )
     },
-    function(ns, subset, select) {
+    function(ns) {
       tagList(
         textInput(
           inputId = ns("expression", "subset"),

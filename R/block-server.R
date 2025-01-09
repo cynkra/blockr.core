@@ -73,7 +73,7 @@ check_expr_server_return_value <- function(x, ret) {
              " is expected to be a reactive.")
       }
 
-      expected <- union(block_ctor_inputs(x), block_ui_inputs(x))
+      expected <- block_ctor_inputs(x)
       current <- names(ret[["state"]])
 
       if (!setequal(current, expected)) {

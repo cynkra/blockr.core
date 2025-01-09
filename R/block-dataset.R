@@ -46,7 +46,7 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
         }
       )
     },
-    function(ns, dataset, package) {
+    function(ns) {
       selectInput(
         inputId = ns("expression", "dataset"),
         label = "Dataset",
