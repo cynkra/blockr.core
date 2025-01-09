@@ -33,9 +33,6 @@ board_ui.board <- function(x) {
         class = "mx-2"
       ),
     ),
-    div(
-      class = "m-2 row",
-      do.call(div, c(class = "d-flex flex-wrap", cards))
-    )
+    cards
   )
 }

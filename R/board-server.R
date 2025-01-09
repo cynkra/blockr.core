@@ -55,7 +55,7 @@ board_server.board <- function(x) {
         }
       )
 
-      rv$blocks
+      reactive(rv$blocks)
     }
   )
 }
