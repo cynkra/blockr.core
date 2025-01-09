@@ -2,7 +2,7 @@ topo_sort <- function(vertices, edges) {
 
   stopifnot(
     is.character(vertices), is.data.frame(edges),
-    setequal(colnames(edges), c("from", "to")),
+    all(c("from", "to") %in% colnames(edges)),
     all(edges[["from"]] %in% vertices), all(edges[["to"]] %in% vertices)
   )
 
