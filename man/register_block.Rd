@@ -5,6 +5,7 @@
 \alias{list_blocks}
 \alias{unregister_block}
 \alias{register_blocks}
+\alias{available_blocks}
 \alias{create_block}
 \title{Block registry}
 \usage{
@@ -24,6 +25,8 @@ list_blocks()
 unregister_block(uid)
 
 register_blocks(...)
+
+available_blocks()
 
 create_block(uid, ...)
 }

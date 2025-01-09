@@ -106,6 +106,12 @@ get_registry_entry <- function(uid) {
 
 #' @rdname register_block
 #' @export
+available_blocks <- function() {
+  lapply(set_names(nm = list_blocks()), get_registry_entry)
+}
+
+#' @rdname register_block
+#' @export
 create_block <- function(uid, ...) {
   ctor <- get_registry_entry(uid)
   ctor(..., ctor = attr(ctor, "ctor_name"), ctor_pkg = attr(ctor, "package"))
