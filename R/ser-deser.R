@@ -3,7 +3,7 @@
 #' Object (de)serialization.
 #'
 #' @param x Object to (de)serialize
-#' @param state Generic consistency
+#' @param ... Generic consistency
 #'
 #' @export
 to_json <- function(x, ...) {
@@ -79,6 +79,7 @@ from_json.list <- function(x, ...) {
   from_json(structure(list(), class = x[["object"]]), x)
 }
 
+#' @param data List valued data (converted from JSON)
 #' @rdname to_json
 #' @export
 from_json.block <- function(x, data, ...) {

@@ -33,9 +33,13 @@ from_json(x, ...)
 \arguments{
 \item{x}{Object to (de)serialize}
 
+\item{...}{Generic consistency}
+
 \item{state}{Object state (as returned from an \code{expr_server})}
 
 \item{blocks}{JSON-serialized blocks}
+
+\item{data}{List valued data (converted from JSON)}
 }
 \description{
 Object (de)serialization.
