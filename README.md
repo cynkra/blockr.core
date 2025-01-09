@@ -31,6 +31,38 @@ library(blockr.core)
 serve(new_dataset_block("iris"))
 ```
 
+or for a block that requires input, by additionally passing static data
+such as
+
+``` r
+serve(
+  blockr.dplyr::new_join_block(by = "name"),
+  data = list(x = dplyr::band_members, y = dplyr::band_instruments)
+)
+```
+
+If previewing multiple connected block is desired, a board can be
+created and passed to `serve()`, e.g.
+
+``` r
+serve(
+  new_board(
+    blocks = list(
+      blockr.dplyr::new_join_block(uid = "d"),
+      new_dataset_block(uid = "a"),
+      blockr.dplyr::new_select_block(uid = "c"),
+      blockr.dplyr::new_select_block(uid = "e"),
+      new_dataset_block(uid = "b")
+    ),
+    links = data.frame(
+      from = c("a", "c", "b", "d"),
+      to = c("d", "d", "c", "e"),
+      input = c("x", "y", "", "")
+    )
+  )
+)
+```
+
 ## How to create a block
 
 A block constructor should expose as arguments anything that defines its
