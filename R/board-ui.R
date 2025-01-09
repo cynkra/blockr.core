@@ -16,14 +16,6 @@ board_ui.board <- function(x) {
   id <- attr(x, "id")
   ns <- NS(id)
 
-  blocks <- lapply(sort(x), block_ui, id = id)
-
-  cards <- lapply(
-    lapply(blocks, div, class = "card-body p-1"),
-    div,
-    class = "card shadow-sm p-2 mb-2 border"
-  )
-
   tagList(
     div(
       class = "d-flex justify-content-center",
@@ -32,7 +24,23 @@ board_ui.board <- function(x) {
         "Save",
         class = "mx-2"
       ),
+      fileInput(
+        ns("restore"),
+        "Restore"
+      )
     ),
-    cards
+    do.call(div, list(id = paste0(id, "_blocks"), block_cards(x)))
+  )
+}
+
+block_cards <- function(x) {
+  lapply(
+    lapply(
+      lapply(sort(x), block_ui, id = attr(x, "id")),
+      div,
+      class = "card-body p-1"
+    ),
+    div,
+    class = "card shadow-sm p-2 mb-2 border"
   )
 }

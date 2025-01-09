@@ -7,7 +7,9 @@
 \alias{from_json}
 \alias{from_json.json}
 \alias{from_json.character}
+\alias{from_json.list}
 \alias{from_json.block}
+\alias{from_json.board}
 \title{Serialization}
 \usage{
 to_json(x, ...)
@@ -22,7 +24,11 @@ from_json(x, ...)
 
 \method{from_json}{character}(x, ...)
 
+\method{from_json}{list}(x, ...)
+
 \method{from_json}{block}(x, data, ...)
+
+\method{from_json}{board}(x, data, ...)
 }
 \arguments{
 \item{x}{Object to (de)serialize}

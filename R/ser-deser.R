@@ -41,6 +41,7 @@ to_json.board <- function(x, blocks, ...) {
       "\"object\":[", paste0("\"", class(x), "\"", collapse = ", "), "],",
       "\"blocks\":[", paste0(blocks, collapse = ", "), "],",
       "\"links\":", jsonlite::toJSON(x[["links"]], auto_unbox = TRUE), ",",
+      "\"id\":\"", attr(x, "id"), "\",",
       "\"version\":\"",
         as.character(utils::packageVersion(utils::packageName())),
       "\"",
@@ -63,12 +64,19 @@ from_json.json <- function(x, ...) {
 #' @rdname to_json
 #' @export
 from_json.character <- function(x, ...) {
+  from_json(
+    jsonlite::fromJSON(
+      paste0(x, collapse = ""),
+      simplifyDataFrame = FALSE
+    )
+  )
+}
 
-  dat <- jsonlite::fromJSON(x)
-
-  stopifnot("object" %in% names(dat))
-
-  from_json(structure(list(), class = dat[["object"]]), dat)
+#' @rdname to_json
+#' @export
+from_json.list <- function(x, ...) {
+  stopifnot("object" %in% names(x))
+  from_json(structure(list(), class = x[["object"]]), x)
 }
 
 #' @rdname to_json
@@ -95,4 +103,15 @@ from_json.block <- function(x, data, ...) {
   )
 
   do.call(ctor, args)
+}
+
+#' @rdname to_json
+#' @export
+from_json.board <- function(x, data, ...) {
+  new_board(
+    lapply(data[["blocks"]], from_json),
+    do.call(rbind.data.frame, data[["links"]]),
+    id = data[["id"]],
+    class = setdiff(class(x), "board")
+  )
 }
