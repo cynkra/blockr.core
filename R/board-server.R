@@ -25,10 +25,9 @@ board_server.board <- function(x) {
       observeEvent(
         TRUE,
         {
-          for (blk in sort(rv$board)) {
-            rv <- setup_block(blk, rv, rv$board[["links"]])
-          }
+          rv <- setup_blocks(rv)
         },
+        priority = 100,
         once = TRUE
       )
 
@@ -52,15 +51,13 @@ board_server.board <- function(x) {
           ui = block_cards(rv$board)
         )
 
-        rv$blocks <- list()
-        rv$inputs <- list()
-
-        for (blk in sort(rv$board)) {
-          rv <- setup_block(blk, rv, rv$board[["links"]])
-        }
+        rv <- setup_blocks(rv)
       })
 
-      reactive(rv$blocks)
+      list(
+        board = reactive(rv$board),
+        blocks = reactive(rv$blocks)
+      )
     }
   )
 }
@@ -88,6 +85,24 @@ write_board_to_disk <- function(x, rv) {
 
     writeLines(json, con)
   }
+}
+
+setup_blocks <- function(rv) {
+
+  stopifnot(
+    is.reactivevalues(rv),
+    setequal(names(rv), c("blocks", "inputs", "board")),
+    is_board(rv$board)
+  )
+
+  rv$blocks <- list()
+  rv$inputs <- list()
+
+  for (blk in sort(rv$board)) {
+    rv <- setup_block(blk, rv, rv$board[["links"]])
+  }
+
+  rv
 }
 
 setup_block <- function(blk, rv, links) {

@@ -2,6 +2,7 @@
 % Please edit documentation in R/board-class.R
 \name{new_board}
 \alias{new_board}
+\alias{is_board}
 \title{Board}
 \usage{
 new_board(
@@ -11,6 +12,8 @@ new_board(
   id = "board",
   class = character()
 )
+
+is_board(x)
 }
 \arguments{
 \item{blocks}{List of blocks}
@@ -22,6 +25,8 @@ new_board(
 \item{id}{Board ID}
 
 \item{class}{Board sub-class}
+
+\item{x}{A board object}
 }
 \description{
 Blocks are placed on a board.

@@ -71,6 +71,13 @@ new_board <- function(blocks = list(), links = data.frame(from = character(),
   )
 }
 
+#' @param x A board object
+#' @rdname new_board
+#' @export
+is_board <- function(x) {
+  inherits(x, "board")
+}
+
 #' @export
 sort.board <- function(x, decreasing = FALSE, ...) {
 
