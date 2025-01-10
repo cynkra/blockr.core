@@ -13,7 +13,7 @@ board_server <- function(x) {
 #' @export
 board_server.board <- function(x) {
   moduleServer(
-    attr(x, "id"),
+    board_id(x),
     function(input, output, session) {
 
       rv <- reactiveValues(
@@ -39,7 +39,7 @@ board_server.board <- function(x) {
       observeEvent(input$restore, {
 
         removeUI(
-          paste0("#", attr(rv$board, "id"), "_blocks", " > div")
+          paste0("#", board_id(rv$board), "_blocks > div")
         )
 
         rv$board <- from_json(
@@ -47,7 +47,7 @@ board_server.board <- function(x) {
         )
 
         insertUI(
-          paste0("#", attr(rv$board, "id"), "_blocks"),
+          paste0("#", board_id(rv$board), "_blocks"),
           "afterBegin",
           block_cards(rv$board)
         )
@@ -57,19 +57,38 @@ board_server.board <- function(x) {
 
       observeEvent(input$add_block, {
 
-        req(input$block_select)
+        req(input$registry_select)
 
-        blk <- create_block(input$block_select)
+        blk <- create_block(input$registry_select)
 
         insertUI(
-          paste0("#", attr(rv$board, "id"), "_blocks"),
+          paste0("#", board_id(rv$board), "_blocks"),
           "beforeEnd",
-          block_card(blk, attr(rv$board, "id"))
+          block_card(blk, board_id(rv$board))
         )
 
         rv$board <- add_block(rv$board, blk)
 
         rv <- setup_block(blk, rv)
+      })
+
+      observe(
+        updateSelectInput(
+          session,
+          inputId = "block_select",
+          choices = block_ids(rv$board)
+        )
+      )
+
+      observeEvent(input$rm_block, {
+
+        req(input$block_select)
+
+        removeUI(
+          paste0("#", input$block_select, "_block")
+        )
+
+        rv <- destroy_block(input$block_select, rv)
       })
 
       list(
@@ -83,7 +102,7 @@ board_server.board <- function(x) {
 board_filename <- function(x) {
   function() {
     paste0(
-      attr(x, "id"), "_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), ".json"
+      board_id(x), "_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), ".json"
     )
   }
 }
@@ -127,7 +146,7 @@ setup_block <- function(blk, rv) {
 
   id <- block_uid(blk)
 
-  links <- rv$board[["links"]]
+  links <- board_links(rv$board)
 
   if (block_arity(blk)) {
 
@@ -160,6 +179,16 @@ setup_block <- function(blk, rv) {
       data = rv$inputs[[id]]
     )
   )
+
+  rv
+}
+
+destroy_block <- function(id, rv) {
+
+  rv$inputs[[id]] <- NULL
+  rv$blocks[[id]] <- NULL
+
+  rv$board <- remove_blocks(rv$board, id)
 
   rv
 }

@@ -18,27 +18,61 @@ new_board <- function(blocks = list(), links = data.frame(from = character(),
     blocks <- list(blocks)
   }
 
-  stopifnot(
-    all(lgl_ply(blocks, is_block)),
-    is.data.frame(links), setequal(colnames(links), c("from", "to", "input"))
+  validate_board(
+    structure(
+      list(blocks = blocks, links = links, ...),
+      id = id,
+      class = c(class, "board")
+    )
   )
+}
+
+validate_board <- function(x) {
+
+  blocks <- board_blocks(x)
+  links <- board_links(x)
+
+  if (!is.list(blocks) || !all(lgl_ply(blocks, is_block))) {
+    browser()
+    stop("Expecting the board to contain a set of blocks.")
+  }
+
+  if (!is.data.frame(links)) {
+    stop("Expecting links to be represented by a data.frame.")
+  }
+
+  link_cols <- c("from", "to", "input")
+
+  if (!setequal(colnames(links), link_cols)) {
+    stop(
+      "Expecting the link data.frame to contain columns ",
+      paste_enum(link_cols)
+    )
+  }
 
   ids <- chr_ply(blocks, block_uid)
 
-  stopifnot(
-    all(links$from %in% ids), all(links$to %in% ids),
-    anyDuplicated(ids) == 0, !any(links$from == links$to)
-  )
+  if (anyDuplicated(ids) != 0) {
+    stop("Block IDs are required to be unique.")
+  }
+
+  if (!all(links$from %in% ids) || !all(links$to %in% ids)) {
+    stop("Expecting all links to refer to known block IDs.")
+  }
+
+  if (any(links$from == links$to)) {
+    stop("Self-referencing blocks are not allowed.")
+  }
 
   arity <- int_ply(blocks, block_arity)
 
   for (i in Filter(Negate(is.na), unique(arity))) {
 
-    fail <- table(factor(links$to, levels = ids[arity == i])) != i
+    fail <- table(factor(links$to, levels = ids[arity == i])) > i
 
     if (any(fail)) {
       stop(
-        i, "-ary blocks are expected to have exactly ", i, " incoming edges, ",
+        i, "-ary blocks are expected to have at most ", i, " incoming edges, ",
         "which does not hold for blocks ", paste_enum(names(fail)[fail]), "."
       )
     }
@@ -64,11 +98,7 @@ new_board <- function(blocks = list(), links = data.frame(from = character(),
     }
   }
 
-  structure(
-    list(blocks = blocks, links = links, ...),
-    id = id,
-    class = c(class, "board")
-  )
+  x
 }
 
 #' @param x A board object
@@ -102,11 +132,54 @@ serve.board <- function(x, ...) {
   shinyApp(ui, server)
 }
 
+board_id <- function(x) {
+  stopifnot(is_board(x))
+  attr(x, "id")
+}
+
+board_blocks <- function(x) {
+  stopifnot(is_board(x))
+  x[["blocks"]]
+}
+
+`board_blocks<-` <- function(x, value) {
+  stopifnot(is_board(x))
+  x[["blocks"]] <- value
+  validate_board(x)
+}
+
+board_links <- function(x) {
+  stopifnot(is_board(x))
+  x[["links"]]
+}
+
+`board_links<-` <- function(x, value) {
+  stopifnot(is_board(x))
+  x[["links"]] <- value
+  validate_board(x)
+}
+
+block_ids <- function(x) {
+  chr_ply(board_blocks(x), block_uid)
+}
+
 add_block <- function(x, blk) {
 
   stopifnot(is_board(x), is_block(blk))
 
-  x[["blocks"]] <- c(x[["blocks"]], blk)
+  board_blocks(x) <- c(board_blocks(x), list(blk))
+
+  x
+}
+
+remove_blocks <- function(x, ids) {
+
+  stopifnot(is_board(x), is.character(ids), all(ids %in% block_ids(x)))
+
+  links <- board_links(x)
+
+  board_links(x) <- links[!links$from %in% ids & !links$to %in% ids, ]
+  board_blocks(x) <- board_blocks(x)[!block_ids(x) %in% ids]
 
   x
 }

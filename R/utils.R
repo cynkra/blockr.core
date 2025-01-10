@@ -137,13 +137,15 @@ set_names <- function(object = nm, nm) {
   object
 }
 
-paste_enum <- function(x, sep = ", ", conj = " and ") {
+paste_enum <- function(x, sep = ", ", conj = " and ", quotes = "`") {
 
   if (length(x) <= 1L) {
     return(x)
   }
 
   paste0(
-    paste0(x[seq_len(length(x) - 1L)], collapse = sep), conj, x[length(x)]
+    paste0(quotes, x[seq_len(length(x) - 1L)], quotes, collapse = sep),
+    conj,
+    quotes, x[length(x)], quotes
   )
 }
