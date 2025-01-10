@@ -23,9 +23,19 @@ block_server.block <- function(x, data, ...) {
       check_expr_server_return_value(x, exp)
 
       res <- reactive({
-        do.call(req, lapply(exp$state, reval_if))
+
+        dat_eval <- lapply(data, reval)
+
+        do.call(
+          req,
+          c(
+            lapply(exp$state, reval_if),
+            dat_eval
+          )
+        )
+
         tryCatch(
-          eval(exp$expr(), lapply(data, reval)),
+          eval(exp$expr(), dat_eval),
           error = function(e) {
             showNotification(conditionMessage(e), duration = NULL,
                              type = "error")

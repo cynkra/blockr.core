@@ -7,7 +7,7 @@
 \usage{
 board_ui(x)
 
-\method{board_ui}{board}(x)
+\method{board_ui}{board}(x, new_block_ui)
 }
 \arguments{
 \item{x}{Board}

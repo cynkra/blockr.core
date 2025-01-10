@@ -101,3 +101,12 @@ serve.board <- function(x, ...) {
 
   shinyApp(ui, server)
 }
+
+add_block <- function(x, blk) {
+
+  stopifnot(is_board(x), is_block(blk))
+
+  x[["blocks"]] <- c(x[["blocks"]], blk)
+
+  x
+}

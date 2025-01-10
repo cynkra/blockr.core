@@ -48,10 +48,28 @@ board_server.board <- function(x) {
 
         insertUI(
           paste0("#", attr(rv$board, "id"), "_blocks"),
-          ui = block_cards(rv$board)
+          "afterBegin",
+          block_cards(rv$board)
         )
 
         rv <- setup_blocks(rv)
+      })
+
+      observeEvent(input$add_block, {
+
+        req(input$block_select)
+
+        blk <- create_block(input$block_select)
+
+        insertUI(
+          paste0("#", attr(rv$board, "id"), "_blocks"),
+          "beforeEnd",
+          block_card(blk, attr(rv$board, "id"))
+        )
+
+        rv$board <- add_block(rv$board, blk)
+
+        rv <- setup_block(blk, rv)
       })
 
       list(
@@ -99,22 +117,39 @@ setup_blocks <- function(rv) {
   rv$inputs <- list()
 
   for (blk in sort(rv$board)) {
-    rv <- setup_block(blk, rv, rv$board[["links"]])
+    rv <- setup_block(blk, rv)
   }
 
   rv
 }
 
-setup_block <- function(blk, rv, links) {
+setup_block <- function(blk, rv) {
 
   id <- block_uid(blk)
 
+  links <- rv$board[["links"]]
+
   if (block_arity(blk)) {
-    rv$inputs[[id]] <- lapply(
-      set_names(links$from[links$to == id], links$input[links$to == id]),
-      function(src) rv$blocks[[src]]$server$result
-    )
+
+    hits <- links$to == id
+
+    if (sum(hits)) {
+
+      rv$inputs[[id]] <- lapply(
+        set_names(links$from[hits], links$input[hits]),
+        function(src) rv$blocks[[src]]$server$result
+      )
+
+    } else {
+
+      rv$inputs[[id]] <- set_names(
+        rep(list(function() list()), block_arity(blk)),
+        block_inputs(blk)
+      )
+    }
+
   } else {
+
     rv$inputs[[id]] <- list()
   }
 

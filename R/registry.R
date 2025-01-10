@@ -110,10 +110,11 @@ available_blocks <- function() {
   lapply(set_names(nm = list_blocks()), get_registry_entry)
 }
 
+#' @param id Block ID as reported by `list_blocks()`
 #' @rdname register_block
 #' @export
-create_block <- function(uid, ...) {
-  ctor <- get_registry_entry(uid)
+create_block <- function(id, ...) {
+  ctor <- get_registry_entry(id)
   ctor(..., ctor = attr(ctor, "ctor_name"), ctor_pkg = attr(ctor, "package"))
 }
 

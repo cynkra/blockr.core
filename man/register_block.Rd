@@ -28,7 +28,7 @@ register_blocks(...)
 
 available_blocks()
 
-create_block(uid, ...)
+create_block(id, ...)
 }
 \arguments{
 \item{ctor}{Block constructor}
@@ -47,6 +47,8 @@ blocks are uncategorized.}
 \item{overwrite}{Overwrite existing entry}
 
 \item{...}{Forwarded to \code{register_block()}}
+
+\item{id}{Block ID as reported by \code{list_blocks()}}
 }
 \description{
 Register, list and retrieve available blocks.
