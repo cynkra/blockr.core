@@ -26,13 +26,14 @@ block_server.block <- function(x, data, ...) {
 
         dat_eval <- lapply(data, reval)
 
-        do.call(
-          req,
-          c(
-            lapply(exp$state, reval_if),
-            dat_eval
-          )
+        required <- c(
+          lapply(exp$state, reval_if),
+          dat_eval
         )
+
+        if (any(lgl_ply(required, Negate(isTruthy)))) {
+          return(NULL)
+        }
 
         tryCatch(
           eval(exp$expr(), dat_eval),

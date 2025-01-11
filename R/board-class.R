@@ -43,11 +43,15 @@ validate_board <- function(x) {
 
   link_cols <- c("from", "to", "input")
 
-  if (!setequal(colnames(links), link_cols)) {
+  if (!all(link_cols %in% colnames(links))) {
     stop(
-      "Expecting the link data.frame to contain columns ",
+      "Expecting the link data.frame to contain at least columns ",
       paste_enum(link_cols)
     )
+  }
+
+  if (!all(lgl_ply(links, is.character))) {
+    stop("Expecting all link columns to be of type `character`.")
   }
 
   ids <- chr_ply(blocks, block_uid)
@@ -84,7 +88,7 @@ validate_board <- function(x) {
 
   inputs <- set_names(lapply(blocks, block_inputs), ids)
 
-  links$input[to_complete] <- inputs[links$to[to_complete]]
+  links$input[to_complete] <- chr_ply(inputs[links$to[to_complete]], identity)
 
   for (i in unique(links$to)) {
 
@@ -96,6 +100,21 @@ validate_board <- function(x) {
         " but received ", paste_enum(actual)
       )
     }
+  }
+
+  if (!"id" %in% colnames(links)) {
+    links <- cbind(id = rep("", nrow(links)), links)
+  }
+
+  to_complete <- links$id == "" | is.na(links$id)
+
+  links[to_complete, ]$id <- rand_names(
+    links[!to_complete, ]$id,
+    sum(to_complete)
+  )
+
+  if (anyDuplicated(links$id) != 0L) {
+    stop("Link IDs are required to be unique.")
   }
 
   x[["links"]] <- links
@@ -192,10 +211,9 @@ modify_links <- function(x, add = NULL, rm = NULL) {
 
   if (not_null(rm)) {
 
-    stopifnot(is_intish(rm), anyDuplicated(rm) == 0L, max(rm) <= nrow(links),
-              min(rm) >= 1L)
+    stopifnot(is.character(rm), anyDuplicated(rm) == 0L, all(rm %in% links$id))
 
-    links <- links[-rm, ]
+    links <- links[!links$id %in% rm, ]
   }
 
   cols <- colnames(links)

@@ -19,7 +19,8 @@ board_server.board <- function(x) {
       rv <- reactiveValues(
         blocks = list(),
         inputs = list(),
-        board = x
+        board = x,
+        links = list()
       )
 
       observeEvent(
@@ -27,7 +28,6 @@ board_server.board <- function(x) {
         {
           rv <- setup_blocks(rv)
         },
-        priority = 100,
         once = TRUE
       )
 
@@ -118,10 +118,14 @@ board_server.board <- function(x) {
 
         temp[, input$links_cell_edit$col] <- input$links_cell_edit$value
 
-        link_updates$rm <- c(link_updates$rm, input$links_cell_edit$row)
+        link_updates$rm <- c(
+          link_updates$rm,
+          orig$id[input$links_cell_edit$row]
+        )
+
         link_updates$add <- rbind(
           link_updates$add,
-          orig[input$links_cell_edit$row, ]
+          temp
         )
       })
 
@@ -131,7 +135,11 @@ board_server.board <- function(x) {
             new <- modify_links(rv$board, link_updates$add, link_updates$rm)
             old <- board_links(rv$board)
 
-            update_block_links(rv, link_updates$add, old[link_updates$rm, ])
+            rv <- update_block_connections(
+              rv,
+              add = link_updates$add,
+              rm = old[old$id %in% link_updates$rm, ]
+            )
 
             link_updates$add <- NULL
             link_updates$rm <- NULL
@@ -157,22 +165,16 @@ board_server.board <- function(x) {
   )
 }
 
-update_block_links <- function(rv, add, rm) {
+update_block_connections <- function(rv, add, rm) {
 
   for (i in seq_len(nrow(rm))) {
-    rv$inputs[[rm[i, "to"]]][[rm[i, "input"]]] <- function() list()
+    rv <- do.call(destroy_connection, c(list(rv), rm[i, ]))
   }
 
   for (i in seq_len(nrow(add))) {
-    rv$inputs[[add[i, "to"]]][[add[i, "input"]]] <-
-      rv$blocks[[add[i, "from"]]]$server$result
+    rv <- do.call(setup_connection, c(list(rv), add[i, ]))
   }
 
-  rv
-}
-
-rm_block_link <- function(link, rv) {
-  rv$inputs[[link[["to"]]]][[link[["input"]]]] <- function() list()
   rv
 }
 
@@ -216,7 +218,7 @@ setup_blocks <- function(rv) {
 
   stopifnot(
     is.reactivevalues(rv),
-    setequal(names(rv), c("blocks", "inputs", "board")),
+    setequal(names(rv), c("blocks", "inputs", "board", "links")),
     is_board(rv$board)
   )
 
@@ -234,30 +236,15 @@ setup_block <- function(blk, rv) {
 
   id <- block_uid(blk)
 
+  rv$inputs[[id]] <- set_names(
+    replicate(block_arity(blk), reactiveVal()),
+    block_inputs(blk)
+  )
+
   links <- board_links(rv$board)
 
-  if (block_arity(blk)) {
-
-    hits <- links$to == id
-
-    if (sum(hits)) {
-
-      rv$inputs[[id]] <- lapply(
-        set_names(links$from[hits], links$input[hits]),
-        function(src) rv$blocks[[src]]$server$result
-      )
-
-    } else {
-
-      rv$inputs[[id]] <- set_names(
-        rep(list(function() list()), block_arity(blk)),
-        block_inputs(blk)
-      )
-    }
-
-  } else {
-
-    rv$inputs[[id]] <- list()
+  for (i in which(links$to == id)) {
+    rv <- do.call(setup_connection, c(list(rv), links[i, ]))
   }
 
   rv$blocks[[id]] <- list(
@@ -267,6 +254,30 @@ setup_block <- function(blk, rv) {
       data = rv$inputs[[id]]
     )
   )
+
+  rv
+}
+
+setup_connection <- function(rv, id, from, to, input) {
+
+  rv$links[[id]] <- observeEvent(
+    rv$blocks[[from]]$server$result(),
+    {
+      rv$inputs[[to]][[input]](
+        rv$blocks[[from]]$server$result()
+      )
+    }
+  )
+
+  rv
+}
+
+destroy_connection <- function(rv, id, from, to, input) {
+
+  rv$links[[id]]$destroy()
+  rv$links[[id]] <- NULL
+
+  rv$inputs[[to]][[input]](NULL)
 
   rv
 }
