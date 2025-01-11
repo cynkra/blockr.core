@@ -49,6 +49,11 @@ board_ui.board <- function(x, new_block_ui) {
         "Remove block",
         icon = icon("minus"),
         class = "btn-danger"
+      ),
+      actionButton(
+        ns("links"),
+        "Show connections",
+        icon = icon("table")
       )
     ),
     do.call(div, list(id = paste0(id, "_blocks"), block_cards(x)))

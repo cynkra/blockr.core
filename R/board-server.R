@@ -91,11 +91,99 @@ board_server.board <- function(x) {
         rv <- destroy_block(input$block_select, rv)
       })
 
+      output$links <- DT::renderDT(
+        {
+          DT::datatable(
+            board_links(rv$board),
+            options = list(pageLength = 5),
+            editable = TRUE
+          )
+        },
+        server = TRUE
+      )
+
+      observeEvent(input$links, {
+        showModal(links_modal(session$ns))
+      })
+
+      link_updates <- reactiveValues(
+        add = NULL,
+        rm = NULL
+      )
+
+      observeEvent(input$links_cell_edit, {
+
+        orig <- board_links(rv$board)
+        temp <- orig[input$links_cell_edit$row, ]
+
+        temp[, input$links_cell_edit$col] <- input$links_cell_edit$value
+
+        link_updates$rm <- c(link_updates$rm, input$links_cell_edit$row)
+        link_updates$add <- rbind(
+          link_updates$add,
+          orig[input$links_cell_edit$row, ]
+        )
+      })
+
+      observeEvent(input$modify_links, {
+        rv <- tryCatch(
+          {
+            new <- modify_links(rv$board, link_updates$add, link_updates$rm)
+            old <- board_links(rv$board)
+
+            update_block_links(rv, link_updates$add, old[link_updates$rm, ])
+
+            link_updates$add <- NULL
+            link_updates$rm <- NULL
+
+            rv$board <- new
+
+            removeModal()
+
+            rv
+          },
+          error = function(e) {
+            showNotification(conditionMessage(e), duration = NULL,
+                             type = "error")
+          }
+        )
+      })
+
       list(
         board = reactive(rv$board),
         blocks = reactive(rv$blocks)
       )
     }
+  )
+}
+
+update_block_links <- function(rv, add, rm) {
+
+  for (i in seq_len(nrow(rm))) {
+    rv$inputs[[rm[i, "to"]]][[rm[i, "input"]]] <- function() list()
+  }
+
+  for (i in seq_len(nrow(add))) {
+    rv$inputs[[add[i, "to"]]][[add[i, "input"]]] <-
+      rv$blocks[[add[i, "from"]]]$server$result
+  }
+
+  rv
+}
+
+rm_block_link <- function(link, rv) {
+  rv$inputs[[link[["to"]]]][[link[["input"]]]] <- function() list()
+  rv
+}
+
+links_modal <- function(ns) {
+  modalDialog(
+    title = "Board connections",
+    DT::dataTableOutput(ns("links")),
+    footer = tagList(
+      modalButton("Cancel"),
+      actionButton(ns("modify_links"), "OK")
+    )
   )
 }
 

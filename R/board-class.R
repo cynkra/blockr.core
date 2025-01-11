@@ -98,6 +98,8 @@ validate_board <- function(x) {
     }
   }
 
+  x[["links"]] <- links
+
   x
 }
 
@@ -180,6 +182,32 @@ remove_blocks <- function(x, ids) {
 
   board_links(x) <- links[!links$from %in% ids & !links$to %in% ids, ]
   board_blocks(x) <- board_blocks(x)[!block_ids(x) %in% ids]
+
+  x
+}
+
+modify_links <- function(x, add = NULL, rm = NULL) {
+
+  links <- board_links(x)
+
+  if (not_null(rm)) {
+
+    stopifnot(is_intish(rm), anyDuplicated(rm) == 0L, max(rm) <= nrow(links),
+              min(rm) >= 1L)
+
+    links <- links[-rm, ]
+  }
+
+  cols <- colnames(links)
+
+  if (not_null(add)) {
+
+    stopifnot(is.data.frame(add), setequal(cols, colnames(add)))
+
+    links <- rbind(links, add[, cols])
+  }
+
+  board_links(x) <- links
 
   x
 }
