@@ -182,6 +182,12 @@ serve.data_block <- function(x, ...) {
 #' @rdname new_block
 #' @export
 block_inputs <- function(x) {
+  UseMethod("block_inputs")
+}
+
+#' @rdname new_block
+#' @export
+block_inputs.block <- function(x) {
   names(formals(block_expr_server(x)))
 }
 

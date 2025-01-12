@@ -52,7 +52,7 @@ board_ui.board <- function(x, new_block_ui) {
       ),
       actionButton(
         ns("links"),
-        "Show connections",
+        "Edit connections",
         icon = icon("table")
       )
     ),

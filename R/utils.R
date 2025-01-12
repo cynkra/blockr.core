@@ -149,3 +149,17 @@ paste_enum <- function(x, sep = ", ", conj = " and ", quotes = "`") {
     quotes, x[length(x)], quotes
   )
 }
+
+coal <- function(..., fail_null = TRUE) {
+
+  for (i in seq_len(...length())) {
+    x <- ...elt(i)
+    if (is.null(x)) next else return(x)
+  }
+
+  if (isTRUE(fail_null)) {
+    stop("No non-NULL value encountered")
+  }
+
+  NULL
+}

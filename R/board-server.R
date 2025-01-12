@@ -98,42 +98,105 @@ board_server.board <- function(x) {
       link_updates <- reactiveValues(
         add = NULL,
         rm = NULL,
-        curr = isolate(board_links(rv$board))
+        curr = isolate(board_links(rv$board)),
+        obs = list(),
+        edit = NULL
       )
 
       output$links <- DT::renderDT(
         {
-          DT::datatable(
-            link_updates$curr,
-            options = list(pageLength = 5),
-            editable = list(
-              target = "cell",
-              disable = list(
-                columns = which(colnames(link_updates$curr) == "id")
-              )
+          dat <- data.frame(
+            From = apply(link_updates$curr, 1L, dt_selectize, session$ns,
+                         "from", choices = block_ids(rv$board)),
+            To = apply(link_updates$curr, 1L, dt_selectize, session$ns, "to",
+                       choices = block_ids(rv$board)),
+            Input = mapply(
+              dt_selectize,
+              split(link_updates$curr, seq_len(nrow(link_updates$curr))),
+              choices = block_inputs(rv$board)[link_updates$curr$to],
+              MoreArgs = list(ns = session$ns, target = "input")
             )
+          )
+
+          DT::datatable(
+            dat,
+            options = list(
+              pageLength = 5,
+              preDrawCallback = DT::JS(
+                "function() { Shiny.unbindAll(this.api().table().node()); }"
+              ),
+              drawCallback = DT::JS(
+                "function() { Shiny.bindAll(this.api().table().node()); }"
+              ),
+              dom = "tp",
+              ordering = FALSE
+            ),
+            rownames = FALSE,
+            escape = FALSE,
+            editable = TRUE
           )
         },
         server = TRUE
       )
 
-      observeEvent(input$links_cell_edit, {
+      observeEvent(
+        link_updates$curr$id,
+        {
+          to_add <- setdiff(link_updates$curr$id, names(link_updates$obs))
 
-        row <- input$links_cell_edit$row
-        col <- input$links_cell_edit$col
+          link_updates$obs[to_add] <- lapply(
+            to_add,
+            function(row) {
+              lapply(
+                set_names(nm = c("from", "to", "input")),
+                function(col) {
+                  observeEvent(
+                    input[[paste0(row, "_", col)]],
+                    {
+                      cur <- link_updates$curr
+                      cur <- cur[cur$id == row, col]
+                      val <- input[[paste0(row, "_", col)]]
+                      if (val != cur) {
+                        link_updates$edit <- list(row = row, col = col,
+                                                  val = val)
+                      }
+                    },
+                    ignoreInit = TRUE
+                  )
+                }
+              )
+            }
+          )
 
-        rm <- link_updates$curr$id[row]
+          to_rm <- setdiff(names(link_updates$obs), link_updates$curr$id)
 
-        if (!rm %in% link_updates$rm && rm %in% board_links(rv$board)$id) {
-          link_updates$rm <- c(link_updates$rm, rm)
+          for (row in to_rm) {
+            for (col in c("from", "to", "input")) {
+              link_updates$obs[[row]][[col]]$destroy()
+            }
+            link_updates$obs[[row]] <- NULL
+          }
+        }
+      )
+
+      observeEvent(link_updates$edit, {
+
+        row <- link_updates$edit$row
+        col <- link_updates$edit$col
+
+        if (!row %in% link_updates$row && row %in% board_links(rv$board)$id) {
+          link_updates$row <- c(link_updates$row, row)
         }
 
-        link_updates$curr[row, col] <- input$links_cell_edit$value
+        link_updates$curr[link_updates$curr$id == row, col] <- coal(
+          link_updates$edit$val,
+          ""
+        )
 
-        new <- link_updates$curr[row, ]
+        new <- link_updates$curr[link_updates$curr$id == row, ]
 
-        if (rm %in% link_updates$add$id) {
-          link_updates$add[link_updates$add$id == rm, ] <- new
+        if (row %in% link_updates$add$id) {
+          link_updates$add[link_updates$add$id == row, ] <- new
         } else {
           link_updates$add <- rbind(link_updates$add, new)
         }
@@ -227,6 +290,17 @@ board_server.board <- function(x) {
   )
 }
 
+dt_selectize <- function(row, ns, target, choices) {
+  as.character(
+    selectInput(
+      ns(paste0(row[["id"]], "_", target)),
+      label = "",
+      choices = c("", choices),
+      selected = row[[target]]
+    )
+  )
+}
+
 update_block_connections <- function(rv, add = NULL, rm = NULL) {
 
   if (not_null(rm)) {
@@ -254,7 +328,7 @@ links_modal <- function(ns) {
       actionButton(ns("cancel_links"), "Cancel", class = "btn-danger"),
       actionButton(ns("modify_links"), "OK", class = "btn-success")
     ),
-    size = "l"
+    size = "xl"
   )
 }
 

@@ -229,3 +229,9 @@ modify_links <- function(x, add = NULL, rm = NULL) {
 
   x
 }
+
+#' @rdname new_block
+#' @export
+block_inputs.board <- function(x) {
+  lapply(set_names(board_blocks(x), block_ids(x)), block_inputs)
+}
