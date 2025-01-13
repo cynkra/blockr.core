@@ -31,30 +31,57 @@ board_ui.board <- function(x,
 
   tagList(
     do.call(div, c(class = "d-flex justify-content-center", toolbar_args)),
-    do.call(div, c(id = paste0(id, "_blocks"), block_cards(x)))
+    do.call(div, c(id = paste0(id, "_blocks"), block_ui(x, id)))
   )
 }
 
-block_cards <- function(x) {
-  lapply(sort(x), block_card, id = board_id(x))
-}
+#' @param block (Optional) block (or ID) for which to generate the UI
+#' @rdname block_ui
+#' @export
+block_ui.board <- function(x, id = NULL, block = NULL, ...) {
 
-block_card <- function(x, id) {
+  block_card <- function(x, id) {
 
-  stopifnot(is_block(x), is_string(id))
+    blk_id <- block_uid(x)
 
-  blk_id <- block_uid(x)
-
-  div(
-    class = "card shadow-sm p-2 mb-2 border",
-    id = paste0(blk_id, "_block"),
     div(
-      class = "card-body p-1",
-      h5(
-        class="card-title",
-        paste0(block_name(x), " (", blk_id, ")")
-      ),
-      block_ui(x, id)
+      class = "card shadow-sm p-2 mb-2 border",
+      id = paste0(blk_id, "_block"),
+      div(
+        class = "card-body p-1",
+        h5(
+          class="card-title",
+          paste0(block_name(x), " (", blk_id, ")")
+        ),
+        block_ui(x, id)
+      )
     )
-  )
+  }
+
+  if (is.null(id)) {
+    id <- board_id(x)
+  }
+
+  stopifnot(is_string(id))
+
+  if (is.null(block)) {
+    return(
+      lapply(sort(x), block_card, id = id)
+    )
+  }
+
+  if (is_string(block)) {
+
+    hit <- match(block, block_ids(x))
+
+    if (is.na(hit)) {
+      stop("Unknown block ", block)
+    }
+
+    block <- board_blocks(x)[[hit]]
+  }
+
+  stopifnot(is_block(block))
+
+  block_card(block, id)
 }

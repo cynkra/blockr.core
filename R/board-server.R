@@ -57,7 +57,7 @@ board_server.board <- function(x,
             insertUI(
               paste0("#", board_id(rv$board), "_blocks"),
               "afterBegin",
-              block_cards(rv$board)
+              block_ui(rv$board)
             )
 
             rv <- setup_blocks(rv)
@@ -78,7 +78,7 @@ board_server.board <- function(x,
             insertUI(
               paste0("#", board_id(rv$board), "_blocks"),
               "beforeEnd",
-              block_card(block$add, board_id(rv$board))
+              block_ui(board_id(rv$board), block$add)
             )
 
             rv$board <- add_block(rv$board, block$add)
