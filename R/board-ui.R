@@ -43,11 +43,17 @@ block_card <- function(x, id) {
 
   stopifnot(is_block(x), is_string(id))
 
+  blk_id <- block_uid(x)
+
   div(
     class = "card shadow-sm p-2 mb-2 border",
-    id = paste0(block_uid(x), "_block"),
+    id = paste0(blk_id, "_block"),
     div(
       class = "card-body p-1",
+      h5(
+        class="card-title",
+        paste0(block_name(x), " (", blk_id, ")")
+      ),
       block_ui(x, id)
     )
   )

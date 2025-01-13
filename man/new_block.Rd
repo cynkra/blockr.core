@@ -6,6 +6,7 @@
 \alias{new_data_block}
 \alias{new_transform_block}
 \alias{block_uid}
+\alias{block_name}
 \alias{block_ctor}
 \alias{block_ns}
 \alias{block_expr_server}
@@ -16,7 +17,16 @@
 \alias{block_inputs.board}
 \title{Blocks}
 \usage{
-new_block(server, ui, class, ctor, ctor_pkg, uid = rand_names(), ...)
+new_block(
+  server,
+  ui,
+  class,
+  ctor,
+  ctor_pkg,
+  uid = rand_names(),
+  name = NULL,
+  ...
+)
 
 is_block(x)
 
@@ -25,6 +35,8 @@ new_data_block(server, ui, class, ctor = sys.parent(), ...)
 new_transform_block(server, ui, class, ctor = sys.parent(), ...)
 
 block_uid(x)
+
+block_name(x)
 
 block_ctor(x)
 

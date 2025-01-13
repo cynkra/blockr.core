@@ -14,7 +14,7 @@
 #'
 #' @export
 new_block <- function(server, ui, class, ctor, ctor_pkg,
-                      uid = rand_names(), ...) {
+                      uid = rand_names(), name = NULL, ...) {
 
   stopifnot(
     is.function(server), is.function(ui),
@@ -56,12 +56,18 @@ new_block <- function(server, ui, class, ctor, ctor_pkg,
     stopifnot(is_string(ctor), is_string(ctor_pkg))
   }
 
+  if (is.null(name)) {
+    name <- gsub("_", " ", class[1L])
+    name <- paste0(toupper(substr(name, 1L, 1L)), substring(name, 2L))
+  }
+
   res <- structure(
     list(expr_server = server, expr_ui = ui),
     ...,
     uid = uid,
     ctor = ctor,
     ctor_pkg = ctor_pkg,
+    name = name,
     class = c(class, "block")
   )
 
@@ -99,6 +105,13 @@ new_transform_block <- function(server, ui, class,
 block_uid <- function(x) {
   stopifnot(is_block(x))
   attr(x, "uid")
+}
+
+#' @rdname new_block
+#' @export
+block_name <- function(x) {
+  stopifnot(is_block(x))
+  attr(x, "name")
 }
 
 #' @rdname new_block
