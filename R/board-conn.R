@@ -5,6 +5,11 @@
 #'
 #' @param rv Reactive values object
 #'
+#' @return A reactive value that evaualtes to `NULL` or a list with components
+#' `add` and `rm`, where `add` is either `NULL` or a `data.frame` with columns
+#' `id`, `from`, `tp` and `input` and `rm` is either `NULL` or a character
+#' vector of connection IDs.
+#'
 #' @rdname add_rm_conn
 #' @export
 add_rm_conn_server <- function(rv) {
@@ -167,7 +172,9 @@ add_rm_conn_server <- function(rv) {
         link_updates$curr <- board_links(rv$board)
       })
 
-      res <- reactiveVal()
+      res <- reactiveVal(
+        list(add = NULL, rm = NULL)
+      )
 
       observeEvent(
         input$modify_links,
@@ -256,3 +263,75 @@ links_modal <- function(ns) {
   )
 }
 
+check_add_rm_conn_val <- function(val, rv) {
+
+  observeEvent(
+    TRUE,
+    {
+      if (!is.reactive(val)) {
+        stop("Expecting `add_rm_conn` to return a reactive value.")
+      }
+    },
+    once = TRUE
+  )
+
+  observeEvent(
+    val(),
+    {
+      if (!is.list(val()) || !setequal(names(val()), c("add", "rm"))) {
+        stop("Expecting the `add_rm_conn` return value to evaluate to a list ",
+             "with components `add` and `rm`.")
+      }
+    },
+    once = TRUE
+  )
+
+  observeEvent(
+    val()$add,
+    {
+      if (!is.data.frame(val()$add)) {
+        stop("Expecting the `add` component of the `add_rm_conn` return ",
+             "value to be `NULL` or a `data.frame`.")
+      }
+
+      if (!all(c("id", "from", "to", "input") %in% colnames(val()$add))) {
+        stop("Expecting the `add` component of the `add_rm_conn` return ",
+             "value to contain columns `id`, `from`, `to` and `input`.")
+      }
+    },
+    once = TRUE
+  )
+
+  observeEvent(
+    val()$add,
+    {
+      if (any(val()$add %in% link_ids(rv$board))) {
+        stop("Expecting unique connection IDs for new connections.")
+      }
+    },
+    priority = 1
+  )
+
+  observeEvent(
+    val()$rm,
+    {
+      if (!is.character(val()$rm)) {
+        stop("Expecting the `add` component of the `add_rm_conn` return ",
+             "value to be a character vector.")
+      }
+    },
+    once = TRUE
+  )
+
+  observeEvent(
+    val()$rm,
+    {
+      if (!all(val()$rm %in% link_ids(rv$board))) {
+        stop("Expecting all connection IDs to be removed to be known.")
+      }
+    },
+    priority = 1
+  )
+
+  val
+}

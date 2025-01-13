@@ -4,6 +4,10 @@
 #'
 #' @param rv Reactive values object
 #'
+#' @return A [shiny::reactiveValues()] object with components `add` and `rm`,
+#' where `add` may be `NULL` or a `block` object and `rm` be `NULL` or a string
+#' (block ID).
+#'
 #' @rdname add_rm_block
 #' @export
 add_rm_block_server <- function(rv) {
@@ -11,7 +15,7 @@ add_rm_block_server <- function(rv) {
     "add_rm_block",
     function(input, output, session) {
 
-      res <- reactiveValues(add = list(), rm = character())
+      res <- reactiveValues(add = NULL, rm = NULL)
 
       observeEvent(input$add_block, {
 
@@ -73,4 +77,66 @@ add_rm_block_ui <- function(id, board) {
       class = "btn-danger"
     )
   )
+}
+
+check_add_rm_block_val <- function(val, rv) {
+
+  observeEvent(
+    TRUE,
+    {
+      if (!is.reactivevalues(val)) {
+        stop("Expecting `add_rm_block` to return a `reactivevalues` object.")
+      }
+
+      if (!setequal(names(val), c("add", "rm"))) {
+        stop("Expecting the `add_rm_block` return value to contain ",
+             "components `add` and `rm`.")
+      }
+    },
+    once = TRUE
+  )
+
+  observeEvent(
+    val$add,
+    {
+      if (!is_block(val$add)) {
+        stop("Expecting the `add` component of the `add_rm_block` return ",
+             "value to be `NULL` or a `block` object.")
+      }
+    },
+    once = TRUE
+  )
+
+  observeEvent(
+    val$add,
+    {
+      if (block_uid(val$add) %in% block_ids(rv$board)) {
+        stop("Expecting the newly added block to have a unique ID.")
+      }
+    },
+    priority = 1
+  )
+
+  observeEvent(
+    val$rm,
+    {
+      if (!is_string(val$rm)) {
+        stop("Expecting the `rm` component of the `add_rm_block` return ",
+             "value to be `NULL` or a string.")
+      }
+    },
+    once = TRUE
+  )
+
+  observeEvent(
+    val$rm,
+    {
+      if (!val$rm %in% block_ids(rv$board)) {
+        stop("Expecting the removed block to be specified by a known ID.")
+      }
+    },
+    priority = 1
+  )
+
+  val
 }

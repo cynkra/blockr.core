@@ -33,7 +33,6 @@ validate_board <- function(x) {
   links <- board_links(x)
 
   if (!is.list(blocks) || !all(lgl_ply(blocks, is_block))) {
-    browser()
     stop("Expecting the board to contain a set of blocks.")
   }
 
@@ -194,6 +193,10 @@ board_links <- function(x) {
 
 block_ids <- function(x) {
   chr_ply(board_blocks(x), block_uid)
+}
+
+link_ids <- function(x) {
+  board_links(x)[, "id"]
 }
 
 add_block <- function(x, blk) {

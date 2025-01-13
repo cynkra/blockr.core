@@ -14,6 +14,11 @@ add_rm_block_ui(id, board)
 
 \item{board}{The initial \code{board} object}
 }
+\value{
+A \code{\link[shiny:reactiveValues]{shiny::reactiveValues()}} object with components \code{add} and \code{rm},
+where \code{add} may be \code{NULL} or a \code{block} object and \code{rm} be \code{NULL} or a string
+(block ID).
+}
 \description{
 Customizable logic for adding/removing blocks to the board.
 }

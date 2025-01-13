@@ -41,7 +41,9 @@ board_server.board <- function(x,
 
       if (not_null(ser_deser)) {
 
-        board_refresh <- ser_deser(rv)
+        board_refresh <- check_ser_deser_val(
+          ser_deser(rv)
+        )
 
         observeEvent(
           board_refresh(),
@@ -59,14 +61,16 @@ board_server.board <- function(x,
             )
 
             rv <- setup_blocks(rv)
-          },
-          ignoreInit = TRUE
+          }
         )
       }
 
       if (not_null(add_rm_block)) {
 
-        block <- add_rm_block(rv)
+        block <- check_add_rm_block_val(
+          add_rm_block(rv),
+          rv
+        )
 
         observeEvent(
           block$add,
@@ -80,8 +84,7 @@ board_server.board <- function(x,
             rv$board <- add_block(rv$board, block$add)
 
             rv <- setup_block(block$add, rv)
-          },
-          ignoreInit = TRUE
+          }
         )
 
         observeEvent(
@@ -92,14 +95,16 @@ board_server.board <- function(x,
             )
 
             rv <- destroy_block(block$rm, rv)
-          },
-          ignoreInit = TRUE
+          }
         )
       }
 
-      if (not_null(add_rm_block)) {
+      if (not_null(add_rm_conn)) {
 
-        conn <- add_rm_conn(rv)
+        conn <- check_add_rm_conn_val(
+          add_rm_conn(rv),
+          rv
+        )
 
         observeEvent(
           conn(),

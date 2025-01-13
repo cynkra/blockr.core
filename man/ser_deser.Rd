@@ -14,6 +14,10 @@ ser_deser_ui(id, board)
 
 \item{board}{The initial \code{board} object}
 }
+\value{
+A \code{\link[shiny:reactiveVal]{shiny::reactiveVal()}} object that evaluates to \code{NULL} or a
+\code{board} obejct.
+}
 \description{
 Object (de)serialization in a board server context.
 }
