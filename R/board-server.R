@@ -28,7 +28,7 @@ board_server.board <- function(x,
         blocks = list(),
         inputs = list(),
         board = x,
-        links = list()
+        conn = list()
       )
 
       observeEvent(
@@ -137,17 +137,17 @@ setup_blocks <- function(rv) {
 
   stopifnot(
     is.reactivevalues(rv),
-    setequal(names(rv), c("blocks", "inputs", "board", "links")),
+    setequal(names(rv), c("blocks", "inputs", "board", "conn")),
     is_board(rv$board)
   )
 
-  for (link in rv$links) {
+  for (link in rv$conn) {
     link$destroy()
   }
 
   rv$blocks <- list()
   rv$inputs <- list()
-  rv$links <- list()
+  rv$conn <- list()
 
   for (blk in sort(rv$board)) {
     rv <- setup_block(blk, rv)
@@ -200,7 +200,7 @@ destroy_block <- function(id, rv) {
 
 setup_connection <- function(rv, id, from, to, input) {
 
-  rv$links[[id]] <- observeEvent(
+  rv$conn[[id]] <- observeEvent(
     rv$blocks[[from]]$server$result(),
     {
       rv$inputs[[to]][[input]](
@@ -214,8 +214,8 @@ setup_connection <- function(rv, id, from, to, input) {
 
 destroy_connection <- function(rv, id, from, to, input) {
 
-  rv$links[[id]]$destroy()
-  rv$links[[id]] <- NULL
+  rv$conn[[id]]$destroy()
+  rv$conn[[id]] <- NULL
 
   rv$inputs[[to]][[input]](NULL)
 
