@@ -103,6 +103,10 @@ board_server.board <- function(x) {
         edit = NULL
       )
 
+      observeEvent(board_links(rv$board), {
+        link_updates$curr <- board_links(rv$board)
+      })
+
       output$links <- DT::renderDT(
         {
           dat <- data.frame(
@@ -426,6 +430,12 @@ destroy_connection <- function(rv, id, from, to, input) {
 }
 
 destroy_block <- function(id, rv) {
+
+  links <- board_links(rv$board)
+
+  for (row in which(links$from %in% id | links$to %in% id)) {
+    rv <- do.call(destroy_connection, c(list(rv), links[row, ]))
+  }
 
   rv$inputs[[id]] <- NULL
   rv$blocks[[id]] <- NULL

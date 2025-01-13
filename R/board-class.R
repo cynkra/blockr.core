@@ -92,12 +92,12 @@ validate_board <- function(x) {
 
   for (i in unique(links$to)) {
 
-    actual <- links$input[links$to == i]
+    unknown <- setdiff(links$input[links$to == i], inputs[[i]])
 
-    if (!setequal(actual, inputs[[i]])) {
+    if (length(unknown)) {
       stop(
         "Block ", i, " expects inputs ", paste_enum(inputs[[i]]),
-        " but received ", paste_enum(actual)
+        " but received ", paste_enum(unknown)
       )
     }
   }
