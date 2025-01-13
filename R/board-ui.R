@@ -12,31 +12,22 @@ board_ui <- function(x, ...) {
 
 #' @param ser_deser UI for serialization/deserialization
 #' @param add_rm_block UI for block addition/removal
+#' @param add_rm_conn UI for block connection addition/removal
 #' @rdname board_ui
 #' @export
 board_ui.board <- function(x,
                            ser_deser = NULL,
                            add_rm_block = NULL,
+                           add_rm_conn = NULL,
                            ...) {
 
   id <- board_id(x)
-  ns <- NS(id)
 
-  toolbar_args <- list(
-    actionButton(
-      ns("links"),
-      "Edit connections",
-      icon = icon("table")
-    )
+  toolbar_args <- c(
+    if (not_null(ser_deser)) ser_deser(id, x),
+    if (not_null(add_rm_block)) add_rm_block(id, x),
+    if (not_null(add_rm_conn)) add_rm_conn(id, x)
   )
-
-  if (not_null(ser_deser)) {
-    toolbar_args <- c(
-      ser_deser(id, x),
-      add_rm_block(id, x),
-      toolbar_args
-    )
-  }
 
   tagList(
     do.call(div, c(class = "d-flex justify-content-center", toolbar_args)),

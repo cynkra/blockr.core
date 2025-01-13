@@ -7,7 +7,7 @@
 \usage{
 board_ui(x, ...)
 
-\method{board_ui}{board}(x, ser_deser = NULL, add_rm_block = NULL, ...)
+\method{board_ui}{board}(x, ser_deser = NULL, add_rm_block = NULL, add_rm_conn = NULL, ...)
 }
 \arguments{
 \item{x}{Board}
@@ -17,6 +17,8 @@ board_ui(x, ...)
 \item{ser_deser}{UI for serialization/deserialization}
 
 \item{add_rm_block}{UI for block addition/removal}
+
+\item{add_rm_conn}{UI for block connection addition/removal}
 }
 \description{
 Shiny UI function for \code{board} objects.

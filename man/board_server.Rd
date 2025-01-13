@@ -7,7 +7,7 @@
 \usage{
 board_server(x, ...)
 
-\method{board_server}{board}(x, ser_deser = NULL, add_rm_block = NULL, ...)
+\method{board_server}{board}(x, ser_deser = NULL, add_rm_block = NULL, add_rm_conn = NULL, ...)
 }
 \arguments{
 \item{x}{Board}
@@ -15,6 +15,10 @@ board_server(x, ...)
 \item{...}{Generic consistency}
 
 \item{ser_deser}{Module for serialization/deserialization}
+
+\item{add_rm_block}{Module for addition/removal of blocks}
+
+\item{add_rm_conn}{Module for addition/removal of connections between blocks}
 }
 \description{
 Shiny server function for \code{board} objects.
