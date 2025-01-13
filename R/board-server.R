@@ -48,17 +48,11 @@ board_server.board <- function(x,
         observeEvent(
           board_refresh(),
           {
-            removeUI(
-              paste0("#", board_id(rv$board), "_blocks > div")
-            )
+            remove_block_ui(rv$board)
 
             rv$board <- board_refresh()
 
-            insertUI(
-              paste0("#", board_id(rv$board), "_blocks"),
-              "afterBegin",
-              block_ui(rv$board)
-            )
+            insert_block_ui(rv$board)
 
             rv <- setup_blocks(rv)
           }
@@ -75,11 +69,7 @@ board_server.board <- function(x,
         observeEvent(
           block$add,
           {
-            insertUI(
-              paste0("#", board_id(rv$board), "_blocks"),
-              "beforeEnd",
-              block_ui(board_id(rv$board), block$add)
-            )
+            insert_block_ui(rv$board, block$add)
 
             rv$board <- add_block(rv$board, block$add)
 
@@ -90,9 +80,7 @@ board_server.board <- function(x,
         observeEvent(
           block$rm,
           {
-            removeUI(
-              paste0("#", block$rm, "_block")
-            )
+            remove_block_ui(rv$board, block$rm)
 
             rv <- destroy_block(block$rm, rv)
           }

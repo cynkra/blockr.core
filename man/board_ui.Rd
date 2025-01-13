@@ -3,11 +3,23 @@
 \name{board_ui}
 \alias{board_ui}
 \alias{board_ui.board}
+\alias{insert_block_ui}
+\alias{insert_block_ui.board}
+\alias{remove_block_ui}
+\alias{remove_block_ui.board}
 \title{Board UI}
 \usage{
 board_ui(x, ...)
 
 \method{board_ui}{board}(x, ser_deser = NULL, add_rm_block = NULL, add_rm_conn = NULL, ...)
+
+insert_block_ui(x, block = NULL, ...)
+
+\method{insert_block_ui}{board}(x, block = NULL, ...)
+
+remove_block_ui(x, block = NULL, ...)
+
+\method{remove_block_ui}{board}(x, block = NULL, ...)
 }
 \arguments{
 \item{x}{Board}
@@ -19,6 +31,8 @@ board_ui(x, ...)
 \item{add_rm_block}{UI for block addition/removal}
 
 \item{add_rm_conn}{UI for block connection addition/removal}
+
+\item{block}{(Optional) block (or ID) for which to insert/remove the UI}
 }
 \description{
 Shiny UI function for \code{board} objects.

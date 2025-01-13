@@ -70,18 +70,86 @@ block_ui.board <- function(x, id = NULL, block = NULL, ...) {
     )
   }
 
+  block_card(resolve_block(block, x), id)
+}
+
+block_id_to_block <- function(id, board) {
+
+  hit <- match(id, block_ids(board))
+
+  if (is.na(hit)) {
+    stop("Unknown block ", id)
+  }
+
+  board_blocks(board)[[hit]]
+}
+
+resolve_block <- function(block, board) {
+
   if (is_string(block)) {
-
-    hit <- match(block, block_ids(x))
-
-    if (is.na(hit)) {
-      stop("Unknown block ", block)
-    }
-
-    block <- board_blocks(x)[[hit]]
+    block <- block_id_to_block(block, board)
   }
 
   stopifnot(is_block(block))
 
-  block_card(block, id)
+  block
+}
+
+#' @param block (Optional) block (or ID) for which to insert/remove the UI
+#' @rdname board_ui
+#' @export
+insert_block_ui <- function(x, block = NULL, ...) {
+  UseMethod("insert_block_ui")
+}
+
+#' @rdname board_ui
+#' @export
+insert_block_ui.board <- function(x, block = NULL, ...) {
+
+  if (is.null(block)) {
+    insertUI(
+      paste0("#", board_id(x), "_blocks"),
+      "afterBegin",
+      block_ui(x)
+    )
+  } else {
+    insertUI(
+      paste0("#", board_id(x), "_blocks"),
+      "beforeEnd",
+      block_ui(x, block = resolve_block(block, x))
+    )
+
+  }
+}
+
+resolve_id <- function(block, board) {
+
+  if (is_block(block)) {
+    block <- block_uid(block)
+  }
+
+  stopifnot(is_string(block), block %in% block_ids(board))
+
+  block
+}
+
+#' @rdname board_ui
+#' @export
+remove_block_ui <- function(x, block = NULL, ...) {
+  UseMethod("remove_block_ui")
+}
+
+#' @rdname board_ui
+#' @export
+remove_block_ui.board <- function(x, block = NULL, ...) {
+
+  if (is.null(block)) {
+    removeUI(
+      paste0("#", board_id(x), "_blocks > div")
+    )
+  } else {
+    removeUI(
+      paste0("#", resolve_id(block, x), "_block")
+    )
+  }
 }
