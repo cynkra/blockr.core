@@ -13,7 +13,10 @@ board_server <- function(x, ...) {
 #' @param ser_deser Module for serialization/deserialization
 #' @rdname board_server
 #' @export
-board_server.board <- function(x, ser_deser = NULL, ...) {
+board_server.board <- function(x,
+                               ser_deser = NULL,
+                               add_rm_block = NULL,
+                               ...) {
   moduleServer(
     board_id(x),
     function(input, output, session) {
@@ -37,59 +40,60 @@ board_server.board <- function(x, ser_deser = NULL, ...) {
 
         board_refresh <- ser_deser(rv)
 
-        observeEvent(board_refresh(), {
+        observeEvent(
+          board_refresh(),
+          {
+            removeUI(
+              paste0("#", board_id(rv$board), "_blocks > div")
+            )
 
-          removeUI(
-            paste0("#", board_id(rv$board), "_blocks > div")
-          )
+            rv$board <- board_refresh()
 
-          rv$board <- board_refresh()
+            insertUI(
+              paste0("#", board_id(rv$board), "_blocks"),
+              "afterBegin",
+              block_cards(rv$board)
+            )
 
-          insertUI(
-            paste0("#", board_id(rv$board), "_blocks"),
-            "afterBegin",
-            block_cards(rv$board)
-          )
-
-          rv <- setup_blocks(rv)
-        })
+            rv <- setup_blocks(rv)
+          },
+          ignoreInit = TRUE
+        )
       }
 
-      observeEvent(input$add_block, {
+      if (not_null(add_rm_block)) {
 
-        req(input$registry_select)
+        block <- add_rm_block(rv)
 
-        blk <- create_block(input$registry_select)
+        observeEvent(
+          block$add,
+          {
+            insertUI(
+              paste0("#", board_id(rv$board), "_blocks"),
+              "beforeEnd",
+              block_card(block$add, board_id(rv$board))
+            )
 
-        insertUI(
-          paste0("#", board_id(rv$board), "_blocks"),
-          "beforeEnd",
-          block_card(blk, board_id(rv$board))
+            rv$board <- add_block(rv$board, block$add)
+
+            rv <- setup_block(block$add, rv)
+          },
+          ignoreInit = TRUE
         )
 
-        rv$board <- add_block(rv$board, blk)
+        observeEvent(
+          block$rm,
+          {
+            removeUI(
+              paste0("#", block$rm, "_block")
+            )
 
-        rv <- setup_block(blk, rv)
-      })
-
-      observe(
-        updateSelectInput(
-          session,
-          inputId = "block_select",
-          choices = block_ids(rv$board)
+            rv <- destroy_block(block$rm, rv)
+          },
+          ignoreInit = TRUE
         )
-      )
+      }
 
-      observeEvent(input$rm_block, {
-
-        req(input$block_select)
-
-        removeUI(
-          paste0("#", input$block_select, "_block")
-        )
-
-        rv <- destroy_block(input$block_select, rv)
-      })
 
       observeEvent(input$links, {
         showModal(links_modal(session$ns))

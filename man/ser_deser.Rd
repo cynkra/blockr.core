@@ -7,10 +7,12 @@
 \usage{
 ser_deser_server(rv)
 
-ser_deser_ui(id)
+ser_deser_ui(id, board)
 }
 \arguments{
 \item{rv}{Namespace ID}
+
+\item{board}{The initial \code{board} object}
 }
 \description{
 Object (de)serialization in a board server context.

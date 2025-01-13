@@ -11,36 +11,18 @@ board_ui <- function(x, ...) {
 }
 
 #' @param ser_deser UI for serialization/deserialization
+#' @param add_rm_block UI for block addition/removal
 #' @rdname board_ui
 #' @export
-board_ui.board <- function(x, ser_deser = NULL, ...) {
+board_ui.board <- function(x,
+                           ser_deser = NULL,
+                           add_rm_block = NULL,
+                           ...) {
 
   id <- board_id(x)
   ns <- NS(id)
 
   toolbar_args <- list(
-    selectInput(
-      ns("registry_select"),
-      "Select block from registry",
-      choices = c("", list_blocks())
-    ),
-    actionButton(
-      ns("add_block"),
-      "Add block",
-      icon = icon("plus"),
-      class = "btn-success"
-    ),
-    selectInput(
-      ns("block_select"),
-      "Select block from board",
-      choices = c("", block_ids(x))
-    ),
-    actionButton(
-      ns("rm_block"),
-      "Remove block",
-      icon = icon("minus"),
-      class = "btn-danger"
-    ),
     actionButton(
       ns("links"),
       "Edit connections",
@@ -50,7 +32,8 @@ board_ui.board <- function(x, ser_deser = NULL, ...) {
 
   if (not_null(ser_deser)) {
     toolbar_args <- c(
-      ser_deser(id),
+      ser_deser(id, x),
+      add_rm_block(id, x),
       toolbar_args
     )
   }

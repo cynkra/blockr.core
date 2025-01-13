@@ -32,11 +32,14 @@ ser_deser_server <- function(rv) {
 }
 
 #' @param rv Namespace ID
+#' @param board The initial `board` object
 #' @rdname ser_deser
 #' @export
-ser_deser_ui <- function(id) {
+ser_deser_ui <- function(id, board) {
 
-  ns <- NS(NS(id, "ser_deser"))
+  ns <- NS(
+    NS(id, "ser_deser")
+  )
 
   list(
     downloadButton(

@@ -7,7 +7,7 @@
 \usage{
 board_server(x, ...)
 
-\method{board_server}{board}(x, ser_deser = NULL, ...)
+\method{board_server}{board}(x, ser_deser = NULL, add_rm_block = NULL, ...)
 }
 \arguments{
 \item{x}{Board}
