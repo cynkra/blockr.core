@@ -5,12 +5,16 @@
 \alias{board_server.board}
 \title{Board server}
 \usage{
-board_server(x)
+board_server(x, ...)
 
-\method{board_server}{board}(x)
+\method{board_server}{board}(x, ser_deser = NULL, ...)
 }
 \arguments{
 \item{x}{Board}
+
+\item{...}{Generic consistency}
+
+\item{ser_deser}{Module for serialization/deserialization}
 }
 \description{
 Shiny server function for \code{board} objects.

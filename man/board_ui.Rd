@@ -5,12 +5,16 @@
 \alias{board_ui.board}
 \title{Board UI}
 \usage{
-board_ui(x)
+board_ui(x, ...)
 
-\method{board_ui}{board}(x, new_block_ui)
+\method{board_ui}{board}(x, ser_deser = NULL, ...)
 }
 \arguments{
 \item{x}{Board}
+
+\item{...}{Generic consistency}
+
+\item{ser_deser}{UI for serialization/deserialization}
 }
 \description{
 Shiny UI function for \code{board} objects.

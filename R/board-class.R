@@ -144,10 +144,10 @@ sort.board <- function(x, decreasing = FALSE, ...) {
 #' @export
 serve.board <- function(x, ...) {
 
-  ui <- bslib::page_fluid(board_ui(x))
+  ui <- bslib::page_fluid(board_ui(x, ser_deser = ser_deser_ui))
 
   server <- function(input, output, session) {
-    board_server(x)
+    board_server(x, ser_deser = ser_deser_server)
   }
 
   shinyApp(ui, server)

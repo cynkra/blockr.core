@@ -3,15 +3,17 @@
 #' Shiny server function for `board` objects.
 #'
 #' @param x Board
+#' @param ... Generic consistency
 #'
 #' @export
-board_server <- function(x) {
+board_server <- function(x, ...) {
   UseMethod("board_server")
 }
 
+#' @param ser_deser Module for serialization/deserialization
 #' @rdname board_server
 #' @export
-board_server.board <- function(x) {
+board_server.board <- function(x, ser_deser = NULL, ...) {
   moduleServer(
     board_id(x),
     function(input, output, session) {
@@ -31,29 +33,27 @@ board_server.board <- function(x) {
         once = TRUE
       )
 
-      output$serialize <- downloadHandler(
-        board_filename(rv$board),
-        write_board_to_disk(rv$board, rv)
-      )
+      if (not_null(ser_deser)) {
 
-      observeEvent(input$restore, {
+        board_refresh <- ser_deser(rv)
 
-        removeUI(
-          paste0("#", board_id(rv$board), "_blocks > div")
-        )
+        observeEvent(board_refresh(), {
 
-        rv$board <- from_json(
-          readLines(input$restore$datapath)
-        )
+          removeUI(
+            paste0("#", board_id(rv$board), "_blocks > div")
+          )
 
-        insertUI(
-          paste0("#", board_id(rv$board), "_blocks"),
-          "afterBegin",
-          block_cards(rv$board)
-        )
+          rv$board <- board_refresh()
 
-        rv <- setup_blocks(rv)
-      })
+          insertUI(
+            paste0("#", board_id(rv$board), "_blocks"),
+            "afterBegin",
+            block_cards(rv$board)
+          )
+
+          rv <- setup_blocks(rv)
+        })
+      }
 
       observeEvent(input$add_block, {
 
@@ -336,31 +336,6 @@ links_modal <- function(ns) {
   )
 }
 
-board_filename <- function(x) {
-  function() {
-    paste0(
-      board_id(x), "_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), ".json"
-    )
-  }
-}
-
-write_board_to_disk <- function(x, rv) {
-
-  function(con) {
-
-    blocks <- lapply(
-      lapply(lapply(rv$blocks, `[[`, "server"), `[[`, "json"),
-      reval
-    )
-
-    json <- jsonlite::prettify(
-      to_json(x, blocks)
-    )
-
-    writeLines(json, con)
-  }
-}
-
 setup_blocks <- function(rv) {
 
   stopifnot(
@@ -369,8 +344,13 @@ setup_blocks <- function(rv) {
     is_board(rv$board)
   )
 
+  for (link in rv$links) {
+    link$destroy()
+  }
+
   rv$blocks <- list()
   rv$inputs <- list()
+  rv$links <- list()
 
   for (blk in sort(rv$board)) {
     rv <- setup_block(blk, rv)

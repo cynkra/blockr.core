@@ -1,4 +1,4 @@
-#' Serialization
+#' Serialization utilities
 #'
 #' Object (de)serialization.
 #'

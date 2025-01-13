@@ -3,60 +3,61 @@
 #' Shiny UI function for `board` objects.
 #'
 #' @param x Board
+#' @param ... Generic consistency
 #'
 #' @export
-board_ui <- function(x) {
+board_ui <- function(x, ...) {
   UseMethod("board_ui")
 }
 
+#' @param ser_deser UI for serialization/deserialization
 #' @rdname board_ui
 #' @export
-board_ui.board <- function(x, new_block_ui) {
+board_ui.board <- function(x, ser_deser = NULL, ...) {
 
   id <- board_id(x)
   ns <- NS(id)
 
-  tagList(
-    div(
-      class = "d-flex justify-content-center",
-      downloadButton(
-        ns("serialize"),
-        "Save",
-        class = "mx-2"
-      ),
-      fileInput(
-        ns("restore"),
-        "Restore"
-      ),
-      selectInput(
-        ns("registry_select"),
-        "Select block from registry",
-        choices = c("", list_blocks())
-      ),
-      actionButton(
-        ns("add_block"),
-        "Add block",
-        icon = icon("plus"),
-        class = "btn-success"
-      ),
-      selectInput(
-        ns("block_select"),
-        "Select block from board",
-        choices = c("", block_ids(x))
-      ),
-      actionButton(
-        ns("rm_block"),
-        "Remove block",
-        icon = icon("minus"),
-        class = "btn-danger"
-      ),
-      actionButton(
-        ns("links"),
-        "Edit connections",
-        icon = icon("table")
-      )
+  toolbar_args <- list(
+    selectInput(
+      ns("registry_select"),
+      "Select block from registry",
+      choices = c("", list_blocks())
     ),
-    do.call(div, list(id = paste0(id, "_blocks"), block_cards(x)))
+    actionButton(
+      ns("add_block"),
+      "Add block",
+      icon = icon("plus"),
+      class = "btn-success"
+    ),
+    selectInput(
+      ns("block_select"),
+      "Select block from board",
+      choices = c("", block_ids(x))
+    ),
+    actionButton(
+      ns("rm_block"),
+      "Remove block",
+      icon = icon("minus"),
+      class = "btn-danger"
+    ),
+    actionButton(
+      ns("links"),
+      "Edit connections",
+      icon = icon("table")
+    )
+  )
+
+  if (not_null(ser_deser)) {
+    toolbar_args <- c(
+      ser_deser(id),
+      toolbar_args
+    )
+  }
+
+  tagList(
+    do.call(div, c(class = "d-flex justify-content-center", toolbar_args)),
+    do.call(div, c(id = paste0(id, "_blocks"), block_cards(x)))
   )
 }
 
