@@ -50,7 +50,7 @@ block_ui.board <- function(x, id = NULL, block = NULL, ...) {
       div(
         class = "card-body p-1",
         h5(
-          class="card-title",
+          class = "card-title",
           paste0(block_name(x), " (", blk_id, ")")
         ),
         block_ui(x, id)

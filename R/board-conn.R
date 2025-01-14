@@ -180,7 +180,7 @@ add_rm_conn_server <- function(rv) {
         input$modify_links,
         {
           if ((is.null(conn_updates$add) || !nrow(conn_updates$add)) &&
-              (is.null(conn_updates$rm) || !length(conn_updates$rm))) {
+            (is.null(conn_updates$rm) || !length(conn_updates$rm))) {
 
             showNotification(
               "No changes specified.",
