@@ -152,7 +152,7 @@ serve.board <- function(x, ...) {
       x,
       ser_deser = ser_deser_ui,
       add_rm_block = add_rm_block_ui,
-      add_rm_conn = add_rm_conn_ui
+      add_rm_link = add_rm_link_ui
     )
   )
 
@@ -161,7 +161,7 @@ serve.board <- function(x, ...) {
       x,
       ser_deser = ser_deser_server,
       add_rm_block = add_rm_block_server,
-      add_rm_conn = add_rm_conn_server
+      add_rm_link = add_rm_link_server
     )
   }
 

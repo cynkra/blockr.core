@@ -12,13 +12,13 @@ board_server <- function(x, ...) {
 
 #' @param ser_deser Module for serialization/deserialization
 #' @param add_rm_block Module for addition/removal of blocks
-#' @param add_rm_conn Module for addition/removal of connections between blocks
+#' @param add_rm_link Module for addition/removal of links between blocks
 #' @rdname board_server
 #' @export
 board_server.board <- function(x,
                                ser_deser = NULL,
                                add_rm_block = NULL,
-                               add_rm_conn = NULL,
+                               add_rm_link = NULL,
                                ...) {
   moduleServer(
     board_id(x),
@@ -28,7 +28,7 @@ board_server.board <- function(x,
         blocks = list(),
         inputs = list(),
         board = x,
-        conn = list()
+        links = list()
       )
 
       observeEvent(
@@ -87,21 +87,21 @@ board_server.board <- function(x,
         )
       }
 
-      if (not_null(add_rm_conn)) {
+      if (not_null(add_rm_link)) {
 
-        conn <- check_add_rm_conn_val(
-          add_rm_conn(rv),
+        links <- check_add_rm_link_val(
+          add_rm_link(rv),
           rv
         )
 
         observeEvent(
-          conn(),
+          links(),
           {
-            updates <- conn()
+            updates <- links()
 
             old <- board_links(rv$board)
 
-            rv <- update_block_connections(
+            rv <- update_block_links(
               rv,
               add = updates$add,
               rm = old[old$id %in% updates$rm, ]
@@ -125,17 +125,17 @@ setup_blocks <- function(rv) {
 
   stopifnot(
     is.reactivevalues(rv),
-    setequal(names(rv), c("blocks", "inputs", "board", "conn")),
+    setequal(names(rv), c("blocks", "inputs", "board", "links")),
     is_board(rv$board)
   )
 
-  for (link in rv$conn) {
+  for (link in rv$links) {
     link$destroy()
   }
 
   rv$blocks <- list()
   rv$inputs <- list()
-  rv$conn <- list()
+  rv$links <- list()
 
   for (blk in sort(rv$board)) {
     rv <- setup_block(blk, rv)
@@ -156,7 +156,7 @@ setup_block <- function(blk, rv) {
   links <- board_links(rv$board)
 
   for (i in which(links$to == id)) {
-    rv <- do.call(setup_connection, c(list(rv), links[i, ]))
+    rv <- do.call(setup_link, c(list(rv), links[i, ]))
   }
 
   rv$blocks[[id]] <- list(
@@ -175,7 +175,7 @@ destroy_block <- function(id, rv) {
   links <- board_links(rv$board)
 
   for (row in which(links$from %in% id | links$to %in% id)) {
-    rv <- do.call(destroy_connection, c(list(rv), links[row, ]))
+    rv <- do.call(destroy_link, c(list(rv), links[row, ]))
   }
 
   rv$inputs[[id]] <- NULL
@@ -186,9 +186,9 @@ destroy_block <- function(id, rv) {
   rv
 }
 
-setup_connection <- function(rv, id, from, to, input) {
+setup_link <- function(rv, id, from, to, input) {
 
-  rv$conn[[id]] <- observeEvent(
+  rv$links[[id]] <- observeEvent(
     rv$blocks[[from]]$server$result(),
     {
       rv$inputs[[to]][[input]](
@@ -200,27 +200,27 @@ setup_connection <- function(rv, id, from, to, input) {
   rv
 }
 
-destroy_connection <- function(rv, id, from, to, input) {
+destroy_link <- function(rv, id, from, to, input) {
 
-  rv$conn[[id]]$destroy()
-  rv$conn[[id]] <- NULL
+  rv$links[[id]]$destroy()
+  rv$links[[id]] <- NULL
 
   rv$inputs[[to]][[input]](NULL)
 
   rv
 }
 
-update_block_connections <- function(rv, add = NULL, rm = NULL) {
+update_block_links <- function(rv, add = NULL, rm = NULL) {
 
   if (not_null(rm)) {
     for (i in seq_len(nrow(rm))) {
-      rv <- do.call(destroy_connection, c(list(rv), rm[i, ]))
+      rv <- do.call(destroy_link, c(list(rv), rm[i, ]))
     }
   }
 
   if (not_null(add)) {
     for (i in seq_len(nrow(add))) {
-      rv <- do.call(setup_connection, c(list(rv), add[i, ]))
+      rv <- do.call(setup_link, c(list(rv), add[i, ]))
     }
   }
 

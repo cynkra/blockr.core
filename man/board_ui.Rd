@@ -11,7 +11,7 @@
 \usage{
 board_ui(x, ...)
 
-\method{board_ui}{board}(x, ser_deser = NULL, add_rm_block = NULL, add_rm_conn = NULL, ...)
+\method{board_ui}{board}(x, ser_deser = NULL, add_rm_block = NULL, add_rm_link = NULL, ...)
 
 insert_block_ui(x, block = NULL, ...)
 
@@ -30,7 +30,7 @@ remove_block_ui(x, block = NULL, ...)
 
 \item{add_rm_block}{UI for block addition/removal}
 
-\item{add_rm_conn}{UI for block connection addition/removal}
+\item{add_rm_link}{UI for block link addition/removal}
 
 \item{block}{(Optional) block (or ID) for which to insert/remove the UI}
 }

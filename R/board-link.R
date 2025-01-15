@@ -1,6 +1,6 @@
-#' Add/remove block connections module
+#' Add/remove block links module
 #'
-#' Customizable logic for adding/removing connections between blocks on the
+#' Customizable logic for adding/removing links between blocks on the
 #' board.
 #'
 #' @param rv Reactive values object
@@ -8,13 +8,13 @@
 #' @return A reactive value that evaualtes to `NULL` or a list with components
 #' `add` and `rm`, where `add` is either `NULL` or a `data.frame` with columns
 #' `id`, `from`, `tp` and `input` and `rm` is either `NULL` or a character
-#' vector of connection IDs.
+#' vector of link IDs.
 #'
-#' @rdname add_rm_conn
+#' @rdname add_rm_link
 #' @export
-add_rm_conn_server <- function(rv) {
+add_rm_link_server <- function(rv) {
   moduleServer(
-    "add_rm_conn",
+    "add_rm_link",
     function(input, output, session) {
 
       observeEvent(input$links, {
@@ -170,18 +170,18 @@ add_rm_conn_server <- function(rv) {
 
 #' @param id Namespace ID
 #' @param board The initial `board` object
-#' @rdname add_rm_conn
+#' @rdname add_rm_link
 #' @export
-add_rm_conn_ui <- function(id, board) {
+add_rm_link_ui <- function(id, board) {
 
   ns <- NS(
-    NS(id, "add_rm_conn")
+    NS(id, "add_rm_link")
   )
 
   list(
     actionButton(
       ns("links"),
-      "Edit connections",
+      "Edit links",
       icon = icon("table")
     )
   )
@@ -195,7 +195,7 @@ dt_board_link <- function(lnk, ns, rv) {
     From = chr_mply(dt_selectize, lapply(paste0(lnk$id, "_from"), ns),
                     lnk$from, MoreArgs = ids),
     To = chr_mply(dt_selectize, lapply(paste0(lnk$id, "_to"), ns),
-                    lnk$to, MoreArgs = ids),
+                  lnk$to, MoreArgs = ids),
     Input = chr_mply(dt_selectize, lapply(paste0(lnk$id, "_input"), ns),
                      lnk$input, block_inputs(rv$board)[lnk$to])
   )
@@ -249,7 +249,7 @@ destroy_dt_observers <- function(ids, update) {
 
 links_modal <- function(ns) {
   modalDialog(
-    title = "Board connections",
+    title = "Board links",
     DT::dataTableOutput(ns("links")),
     footer = tagList(
       actionButton(ns("add_link"), "Add row", icon = icon("plus")),
@@ -261,13 +261,13 @@ links_modal <- function(ns) {
   )
 }
 
-check_add_rm_conn_val <- function(val, rv) {
+check_add_rm_link_val <- function(val, rv) {
 
   observeEvent(
     TRUE,
     {
       if (!is.reactive(val)) {
-        stop("Expecting `add_rm_conn` to return a reactive value.")
+        stop("Expecting `add_rm_link` to return a reactive value.")
       }
     },
     once = TRUE
@@ -277,7 +277,7 @@ check_add_rm_conn_val <- function(val, rv) {
     val(),
     {
       if (!is.list(val()) || !setequal(names(val()), c("add", "rm"))) {
-        stop("Expecting the `add_rm_conn` return value to evaluate to a list ",
+        stop("Expecting the `add_rm_link` return value to evaluate to a list ",
              "with components `add` and `rm`.")
       }
     },
@@ -288,12 +288,12 @@ check_add_rm_conn_val <- function(val, rv) {
     val()$add,
     {
       if (!is.data.frame(val()$add)) {
-        stop("Expecting the `add` component of the `add_rm_conn` return ",
+        stop("Expecting the `add` component of the `add_rm_link` return ",
              "value to be `NULL` or a `data.frame`.")
       }
 
       if (!all(c("id", "from", "to", "input") %in% colnames(val()$add))) {
-        stop("Expecting the `add` component of the `add_rm_conn` return ",
+        stop("Expecting the `add` component of the `add_rm_link` return ",
              "value to contain columns `id`, `from`, `to` and `input`.")
       }
     },
@@ -304,7 +304,7 @@ check_add_rm_conn_val <- function(val, rv) {
     val()$add,
     {
       if (any(val()$add %in% board_link_ids(rv$board))) {
-        stop("Expecting unique connection IDs for new connections.")
+        stop("Expecting unique link IDs for new links.")
       }
     },
     priority = 1
@@ -314,7 +314,7 @@ check_add_rm_conn_val <- function(val, rv) {
     val()$rm,
     {
       if (!is.character(val()$rm)) {
-        stop("Expecting the `add` component of the `add_rm_conn` return ",
+        stop("Expecting the `add` component of the `add_rm_link` return ",
              "value to be a character vector.")
       }
     },
@@ -325,7 +325,7 @@ check_add_rm_conn_val <- function(val, rv) {
     val()$rm,
     {
       if (!all(val()$rm %in% board_link_ids(rv$board))) {
-        stop("Expecting all connection IDs to be removed to be known.")
+        stop("Expecting all link IDs to be removed to be known.")
       }
     },
     priority = 1

@@ -12,13 +12,13 @@ board_ui <- function(x, ...) {
 
 #' @param ser_deser UI for serialization/deserialization
 #' @param add_rm_block UI for block addition/removal
-#' @param add_rm_conn UI for block connection addition/removal
+#' @param add_rm_link UI for block link addition/removal
 #' @rdname board_ui
 #' @export
 board_ui.board <- function(x,
                            ser_deser = NULL,
                            add_rm_block = NULL,
-                           add_rm_conn = NULL,
+                           add_rm_link = NULL,
                            ...) {
 
   id <- board_id(x)
@@ -26,7 +26,7 @@ board_ui.board <- function(x,
   toolbar_args <- c(
     if (not_null(ser_deser)) ser_deser(id, x),
     if (not_null(add_rm_block)) add_rm_block(id, x),
-    if (not_null(add_rm_conn)) add_rm_conn(id, x)
+    if (not_null(add_rm_link)) add_rm_link(id, x)
   )
 
   tagList(
