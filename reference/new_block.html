@@ -48,7 +48,16 @@ attribute</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">new_block</span><span class="op">(</span><span class="va">server</span>, <span class="va">ui</span>, <span class="va">class</span>, <span class="va">ctor</span>, <span class="va">ctor_pkg</span>, uid <span class="op">=</span> <span class="fu"><a href="rand_names.html">rand_names</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">new_block</span><span class="op">(</span></span>
+<span>  <span class="va">server</span>,</span>
+<span>  <span class="va">ui</span>,</span>
+<span>  <span class="va">class</span>,</span>
+<span>  <span class="va">ctor</span>,</span>
+<span>  <span class="va">ctor_pkg</span>,</span>
+<span>  uid <span class="op">=</span> <span class="fu"><a href="rand_names.html">rand_names</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">is_block</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
@@ -57,6 +66,8 @@ attribute</p>
 <span><span class="fu">new_transform_block</span><span class="op">(</span><span class="va">server</span>, <span class="va">ui</span>, <span class="va">class</span>, ctor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">sys.parent</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">block_uid</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">block_name</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">block_ctor</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
@@ -68,7 +79,13 @@ attribute</p>
 <span></span>
 <span><span class="fu">block_inputs</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">block_arity</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># S3 method for class 'block'</span></span>
+<span><span class="fu">block_inputs</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">block_arity</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'board'</span></span>
+<span><span class="fu">block_inputs</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -97,6 +114,10 @@ attribute</p>
 
 <dt id="arg-uid">uid<a class="anchor" aria-label="anchor" href="#arg-uid"></a></dt>
 <dd><p>Unique block ID</p></dd>
+
+
+<dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
+<dd><p>Block name</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

@@ -3,6 +3,8 @@
 <url><loc>/LICENSE.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
+<url><loc>/reference/add_rm_block.html</loc></url>
+<url><loc>/reference/add_rm_link.html</loc></url>
 <url><loc>/reference/block_server.html</loc></url>
 <url><loc>/reference/block_ui.html</loc></url>
 <url><loc>/reference/blockr.core-package.html</loc></url>
@@ -12,9 +14,11 @@
 <url><loc>/reference/new_block.html</loc></url>
 <url><loc>/reference/new_board.html</loc></url>
 <url><loc>/reference/new_dataset_block.html</loc></url>
+<url><loc>/reference/new_link.html</loc></url>
 <url><loc>/reference/new_subset_block.html</loc></url>
 <url><loc>/reference/rand_names.html</loc></url>
 <url><loc>/reference/register_block.html</loc></url>
+<url><loc>/reference/ser_deser.html</loc></url>
 <url><loc>/reference/serve.html</loc></url>
 <url><loc>/reference/to_json.html</loc></url>
 </urlset>

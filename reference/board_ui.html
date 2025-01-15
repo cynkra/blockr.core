@@ -44,10 +44,20 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">board_ui</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">board_ui</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'board'</span></span>
-<span><span class="fu">board_ui</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">board_ui</span><span class="op">(</span><span class="va">x</span>, ser_deser <span class="op">=</span> <span class="cn">NULL</span>, add_rm_block <span class="op">=</span> <span class="cn">NULL</span>, add_rm_link <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">insert_block_ui</span><span class="op">(</span><span class="va">x</span>, block <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'board'</span></span>
+<span><span class="fu">insert_block_ui</span><span class="op">(</span><span class="va">x</span>, block <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">remove_block_ui</span><span class="op">(</span><span class="va">x</span>, block <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'board'</span></span>
+<span><span class="fu">remove_block_ui</span><span class="op">(</span><span class="va">x</span>, block <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -56,6 +66,26 @@
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>Board</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Generic consistency</p></dd>
+
+
+<dt id="arg-ser-deser">ser_deser<a class="anchor" aria-label="anchor" href="#arg-ser-deser"></a></dt>
+<dd><p>UI for serialization/deserialization</p></dd>
+
+
+<dt id="arg-add-rm-block">add_rm_block<a class="anchor" aria-label="anchor" href="#arg-add-rm-block"></a></dt>
+<dd><p>UI for block addition/removal</p></dd>
+
+
+<dt id="arg-add-rm-link">add_rm_link<a class="anchor" aria-label="anchor" href="#arg-add-rm-link"></a></dt>
+<dd><p>UI for block link addition/removal</p></dd>
+
+
+<dt id="arg-block">block<a class="anchor" aria-label="anchor" href="#arg-block"></a></dt>
+<dd><p>(Optional) block (or ID) for which to insert/remove the UI</p></dd>
 
 </dl></div>
 
