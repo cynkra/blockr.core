@@ -10,6 +10,7 @@
 #' @param ctor Constructor name (or function/frame number)
 #' @param ctor_pkg Package name (or `NULL`)
 #' @param uid Unique block ID
+#' @param name Block name
 #' @param ... Further (metadata) attributes
 #'
 #' @export

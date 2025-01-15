@@ -60,7 +60,7 @@ serve(
       blockr.dplyr::new_select_block(uid = "e"),
       new_dataset_block(uid = "b")
     ),
-    links = data.frame(
+    links = new_link(
       from = c("a", "c", "b", "d"),
       to = c("d", "d", "c", "e"),
       input = c("x", "y", "", "")

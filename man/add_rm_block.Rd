@@ -10,7 +10,9 @@ add_rm_block_server(rv)
 add_rm_block_ui(id, board)
 }
 \arguments{
-\item{rv}{Namespace ID}
+\item{rv}{Reactive values object}
+
+\item{id}{Namespace ID}
 
 \item{board}{The initial \code{board} object}
 }

@@ -2,18 +2,51 @@
 % Please edit documentation in R/board-class.R
 \name{new_board}
 \alias{new_board}
+\alias{validate_board}
 \alias{is_board}
+\alias{board_id}
+\alias{board_blocks}
+\alias{board_blocks<-}
+\alias{board_links}
+\alias{board_links<-}
+\alias{board_block_ids}
+\alias{board_link_ids}
+\alias{add_block}
+\alias{remove_blocks}
+\alias{modify_links}
 \title{Board}
 \usage{
 new_board(
   blocks = list(),
-  links = data.frame(from = character(), to = character(), input = character()),
+  links = new_link(),
   ...,
   id = "board",
   class = character()
 )
 
+validate_board(x)
+
 is_board(x)
+
+board_id(x)
+
+board_blocks(x)
+
+board_blocks(x) <- value
+
+board_links(x)
+
+board_links(x) <- value
+
+board_block_ids(x)
+
+board_link_ids(x)
+
+add_block(x, blk)
+
+remove_blocks(x, ids)
+
+modify_links(x, add = NULL, rm = NULL)
 }
 \arguments{
 \item{blocks}{List of blocks}
@@ -26,7 +59,17 @@ is_board(x)
 
 \item{class}{Board sub-class}
 
-\item{x}{A board object}
+\item{x}{Board object}
+
+\item{value}{Replacement value}
+
+\item{blk}{Block object}
+
+\item{ids}{Block IDs}
+
+\item{add}{Links to add}
+
+\item{rm}{Link IDs to remove}
 }
 \description{
 Blocks are placed on a board.

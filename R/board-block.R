@@ -27,7 +27,7 @@ add_rm_block_server <- function(rv) {
         updateSelectInput(
           session,
           inputId = "block_select",
-          choices = block_ids(rv$board)
+          choices = board_block_ids(rv$board)
         )
       )
 
@@ -43,7 +43,7 @@ add_rm_block_server <- function(rv) {
   )
 }
 
-#' @param rv Namespace ID
+#' @param id Namespace ID
 #' @param board The initial `board` object
 #' @rdname add_rm_block
 #' @export
@@ -68,7 +68,7 @@ add_rm_block_ui <- function(id, board) {
     selectInput(
       ns("block_select"),
       "Select block from board",
-      choices = c("", block_ids(board))
+      choices = c("", board_block_ids(board))
     ),
     actionButton(
       ns("rm_block"),
@@ -110,7 +110,7 @@ check_add_rm_block_val <- function(val, rv) {
   observeEvent(
     val$add,
     {
-      if (block_uid(val$add) %in% block_ids(rv$board)) {
+      if (block_uid(val$add) %in% board_block_ids(rv$board)) {
         stop("Expecting the newly added block to have a unique ID.")
       }
     },
@@ -131,7 +131,7 @@ check_add_rm_block_val <- function(val, rv) {
   observeEvent(
     val$rm,
     {
-      if (!val$rm %in% block_ids(rv$board)) {
+      if (!val$rm %in% board_block_ids(rv$board)) {
         stop("Expecting the removed block to be specified by a known ID.")
       }
     },

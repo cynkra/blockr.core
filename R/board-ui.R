@@ -75,7 +75,7 @@ block_ui.board <- function(x, id = NULL, block = NULL, ...) {
 
 block_id_to_block <- function(id, board) {
 
-  hit <- match(id, block_ids(board))
+  hit <- match(id, board_block_ids(board))
 
   if (is.na(hit)) {
     stop("Unknown block ", id)
@@ -128,7 +128,7 @@ resolve_id <- function(block, board) {
     block <- block_uid(block)
   }
 
-  stopifnot(is_string(block), block %in% block_ids(board))
+  stopifnot(is_string(block), block %in% board_block_ids(board))
 
   block
 }

@@ -9,62 +9,61 @@
 #' @param class Board sub-class
 #'
 #' @export
-new_board <- function(blocks = list(), links = data.frame(from = character(),
-                                                          to = character(),
-                                                          input = character()),
-                      ..., id = "board", class = character()) {
+new_board <- function(blocks = list(), links = new_link(), ...,
+                      id = "board", class = character()) {
 
   if (is_block(blocks)) {
     blocks <- list(blocks)
   }
 
-  validate_board(
-    structure(
-      list(blocks = blocks, links = links, ...),
-      id = id,
-      class = c(class, "board")
-    )
+  validate_board_blocks(blocks)
+
+  links <- as_link(links)
+
+  ids <- chr_ply(blocks, block_uid)
+
+  to_complete <- links$to %in% ids[int_ply(blocks, block_arity) == 1L] & (
+    is.na(links$input) | nchar(links$input) == 0L
+  )
+
+  inputs <- set_names(lapply(blocks, block_inputs), ids)
+
+  links$input[to_complete] <- chr_ply(inputs[links$to[to_complete]], identity)
+
+  validate_board_blocks_links(blocks, links)
+
+  structure(
+    list(blocks = blocks, links = links, ...),
+    id = id,
+    class = c(class, "board")
   )
 }
 
-validate_board <- function(x) {
+validate_board_blocks <- function(x) {
 
-  blocks <- board_blocks(x)
-  links <- board_links(x)
+  if (is_board(x)) {
+    x <- board_blocks(x)
+  }
 
-  if (!is.list(blocks) || !all(lgl_ply(blocks, is_block))) {
+  if (!is.list(x) || !all(lgl_ply(x, is_block))) {
     stop("Expecting the board to contain a set of blocks.")
   }
 
-  if (!is.data.frame(links)) {
-    stop("Expecting links to be represented by a data.frame.")
-  }
-
-  link_cols <- c("from", "to", "input")
-
-  if (!all(link_cols %in% colnames(links))) {
-    stop(
-      "Expecting the link data.frame to contain at least columns ",
-      paste_enum(link_cols)
-    )
-  }
-
-  if (!all(lgl_ply(links, is.character))) {
-    stop("Expecting all link columns to be of type `character`.")
-  }
-
-  ids <- chr_ply(blocks, block_uid)
+  ids <- chr_ply(x, block_uid)
 
   if (anyDuplicated(ids) != 0) {
     stop("Block IDs are required to be unique.")
   }
 
+  invisible(x)
+}
+
+validate_board_blocks_links <- function(blocks, links) {
+
+  ids <- chr_ply(blocks, block_uid)
+
   if (!all(links$from %in% ids) || !all(links$to %in% ids)) {
     stop("Expecting all links to refer to known block IDs.")
-  }
-
-  if (any(links$from == links$to)) {
-    stop("Self-referencing blocks are not allowed.")
   }
 
   arity <- int_ply(blocks, block_arity)
@@ -75,19 +74,14 @@ validate_board <- function(x) {
 
     if (any(fail)) {
       stop(
-        i, "-ary blocks are expected to have at most ", i, " incoming edges, ",
-        "which does not hold for blocks ", paste_enum(names(fail)[fail]), "."
+        i, "-ary blocks are expected to have at most ", i, " incoming ",
+        "edge(s), which does not hold for block(s) ",
+        paste_enum(names(fail)[fail]), "."
       )
     }
   }
 
-  to_complete <- links$to %in% ids[arity == 1L] & (
-    is.na(links$input) | nchar(links$input) == 0L
-  )
-
   inputs <- set_names(lapply(blocks, block_inputs), ids)
-
-  links$input[to_complete] <- chr_ply(inputs[links$to[to_complete]], identity)
 
   for (i in unique(links$to)) {
 
@@ -101,27 +95,22 @@ validate_board <- function(x) {
     }
   }
 
-  if (!"id" %in% colnames(links)) {
-    links <- cbind(id = rep("", nrow(links)), links)
-  }
+  invisible()
+}
 
-  to_complete <- links$id == "" | is.na(links$id)
+#' @param x Board object
+#' @rdname new_board
+#' @export
+validate_board <- function(x) {
 
-  links[to_complete, ]$id <- rand_names(
-    links[!to_complete, ]$id,
-    sum(to_complete)
+  validate_board_blocks_links(
+    validate_board_blocks(x),
+    validate_link(x)
   )
-
-  if (anyDuplicated(links$id) != 0L) {
-    stop("Link IDs are required to be unique.")
-  }
-
-  x[["links"]] <- links
 
   x
 }
 
-#' @param x A board object
 #' @rdname new_board
 #' @export
 is_board <- function(x) {
@@ -131,12 +120,27 @@ is_board <- function(x) {
 #' @export
 sort.board <- function(x, decreasing = FALSE, ...) {
 
+  res <- topo_sort(as.matrix(x))
+
   blk <- x[["blocks"]]
   ids <- chr_ply(blk, block_uid)
 
-  res <- topo_sort(ids, x[["links"]])
+  ind <- match(res, ids)
 
-  blk[match(res, ids)]
+  if (isTRUE(decreasing)) {
+    ind <- rev(ind)
+  }
+
+  blk[ind]
+}
+
+#' @export
+as.matrix.board <- function(x, ...) {
+
+  block_ids <- board_block_ids(x)
+  links <- board_links(x)
+
+  as_adjacency_matrix(links$from, links$to, block_ids)
 }
 
 #' @rdname serve
@@ -164,41 +168,59 @@ serve.board <- function(x, ...) {
   shinyApp(ui, server)
 }
 
+#' @rdname new_board
+#' @export
 board_id <- function(x) {
   stopifnot(is_board(x))
   attr(x, "id")
 }
 
+#' @rdname new_board
+#' @export
 board_blocks <- function(x) {
   stopifnot(is_board(x))
-  x[["blocks"]]
+  validate_board_blocks(x[["blocks"]])
 }
 
+#' @param value Replacement value
+#' @rdname new_board
+#' @export
 `board_blocks<-` <- function(x, value) {
   stopifnot(is_board(x))
   x[["blocks"]] <- value
   validate_board(x)
 }
 
+#' @rdname new_board
+#' @export
 board_links <- function(x) {
   stopifnot(is_board(x))
-  x[["links"]]
+  validate_link(x[["links"]])
 }
 
+#' @rdname new_board
+#' @export
 `board_links<-` <- function(x, value) {
   stopifnot(is_board(x))
   x[["links"]] <- value
   validate_board(x)
 }
 
-block_ids <- function(x) {
+#' @rdname new_board
+#' @export
+board_block_ids <- function(x) {
   chr_ply(board_blocks(x), block_uid)
 }
 
-link_ids <- function(x) {
-  board_links(x)[, "id"]
+#' @rdname new_board
+#' @export
+board_link_ids <- function(x) {
+  names(board_links(x))
 }
 
+#' @param blk Block object
+#' @rdname new_board
+#' @export
 add_block <- function(x, blk) {
 
   stopifnot(is_board(x), is_block(blk))
@@ -208,36 +230,37 @@ add_block <- function(x, blk) {
   x
 }
 
+#' @param ids Block IDs
+#' @rdname new_board
+#' @export
 remove_blocks <- function(x, ids) {
 
-  stopifnot(is_board(x), is.character(ids), all(ids %in% block_ids(x)))
+  stopifnot(is_board(x), is.character(ids), all(ids %in% board_block_ids(x)))
 
   links <- board_links(x)
 
-  board_links(x) <- links[!links$from %in% ids & !links$to %in% ids, ]
-  board_blocks(x) <- board_blocks(x)[!block_ids(x) %in% ids]
+  board_links(x) <- links[!links$from %in% ids & !links$to %in% ids]
+  board_blocks(x) <- board_blocks(x)[!board_block_ids(x) %in% ids]
 
   x
 }
 
+#' @param add Links to add
+#' @param rm Link IDs to remove
+#' @rdname new_board
+#' @export
 modify_links <- function(x, add = NULL, rm = NULL) {
 
   links <- board_links(x)
 
   if (not_null(rm)) {
-
-    stopifnot(is.character(rm), anyDuplicated(rm) == 0L, all(rm %in% links$id))
-
-    links <- links[!links$id %in% rm, ]
+    stopifnot(is.character(rm), all(rm %in% names(links)))
+    links <- links[!names(links) %in% rm, ]
   }
 
-  cols <- colnames(links)
-
   if (not_null(add)) {
-
-    stopifnot(is.data.frame(add), setequal(cols, colnames(add)))
-
-    links <- rbind(links, add[, cols])
+    stopifnot(is_link(add))
+    links <- c(links, add)
   }
 
   board_links(x) <- links
@@ -248,5 +271,5 @@ modify_links <- function(x, add = NULL, rm = NULL) {
 #' @rdname new_block
 #' @export
 block_inputs.board <- function(x) {
-  lapply(set_names(board_blocks(x), block_ids(x)), block_inputs)
+  lapply(set_names(board_blocks(x), board_block_ids(x)), block_inputs)
 }

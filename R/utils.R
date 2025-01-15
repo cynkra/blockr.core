@@ -103,6 +103,22 @@ dbl_ply <- function(x, fun, ..., length = 1L, use_names = FALSE) {
   vapply(x, fun, double(length), ..., USE.NAMES = use_names)
 }
 
+chr_mply <- function(...) {
+  chr_ply(Map(...), identity)
+}
+
+lgl_mply <- function(fun, ...) {
+  lgl_ply(Map(...), identity)
+}
+
+int_mply <- function(fun, ...) {
+  int_ply(Map(...), identity)
+}
+
+dbl_mply <- function(fun, ...) {
+  dbl_ply(Map(...), identity)
+}
+
 chr_xtr <- function(x, i, ...) chr_ply(x, `[[`, i, ...)
 
 lgl_xtr <- function(x, i, ...) lgl_ply(x, `[[`, i, ...)

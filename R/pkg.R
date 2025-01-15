@@ -1,3 +1,4 @@
+#' @import vctrs
 #' @keywords internal
 "_PACKAGE"
 

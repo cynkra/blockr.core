@@ -20,8 +20,14 @@ test_that("block constructor", {
   expect_s3_class(board, "board")
 
   expect_error(
-    new_board(blockr.dplyr::new_select_block()),
-    "1-ary blocks are expected"
+    new_board(
+      list(
+        new_dataset_block(uid = "a"),
+        blockr.dplyr::new_select_block(uid = "b")
+      ),
+      new_link("a", "b", "foo")
+    ),
+    "expects inputs"
   )
 
   expect_error(

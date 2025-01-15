@@ -21,35 +21,22 @@ add_rm_conn_server <- function(rv) {
         showModal(links_modal(session$ns))
       })
 
-      conn_updates <- reactiveValues(
-        add = NULL,
-        rm = NULL,
+      upd <- reactiveValues(
+        add = new_link(),
+        rm = character(),
         curr = isolate(board_links(rv$board)),
         obs = list(),
         edit = NULL
       )
 
       observeEvent(board_links(rv$board), {
-        conn_updates$curr <- board_links(rv$board)
+        upd$curr <- board_links(rv$board)
       })
 
       output$links <- DT::renderDT(
         {
-          dat <- data.frame(
-            From = apply(conn_updates$curr, 1L, dt_selectize, session$ns,
-                         "from", choices = block_ids(rv$board)),
-            To = apply(conn_updates$curr, 1L, dt_selectize, session$ns, "to",
-                       choices = block_ids(rv$board)),
-            Input = mapply(
-              dt_selectize,
-              split(conn_updates$curr, seq_len(nrow(conn_updates$curr))),
-              choices = block_inputs(rv$board)[conn_updates$curr$to],
-              MoreArgs = list(ns = session$ns, target = "input")
-            )
-          )
-
           DT::datatable(
-            dat,
+            dt_board_link(upd$curr, session$ns, rv),
             options = list(
               pageLength = 5,
               preDrawCallback = DT::JS(
@@ -70,79 +57,42 @@ add_rm_conn_server <- function(rv) {
       )
 
       observeEvent(
-        conn_updates$curr$id,
+        names(upd$curr),
         {
-          to_add <- setdiff(conn_updates$curr$id, names(conn_updates$obs))
+          ids <- names(upd$curr)
 
-          conn_updates$obs[to_add] <- lapply(
-            to_add,
-            function(row) {
-              lapply(
-                set_names(nm = c("from", "to", "input")),
-                function(col) {
-                  observeEvent(
-                    input[[paste0(row, "_", col)]],
-                    {
-                      cur <- conn_updates$curr
-                      cur <- cur[cur$id == row, col]
-                      val <- input[[paste0(row, "_", col)]]
-                      if (val != cur) {
-                        conn_updates$edit <- list(row = row, col = col,
-                                                  val = val)
-                      }
-                    },
-                    ignoreInit = TRUE
-                  )
-                }
-              )
-            }
-          )
-
-          to_rm <- setdiff(names(conn_updates$obs), conn_updates$curr$id)
-
-          for (row in to_rm) {
-            for (col in c("from", "to", "input")) {
-              conn_updates$obs[[row]][[col]]$destroy()
-            }
-            conn_updates$obs[[row]] <- NULL
-          }
+          upd <- create_dt_observers(setdiff(ids, names(upd$obs)), input, upd)
+          upd <- destroy_dt_observers(setdiff(names(upd$obs), ids), upd)
         }
       )
 
-      observeEvent(conn_updates$edit, {
+      observeEvent(upd$edit, {
 
-        row <- conn_updates$edit$row
-        col <- conn_updates$edit$col
+        row <- upd$edit$row
+        col <- upd$edit$col
 
-        if (!row %in% conn_updates$row && row %in% board_links(rv$board)$id) {
-          conn_updates$row <- c(conn_updates$row, row)
+        if (!row %in% upd$row && row %in% board_link_ids(rv$board)) {
+          upd$row <- c(upd$row, row)
         }
 
-        conn_updates$curr[conn_updates$curr$id == row, col] <- coal(
-          conn_updates$edit$val,
-          ""
-        )
+        new <- upd$curr[[row]]
+        new[[col]] <- coal(upd$edit$val, "")
 
-        new <- conn_updates$curr[conn_updates$curr$id == row, ]
+        upd$curr[[row]] <- new
 
-        if (row %in% conn_updates$add$id) {
-          conn_updates$add[conn_updates$add$id == row, ] <- new
+        if (row %in% names(upd$add)) {
+          upd$add[[row]] <- new
         } else {
-          conn_updates$add <- rbind(conn_updates$add, new)
+          upd$add <- c(upd$add, new)
         }
       })
 
       observeEvent(input$add_link, {
 
-        new <- data.frame(
-          id = rand_names(conn_updates$curr$id),
-          from = "",
-          to = "",
-          input = ""
-        )
+        new <- new_link(from = "", to = "", input = "")
 
-        conn_updates$curr <- rbind(conn_updates$curr, new)
-        conn_updates$add <- rbind(conn_updates$add, new)
+        upd$curr <- c(upd$curr, new)
+        upd$add <- c(upd$add, new)
       })
 
       observeEvent(input$rm_link, {
@@ -151,25 +101,22 @@ add_rm_conn_server <- function(rv) {
 
         if (length(sel)) {
 
-          id <- conn_updates$curr[sel, "id"]
+          ids <- names(upd$curr[sel])
 
-          if (id %in% board_links(rv$board)$id) {
-            conn_updates$rm <- c(conn_updates$rm, id)
-          } else {
-            to_rm <- which(conn_updates$add$id == id)
-            conn_updates$add <- conn_updates$add[-to_rm, ]
-          }
+          upd$rm <- c(upd$rm, ids[ids %in% board_link_ids(rv$board)])
 
-          conn_updates$curr <- conn_updates$curr[-sel, ]
+          upd$add <- upd$add[setdiff(names(upd$add), ids)]
+          upd$curr <- upd$curr[setdiff(names(upd$curr), ids)]
 
         } else {
+
           showNotification("No row selected", type = "warning")
         }
       })
 
       observeEvent(input$cancel_links, {
         removeModal()
-        conn_updates$curr <- board_links(rv$board)
+        upd$curr <- board_links(rv$board)
       })
 
       res <- reactiveVal(
@@ -179,8 +126,7 @@ add_rm_conn_server <- function(rv) {
       observeEvent(
         input$modify_links,
         {
-          if ((is.null(conn_updates$add) || !nrow(conn_updates$add)) &&
-            (is.null(conn_updates$rm) || !length(conn_updates$rm))) {
+          if (!length(upd$add) && !length(upd$rm)) {
 
             showNotification(
               "No changes specified.",
@@ -191,7 +137,7 @@ add_rm_conn_server <- function(rv) {
           }
 
           new <- tryCatch(
-            modify_links(rv$board, conn_updates$add, conn_updates$rm),
+            modify_links(rv$board, upd$add, upd$rm),
             warning = function(e) {
               showNotification(conditionMessage(e), duration = NULL,
                                type = "warning")
@@ -203,12 +149,15 @@ add_rm_conn_server <- function(rv) {
           )
 
           res(
-            list(add = conn_updates$add, rm = conn_updates$rm)
+            list(
+              add = if (length(upd$add)) upd$add,
+              rm = if (length(upd$rm)) upd$rm
+            )
           )
 
-          conn_updates$add <- NULL
-          conn_updates$rm <- NULL
-          conn_updates$curr <- board_links(new)
+          upd$add <- NULL
+          upd$rm <- NULL
+          upd$curr <- board_links(new)
 
           removeModal()
         }
@@ -219,7 +168,7 @@ add_rm_conn_server <- function(rv) {
   )
 }
 
-#' @param rv Namespace ID
+#' @param id Namespace ID
 #' @param board The initial `board` object
 #' @rdname add_rm_conn
 #' @export
@@ -238,15 +187,64 @@ add_rm_conn_ui <- function(id, board) {
   )
 }
 
-dt_selectize <- function(row, ns, target, choices) {
-  as.character(
-    selectInput(
-      ns(paste0(row[["id"]], "_", target)),
-      label = "",
-      choices = c("", choices),
-      selected = row[[target]]
-    )
+dt_board_link <- function(lnk, ns, rv) {
+
+  ids <- list(choices = board_block_ids(rv$board))
+
+  data.frame(
+    From = chr_mply(dt_selectize, lapply(paste0(lnk$id, "_from"), ns),
+                    lnk$from, MoreArgs = ids),
+    To = chr_mply(dt_selectize, lapply(paste0(lnk$id, "_to"), ns),
+                    lnk$to, MoreArgs = ids),
+    Input = chr_mply(dt_selectize, lapply(paste0(lnk$id, "_input"), ns),
+                     lnk$input, block_inputs(rv$board)[lnk$to])
   )
+}
+
+dt_selectize <- function(id, val, choices) {
+  as.character(
+    selectInput(id, label = "", choices = c("", choices), selected = val)
+  )
+}
+
+create_dt_observers <- function(ids, input, update) {
+  update$obs[ids] <- lapply(ids, create_dt_observers_for_id, input, update)
+  update
+}
+
+create_dt_observers_for_id <- function(id, input, update) {
+
+  obs <- set_names(nm = c("from", "to", "input"))
+
+  lapply(obs, create_dt_observer, id, input, update)
+}
+
+create_dt_observer <- function(col, row, input, upd) {
+
+  inp <- paste0(row, "_", col)
+
+  observeEvent(
+    input[[inp]],
+    {
+      val <- input[[inp]]
+      if (val != upd$curr[[row]][[col]]) {
+        upd$edit <- list(row = row, col = col, val = val)
+      }
+    },
+    ignoreInit = TRUE
+  )
+}
+
+destroy_dt_observers <- function(ids, update) {
+
+  for (row in ids) {
+    for (col in c("from", "to", "input")) {
+      update$obs[[row]][[col]]$destroy()
+    }
+    update$obs[[row]] <- NULL
+  }
+
+  update
 }
 
 links_modal <- function(ns) {
@@ -305,7 +303,7 @@ check_add_rm_conn_val <- function(val, rv) {
   observeEvent(
     val()$add,
     {
-      if (any(val()$add %in% link_ids(rv$board))) {
+      if (any(val()$add %in% board_link_ids(rv$board))) {
         stop("Expecting unique connection IDs for new connections.")
       }
     },
@@ -326,7 +324,7 @@ check_add_rm_conn_val <- function(val, rv) {
   observeEvent(
     val()$rm,
     {
-      if (!all(val()$rm %in% link_ids(rv$board))) {
+      if (!all(val()$rm %in% board_link_ids(rv$board))) {
         stop("Expecting all connection IDs to be removed to be known.")
       }
     },

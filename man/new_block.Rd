@@ -67,6 +67,8 @@ block_arity(x)
 
 \item{uid}{Unique block ID}
 
+\item{name}{Block name}
+
 \item{...}{Further (metadata) attributes}
 
 \item{x}{An object inheriting from \code{"block"}}

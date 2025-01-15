@@ -34,7 +34,7 @@ ser_deser_server <- function(rv) {
   )
 }
 
-#' @param rv Namespace ID
+#' @param id Namespace ID
 #' @param board The initial `board` object
 #' @rdname ser_deser
 #' @export

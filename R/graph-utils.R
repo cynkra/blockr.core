@@ -1,12 +1,16 @@
-topo_sort <- function(vertices, edges) {
+topo_sort <- function(adj_matrix) {
 
   stopifnot(
-    is.character(vertices), is.data.frame(edges),
-    all(c("from", "to") %in% colnames(edges)),
-    all(edges[["from"]] %in% vertices), all(edges[["to"]] %in% vertices)
+    is.matrix(adj_matrix), nrow(adj_matrix) == ncol(adj_matrix),
+    identical(rownames(adj_matrix), colnames(adj_matrix)),
+    is.integer(adj_matrix), all(adj_matrix %in% c(0L, 1L))
   )
 
-  num_nodes <- length(vertices)
+  num_nodes <- nrow(adj_matrix)
+
+  if (!num_nodes) {
+    return(character())
+  }
 
   dfs <- local({
 
@@ -36,15 +40,25 @@ topo_sort <- function(vertices, edges) {
     }
   })
 
-  adj_matrix <- matrix(0L, num_nodes, num_nodes,
-                       dimnames = list(vertices, vertices))
-  adj_matrix[as.matrix(edges[, c("from", "to")])] <- 1L
-
   stack <- integer()
 
   for (node in seq_len(num_nodes)) {
     stack <- dfs(node, adj_matrix, stack)
   }
 
-  vertices[stack]
+  rownames(adj_matrix)[stack]
+}
+
+as_adjacency_matrix <- function(from, to, nodes = unique(c(from, to))) {
+
+  stopifnot(
+    all(from %in% nodes), all(to %in% nodes), anyDuplicated(nodes) == 0L
+  )
+
+  n <- length(nodes)
+
+  res <- matrix(0L, n, n, dimnames = list(nodes, nodes))
+  res[cbind(from, to)] <- 1L
+
+  res
 }
