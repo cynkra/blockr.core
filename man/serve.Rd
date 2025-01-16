@@ -18,7 +18,7 @@ serve(x, ...)
 \arguments{
 \item{x}{Object}
 
-\item{data}{Data input}
+\item{data}{Data inputs}
 
 \item{...}{Generic consistency}
 }

@@ -13,24 +13,33 @@ board_ui <- function(x, ...) {
 #' @param ser_deser UI for serialization/deserialization
 #' @param add_rm_block UI for block addition/removal
 #' @param add_rm_link UI for block link addition/removal
+#' @param block_notifications UI for block notifications
 #' @rdname board_ui
 #' @export
 board_ui.board <- function(x,
                            ser_deser = NULL,
                            add_rm_block = NULL,
                            add_rm_link = NULL,
+                           block_notifications = NULL,
                            ...) {
 
   id <- board_id(x)
 
   toolbar_args <- c(
-    if (not_null(ser_deser)) ser_deser(id, x),
-    if (not_null(add_rm_block)) add_rm_block(id, x),
-    if (not_null(add_rm_link)) add_rm_link(id, x)
+    if (length(ser_deser)) ser_deser(id, x),
+    if (length(add_rm_block)) add_rm_block(id, x),
+    if (length(add_rm_link)) add_rm_link(id, x)
   )
+
+  if (is.null(block_notifications)) {
+    block_notifications <- list()
+  } else {
+    block_notifications <- block_notifications(id, x)
+  }
 
   tagList(
     do.call(div, c(class = "d-flex justify-content-center", toolbar_args)),
+    do.call(div, block_notifications),
     do.call(div, c(id = paste0(id, "_blocks"), block_ui(x, id)))
   )
 }

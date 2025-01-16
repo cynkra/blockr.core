@@ -7,7 +7,14 @@
 \usage{
 board_server(x, ...)
 
-\method{board_server}{board}(x, ser_deser = NULL, add_rm_block = NULL, add_rm_link = NULL, ...)
+\method{board_server}{board}(
+  x,
+  ser_deser = NULL,
+  add_rm_block = NULL,
+  add_rm_link = NULL,
+  block_notifications = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{Board}
@@ -19,6 +26,8 @@ board_server(x, ...)
 \item{add_rm_block}{Module for addition/removal of blocks}
 
 \item{add_rm_link}{Module for addition/removal of links between blocks}
+
+\item{block_notifications}{Module for block nptifications}
 }
 \description{
 Shiny server function for \code{board} objects.

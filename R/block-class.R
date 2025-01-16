@@ -239,6 +239,7 @@ block_has_dat_val <- function(x) {
   not_null(block_dat_val(x))
 }
 
+#' @param data Data inputs
 #' @rdname new_block
 #' @export
 validate_data_inputs <- function(x, data) {
@@ -250,7 +251,7 @@ validate_data_inputs <- function(x, data) {
   NULL
 }
 
-#' @param data Data input
+#' @param data Data inputs
 #' @rdname serve
 #' @export
 serve.block <- function(x, data, ...) {

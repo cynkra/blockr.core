@@ -161,7 +161,8 @@ serve.board <- function(x, ...) {
       x,
       ser_deser = ser_deser_server,
       add_rm_block = add_rm_block_server,
-      add_rm_link = add_rm_link_server
+      add_rm_link = add_rm_link_server,
+      block_notifications = block_notification_server
     )
   }
 

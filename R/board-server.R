@@ -13,12 +13,14 @@ board_server <- function(x, ...) {
 #' @param ser_deser Module for serialization/deserialization
 #' @param add_rm_block Module for addition/removal of blocks
 #' @param add_rm_link Module for addition/removal of links between blocks
+#' @param block_notifications Module for block nptifications
 #' @rdname board_server
 #' @export
 board_server.board <- function(x,
                                ser_deser = NULL,
                                add_rm_block = NULL,
                                add_rm_link = NULL,
+                               block_notifications = NULL,
                                ...) {
   moduleServer(
     board_id(x),
@@ -113,9 +115,20 @@ board_server.board <- function(x,
         )
       }
 
+      if (is.null(block_notifications)) {
+        notifications <- reactive(
+          filter_all_zero_len(lst_xtr_reval(rv$blocks, "server", "cond"))
+        )
+      } else {
+        notifications <- check_block_notifications_val(
+          block_notification_server(rv)
+        )
+      }
+
       list(
         board = reactive(rv$board),
-        blocks = reactive(rv$blocks)
+        blocks = reactive(rv$blocks),
+        notifications = notifications
       )
     }
   )

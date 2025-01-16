@@ -83,3 +83,32 @@ test_that("zero length", {
   expect_true(all_zero_len(x))
   expect_null(filter_all_zero_len(x))
 })
+
+test_that("*_xtr", {
+
+  x <- list(
+    list(
+      a = "1",
+      b = "2"
+    ),
+    list(
+      a = "3",
+      b = "4"
+    )
+  )
+
+  expect_identical(lst_xtr(x, "a"), list("1", "3"))
+
+  x <- list(
+    list(
+      a = list(a = "1", b = "2"),
+      b = list(a = "3", b = "4")
+    ),
+    list(
+      a = list(a = "5", b = "6"),
+      b = list(a = "7", b = "8")
+    )
+  )
+
+  expect_identical(lst_xtr(x, "a", "a"), list("1", "5"))
+})

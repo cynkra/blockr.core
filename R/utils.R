@@ -127,7 +127,14 @@ int_xtr <- function(x, i, ...) int_ply(x, `[[`, i, ...)
 
 dbl_xtr <- function(x, i, ...) dbl_ply(x, `[[`, i, ...)
 
-lst_xtr <- function(x, i) lapply(x, `[[`, i)
+lst_xtr <- function(x, ...) {
+
+  for (i in c(...)) {
+    x <- lapply(x, `[[`, i)
+  }
+
+  x
+}
 
 map <- function(f, ..., use_names = FALSE) Map(f, ..., USE.NAMES = use_names)
 
@@ -200,4 +207,18 @@ filter_all_zero_len <- function(x) {
   } else {
     x
   }
+}
+
+lst_xtr_reval <- function(x, ...) {
+  lapply(lst_xtr(x, ...), reval)
+}
+
+int_to_chr <- function(x) {
+
+  stopifnot(is_intish(x))
+
+  chr_ply(
+    lapply(strsplit(as.character(x), ""), as.integer),
+    function(i) paste0(letters[i + 1L], collapse = "")
+  )
 }

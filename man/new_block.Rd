@@ -83,6 +83,8 @@ block_arity(x)
 \item{x}{An object inheriting from \code{"block"}}
 
 \item{namespace}{(Optional) parent namespace}
+
+\item{data}{Data inputs}
 }
 \description{
 Blocks consist of an expression that defines what the block produces (given

@@ -18,10 +18,29 @@ block_server.block <- function(x, data, ...) {
     block_uid(x),
     function(input, output, session) {
 
+      cond_msg <- local(
+        {
+          id <- 1L
+
+          function(cnd) {
+
+            id <<- id + 1L
+
+            if (inherits(cnd, "condition")) {
+              cnd <- conditionMessage(cnd)
+            }
+
+            list(
+              structure(cnd, id = int_to_chr(id), class = "block_cnd")
+            )
+          }
+        }
+      )
+
       empty_cond <- list(
         error = character(),
-        warnings = character(),
-        messages = character()
+        warning = character(),
+        message = character()
       )
 
       rv <- reactiveValues(
@@ -44,6 +63,8 @@ block_server.block <- function(x, data, ...) {
         observeEvent(
           lapply(data, reval),
           {
+            res(NULL)
+
             rv$data_cond <- empty_cond
             rv$state_set <- NULL
 
@@ -53,21 +74,15 @@ block_server.block <- function(x, data, ...) {
                   validate_data_inputs(x, lapply(data, reval))
                   TRUE
                 },
-                messages = function(m) {
-                  rv$data_cond$messages <- c(
-                    rv$data_cond$messages,
-                    conditionMessage(m)
-                  )
+                message = function(m) {
+                  rv$data_cond$message <- c(rv$data_cond$message, cond_msg(m))
                 },
-                warnings = function(w) {
-                  rv$data_cond$warnings <- c(
-                    rv$data_cond$warnings,
-                    conditionMessage(w)
-                  )
+                warning = function(w) {
+                  rv$data_cond$warning <- c(rv$data_cond$warning, cond_msg(w))
                 }
               ),
               error = function(e) {
-                rv$data_cond$error <- conditionMessage(e)
+                rv$data_cond$error <- cond_msg(e)
                 NULL
               }
             )
@@ -75,20 +90,34 @@ block_server.block <- function(x, data, ...) {
         )
       }
 
-      observe(
+      state <- reactive(
         {
-          req(rv$data_valid)
+          if (isTruthy(rv$data_valid)) {
+            lgl_ply(
+              lapply(exp$state, reval_if),
+              isTruthy,
+              use_names = TRUE
+            )
+          } else {
+            NULL
+          }
+        }
+      )
 
-          state <- lgl_ply(
-            lapply(exp$state, reval_if),
-            isTruthy,
-            use_names = TRUE
-          )
+      observeEvent(
+        state(),
+        {
+          res(NULL)
 
-          if (!all(state)) {
-            rv$state_cond$error <- paste0(
-              "State values ", paste_enum(names(state)[!state]), " are not ",
-              "yet initialized."
+          ok <- state()
+
+          rv$state_cond <- empty_cond
+          rv$state_set <- NULL
+
+          if (!all(ok)) {
+            rv$state_cond$error <- cond_msg(
+              paste0("State values ", paste_enum(names(ok)[!ok]), " are ",
+                     "not yet initialized.")
             )
           } else {
             rv$state_set <- TRUE
@@ -105,21 +134,15 @@ block_server.block <- function(x, data, ...) {
           out <- tryCatch(
             withCallingHandlers(
               eval(exp$expr(), lapply(data, reval)),
-              messages = function(m) {
-                rv$eval_cond$messages <- c(
-                  rv$eval_cond$messages,
-                  conditionMessage(m)
-                )
+              message = function(m) {
+                rv$eval_cond$message <- c(rv$eval_cond$message, cond_msg(m))
               },
-              warnings = function(w) {
-                rv$eval_cond$warnings <- c(
-                  rv$eval_cond$warnings,
-                  conditionMessage(w)
-                )
+              warning = function(w) {
+                rv$eval_cond$warning <- c(rv$eval_cond$warning, cond_msg(w))
               }
             ),
             error = function(e) {
-              rv$eval_cond$error <- conditionMessage(e)
+              rv$eval_cond$error <- cond_msg(e)
               NULL
             }
           )
@@ -136,9 +159,9 @@ block_server.block <- function(x, data, ...) {
         json = reactive(to_json(x, lapply(exp$state, reval_if))),
         cond = reactive(
           list(
-            data = data_cond,
-            state = state_cond,
-            eval = eval_cond
+            data = rv$data_cond,
+            state = rv$state_cond,
+            eval = rv$eval_cond
           )
         )
       )
