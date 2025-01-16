@@ -38,6 +38,8 @@ to_json.board <- function(x, blocks, ...) {
 
   vers <- utils::packageVersion(utils::packageName())
 
+  stop("need `to_json.link()` method")
+
   paste0(
     "{",
     "\"object\":[", paste0("\"", class(x), "\"", collapse = ", "), "],",

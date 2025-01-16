@@ -11,6 +11,8 @@
 \alias{block_ns}
 \alias{block_expr_server}
 \alias{block_expr_ui}
+\alias{block_dat_val}
+\alias{validate_data_inputs}
 \alias{block_inputs}
 \alias{block_inputs.block}
 \alias{block_arity}
@@ -23,6 +25,7 @@ new_block(
   class,
   ctor,
   ctor_pkg,
+  dat_val = NULL,
   uid = rand_names(),
   name = NULL,
   ...
@@ -46,6 +49,10 @@ block_expr_server(x)
 
 block_expr_ui(x)
 
+block_dat_val(x)
+
+validate_data_inputs(x, data)
+
 block_inputs(x)
 
 \method{block_inputs}{block}(x)
@@ -64,6 +71,8 @@ block_arity(x)
 \item{ctor}{Constructor name (or function/frame number)}
 
 \item{ctor_pkg}{Package name (or \code{NULL})}
+
+\item{dat_val}{(Optioanl) input validator}
 
 \item{uid}{Unique block ID}
 

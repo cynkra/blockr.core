@@ -179,3 +179,25 @@ coal <- function(..., fail_null = TRUE) {
 
   NULL
 }
+
+is_zero_len <- function(x) {
+  length(x) == 0L
+}
+
+all_zero_len <- function(x) {
+  if (is.list(x)) {
+    all(lgl_ply(x, all_zero_len))
+  } else {
+    is_zero_len(x)
+  }
+}
+
+filter_all_zero_len <- function(x) {
+  if (all_zero_len(x)) {
+    NULL
+  } else if (is.list(x)) {
+    Filter(Negate(is.null), lapply(x, filter_all_zero_len))
+  } else {
+    x
+  }
+}

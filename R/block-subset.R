@@ -39,6 +39,9 @@ new_subset_block <- function(subset = "", select = "", ...) {
         )
       )
     },
+    dat_val = function(data) {
+      stopifnot(is.data.frame(data))
+    },
     class = "subset_block",
     ...
   )

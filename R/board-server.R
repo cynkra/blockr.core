@@ -194,7 +194,8 @@ setup_link <- function(rv, id, from, to, input) {
       rv$inputs[[to]][[input]](
         rv$blocks[[from]]$server$result()
       )
-    }
+    },
+    ignoreNULL = FALSE
   )
 
   rv

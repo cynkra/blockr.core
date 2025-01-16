@@ -9,17 +9,16 @@
 #' @param class Block subclass
 #' @param ctor Constructor name (or function/frame number)
 #' @param ctor_pkg Package name (or `NULL`)
+#' @param dat_val (Optioanl) input validator
 #' @param uid Unique block ID
 #' @param name Block name
 #' @param ... Further (metadata) attributes
 #'
 #' @export
-new_block <- function(server, ui, class, ctor, ctor_pkg,
+new_block <- function(server, ui, class, ctor, ctor_pkg, dat_val = NULL,
                       uid = rand_names(), name = NULL, ...) {
 
   stopifnot(
-    is.function(server), is.function(ui),
-    identical(names(formals(ui)), "ns"),
     is.character(class), length(class) > 0L, is_string(uid)
   )
 
@@ -62,21 +61,78 @@ new_block <- function(server, ui, class, ctor, ctor_pkg,
     name <- paste0(toupper(substr(name, 1L, 1L)), substring(name, 2L))
   }
 
-  res <- structure(
-    list(expr_server = server, expr_ui = ui),
-    ...,
-    uid = uid,
-    ctor = ctor,
-    ctor_pkg = ctor_pkg,
-    name = name,
-    class = c(class, "block")
+  validate_block(
+    structure(
+      list(
+        expr_server = validate_block_server(server),
+        expr_ui = validate_block_ui(ui),
+        dat_val = validate_data_validator(dat_val, server)
+      ),
+      ...,
+      uid = uid,
+      ctor = ctor,
+      ctor_pkg = ctor_pkg,
+      name = name,
+      class = c(class, "block")
+    )
   )
+}
 
-  stopifnot(
-    inherits(expr_ui(res), "shiny.tag", "shiny.tag.list", agg = any)
-  )
+validate_block_server <- function(server) {
 
-  res
+  if (!is.function(server)) {
+    stop("A block server component is expected to be a function.")
+  }
+
+  server
+}
+
+validate_block_ui <- function(ui) {
+
+  if (!is.function(ui)) {
+    stop("A block UI component is expected to be a function.")
+  }
+
+  if (!identical(names(formals(ui)), "ns")) {
+    stop("A block UI function is expected to have a single argument `ns`.")
+  }
+
+  ui
+}
+
+validate_data_validator <- function(validator, server) {
+
+  server_args <- names(formals(server))
+
+  if (!length(server_args) && not_null(validator)) {
+    stop("A nullary server function cannot accopmany a data input validator.")
+  }
+
+  if (not_null(validator)) {
+
+    if (!is.function(validator)) {
+      stop("Data input validator is expected to be a function.")
+    }
+
+    val_args <- names(formals(validator))
+
+    if (!identical(server_args, val_args)) {
+      stop("Block `", class[1L], "` has server args ", paste_enum(server_args),
+           " which does not match validator args ", paste_enum(val_args), ".")
+    }
+  }
+
+  validator
+}
+
+validate_block <- function(x) {
+
+  if (!inherits(expr_ui(x), "shiny.tag", "shiny.tag.list", agg = any)) {
+    stop("A block UI function is expected to return a shiny UI object, ",
+         "i.e. either a `shiny.tag` or a `shiny.tag.list`.")
+  }
+
+  x
 }
 
 #' @param x An object inheriting from `"block"`
@@ -171,6 +227,27 @@ block_expr_server <- function(x) {
 #' @export
 block_expr_ui <- function(x) {
   x[["expr_ui"]]
+}
+
+#' @rdname new_block
+#' @export
+block_dat_val <- function(x) {
+  x[["dat_val"]]
+}
+
+block_has_dat_val <- function(x) {
+  not_null(block_dat_val(x))
+}
+
+#' @rdname new_block
+#' @export
+validate_data_inputs <- function(x, data) {
+
+  if (block_has_dat_val(x)) {
+    return(do.call(block_dat_val(x), data))
+  }
+
+  NULL
 }
 
 #' @param data Data input
