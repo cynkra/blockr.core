@@ -250,8 +250,14 @@ as.data.frame.link <- function(x, ...) {
 
 #' @export
 as.list.link <- function(x, ...) {
+
   df <- vec_proxy(x)
-  split(df, seq_len(nrow(df)))
+
+  res <- split(df, seq_len(nrow(df)))
+  res <- lapply(res, as.list)
+  names(res) <- NULL
+
+  res
 }
 
 link_slice <- function(...) {

@@ -29,17 +29,22 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
       moduleServer(
         "expression",
         function(input, output, session) {
+
+          dat <- reactiveVal(dataset)
+
+          observeEvent(input$dataset, dat(input$dataset))
+
           list(
             expr = reactive({
               eval(
                 bquote(
                   as.call(c(as.symbol("::"), quote(.(pkg)), quote(.(dat)))),
-                  list(pkg = as.name(package), dat = as.name(input$dataset))
+                  list(pkg = as.name(package), dat = as.name(dat()))
                 )
               )
             }),
             state = list(
-              dataset = reactive(input$dataset),
+              dataset = dat,
               package = package
             )
           )

@@ -74,9 +74,12 @@ block_ui.board <- function(x, id = NULL, block = NULL, ...) {
   stopifnot(is_string(id))
 
   if (is.null(block)) {
-    return(
+
+    res <- tagList(
       lapply(sort(x), block_card, id = id)
     )
+
+    return(res)
   }
 
   block_card(resolve_block(block, x), id)
@@ -119,13 +122,15 @@ insert_block_ui.board <- function(x, block = NULL, ...) {
     insertUI(
       paste0("#", board_id(x), "_blocks"),
       "afterBegin",
-      block_ui(x)
+      block_ui(x),
+      immediate = TRUE
     )
   } else {
     insertUI(
       paste0("#", board_id(x), "_blocks"),
       "beforeEnd",
-      block_ui(x, block = resolve_block(block, x))
+      block_ui(x, block = resolve_block(block, x)),
+      immediate = TRUE
     )
 
   }
@@ -154,11 +159,14 @@ remove_block_ui.board <- function(x, block = NULL, ...) {
 
   if (is.null(block)) {
     removeUI(
-      paste0("#", board_id(x), "_blocks > div")
+      paste0("#", board_id(x), "_blocks > div"),
+      multiple = TRUE,
+      immediate = TRUE
     )
   } else {
     removeUI(
-      paste0("#", resolve_id(block, x), "_block")
+      paste0("#", resolve_id(block, x), "_block"),
+      immediate = TRUE
     )
   }
 }

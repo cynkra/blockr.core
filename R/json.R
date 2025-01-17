@@ -38,17 +38,27 @@ to_json.board <- function(x, blocks, ...) {
 
   vers <- utils::packageVersion(utils::packageName())
 
-  stop("need `to_json.link()` method")
-
   paste0(
     "{",
     "\"object\":[", paste0("\"", class(x), "\"", collapse = ", "), "],",
     "\"blocks\":[", paste0(blocks, collapse = ", "), "],",
-    "\"links\":", jsonlite::toJSON(x[["links"]], auto_unbox = TRUE), ",",
+    "\"links\":", to_json(board_links(x)), ",",
     "\"id\":\"", attr(x, "id"), "\",",
     "\"version\":\"", as.character(vers), "\"",
     "}"
   )
+}
+
+#' @rdname to_json
+#' @export
+to_json.link <- function(x, ...) {
+
+  res <- list(
+    object = class(x),
+    payload = as.list(x)
+  )
+
+  jsonlite::toJSON(res, auto_unbox = TRUE)
 }
 
 #' @rdname to_json
@@ -78,7 +88,7 @@ from_json.character <- function(x, ...) {
 #' @export
 from_json.list <- function(x, ...) {
   stopifnot("object" %in% names(x))
-  from_json(structure(list(), class = x[["object"]]), x)
+  from_json(structure(list(), class = x[["object"]]), data = x)
 }
 
 #' @param data List valued data (converted from JSON)
@@ -113,8 +123,14 @@ from_json.block <- function(x, data, ...) {
 from_json.board <- function(x, data, ...) {
   new_board(
     lapply(data[["blocks"]], from_json),
-    do.call(rbind.data.frame, data[["links"]]),
+    from_json(data[["links"]]),
     id = data[["id"]],
     class = setdiff(class(x), "board")
   )
+}
+
+#' @rdname to_json
+#' @export
+from_json.link <- function(x, data, ...) {
+  as_link(data[["payload"]])
 }

@@ -163,8 +163,8 @@ setup_block <- function(blk, rv) {
 
   links <- board_links(rv$board)
 
-  for (i in which(links$to == id)) {
-    rv <- do.call(setup_link, c(list(rv), links[i, ]))
+  for (x in as.list(links[links$to == id])) {
+    rv <- do.call(setup_link, c(list(rv), x))
   }
 
   rv$blocks[[id]] <- list(

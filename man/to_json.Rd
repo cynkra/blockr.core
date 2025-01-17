@@ -4,12 +4,14 @@
 \alias{to_json}
 \alias{to_json.block}
 \alias{to_json.board}
+\alias{to_json.link}
 \alias{from_json}
 \alias{from_json.json}
 \alias{from_json.character}
 \alias{from_json.list}
 \alias{from_json.block}
 \alias{from_json.board}
+\alias{from_json.link}
 \title{Serialization utilities}
 \usage{
 to_json(x, ...)
@@ -17,6 +19,8 @@ to_json(x, ...)
 \method{to_json}{block}(x, state, ...)
 
 \method{to_json}{board}(x, blocks, ...)
+
+\method{to_json}{link}(x, ...)
 
 from_json(x, ...)
 
@@ -29,6 +33,8 @@ from_json(x, ...)
 \method{from_json}{block}(x, data, ...)
 
 \method{from_json}{board}(x, data, ...)
+
+\method{from_json}{link}(x, data, ...)
 }
 \arguments{
 \item{x}{Object to (de)serialize}
