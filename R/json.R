@@ -18,11 +18,7 @@ blockr_ser.block <- function(x, state = NULL, ...) {
   pkg <- attr(x, "ctor_pkg")
 
   if (is.null(state)) {
-    state <- lapply(
-      set_names(nm = block_ctor_inputs(x)),
-      get,
-      envir = environment(block_expr_server(x))
-    )
+    state <- initial_block_state(x)
   }
 
   res <- list(

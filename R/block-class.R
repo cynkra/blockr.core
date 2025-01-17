@@ -293,6 +293,14 @@ block_ui_inputs <- function(x) {
   setdiff(names(formals(block_expr_ui(x))), "ns")
 }
 
+initial_block_state <- function(x) {
+  lapply(
+    set_names(nm = block_ctor_inputs(x)),
+    get,
+    envir = environment(block_expr_server(x))
+  )
+}
+
 #' @rdname new_block
 #' @export
 block_arity <- function(x) {
@@ -304,4 +312,41 @@ block_arity <- function(x) {
   }
 
   length(args)
+}
+
+#' @export
+format.block <- function(x, ...) {
+
+  out <- ""
+
+  for (cl in rev(class(x))) {
+    out <- paste0("<", cl, out, ">")
+  }
+
+  out <- paste0(block_uid(x), out, "\nName: \"", attr(x, "name"), "\"")
+
+  if (block_arity(x)) {
+    out <- paste0(out, "\nData inputs: ", paste_enum(block_inputs(x)))
+  } else {
+    out <- paste0(out, "\nNo data inputs")
+  }
+
+  if (length(block_ctor_inputs(x))) {
+
+    args <- initial_block_state(x)
+    args <- trimws(utils::capture.output(utils::str(args))[-1L], "right")
+
+    out <- paste0(
+      out, "\nInitial block state:\n", paste0(args, collapse = "\n")
+    )
+  }
+
+  paste0(
+    out, "\nConstructor: ", attr(x, "ctor_pkg"), "::", attr(x, "ctor"), "()"
+  )
+}
+
+#' @export
+print.block <- function(x, ...) {
+  cat(format(x, ...), "\n", sep = "")
 }
