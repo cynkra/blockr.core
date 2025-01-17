@@ -54,6 +54,7 @@ attribute</p>
 <span>  <span class="va">class</span>,</span>
 <span>  <span class="va">ctor</span>,</span>
 <span>  <span class="va">ctor_pkg</span>,</span>
+<span>  dat_valid <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  uid <span class="op">=</span> <span class="fu"><a href="rand_names.html">rand_names</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -76,6 +77,12 @@ attribute</p>
 <span><span class="fu">block_expr_server</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">block_expr_ui</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">block_dat_valid</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">block_has_data_validator</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">validate_data_inputs</span><span class="op">(</span><span class="va">x</span>, <span class="va">data</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">block_inputs</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
@@ -112,6 +119,10 @@ attribute</p>
 <dd><p>Package name (or <code>NULL</code>)</p></dd>
 
 
+<dt id="arg-dat-valid">dat_valid<a class="anchor" aria-label="anchor" href="#arg-dat-valid"></a></dt>
+<dd><p>(Optioanl) input data validator</p></dd>
+
+
 <dt id="arg-uid">uid<a class="anchor" aria-label="anchor" href="#arg-uid"></a></dt>
 <dd><p>Unique block ID</p></dd>
 
@@ -130,6 +141,10 @@ attribute</p>
 
 <dt id="arg-namespace">namespace<a class="anchor" aria-label="anchor" href="#arg-namespace"></a></dt>
 <dd><p>(Optional) parent namespace</p></dd>
+
+
+<dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
+<dd><p>Data inputs</p></dd>
 
 </dl></div>
 

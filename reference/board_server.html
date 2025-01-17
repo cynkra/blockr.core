@@ -47,7 +47,14 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">board_server</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'board'</span></span>
-<span><span class="fu">board_server</span><span class="op">(</span><span class="va">x</span>, ser_deser <span class="op">=</span> <span class="cn">NULL</span>, add_rm_block <span class="op">=</span> <span class="cn">NULL</span>, add_rm_link <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">board_server</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  ser_deser <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  add_rm_block <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  add_rm_link <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  block_notifications <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -72,6 +79,10 @@
 
 <dt id="arg-add-rm-link">add_rm_link<a class="anchor" aria-label="anchor" href="#arg-add-rm-link"></a></dt>
 <dd><p>Module for addition/removal of links between blocks</p></dd>
+
+
+<dt id="arg-block-notifications">block_notifications<a class="anchor" aria-label="anchor" href="#arg-block-notifications"></a></dt>
+<dd><p>Module for block nptifications</p></dd>
 
 </dl></div>
 
