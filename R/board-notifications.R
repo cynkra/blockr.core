@@ -36,25 +36,7 @@ block_notification_server <- function(rv) {
 
           for (blk in names(notf)) {
 
-            cur <- c()
-
-            for (typ in names(notf[[blk]])) {
-              for (cnd in names(notf[[blk]][[typ]])) {
-                for (msg in notf[[blk]][[typ]][[cnd]]) {
-
-                  id <- paste0(blk, "_", attr(msg, "id"))
-
-                  showNotification(
-                    paste0("Block ", blk, ": ", msg),
-                    duration = NULL,
-                    id = id,
-                    type = cnd
-                  )
-
-                  cur <- c(cur, id)
-                }
-              }
-            }
+            cur <- create_block_notifications(notf, blk)
 
             for (id in setdiff(ids[[blk]], cur)) {
               removeNotification(id)
@@ -70,6 +52,31 @@ block_notification_server <- function(rv) {
       )
     }
   )
+}
+
+create_block_notifications <- function(notf, blk) {
+
+  cur <- c()
+
+  for (typ in names(notf[[blk]])) {
+    for (cnd in names(notf[[blk]][[typ]])) {
+      for (msg in notf[[blk]][[typ]][[cnd]]) {
+
+        id <- paste0(blk, "_", attr(msg, "id"))
+
+        showNotification(
+          paste0("Block ", blk, ": ", msg),
+          duration = NULL,
+          id = id,
+          type = cnd
+        )
+
+        cur <- c(cur, id)
+      }
+    }
+  }
+
+  cur
 }
 
 check_block_notifications_val <- function(val) {
