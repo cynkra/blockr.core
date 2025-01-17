@@ -23,9 +23,7 @@ ser_deser_server <- function(rv) {
 
       observeEvent(input$restore, {
         res(
-          from_json(
-            readLines(input$restore$datapath)
-          )
+          from_json(input$restore$datapath)
         )
       })
 
@@ -70,8 +68,9 @@ write_board_to_disk <- function(x, rv) {
   function(con) {
 
     blocks <- lapply(
-      lapply(lapply(rv$blocks, `[[`, "server"), `[[`, "json"),
-      reval
+      lst_xtr(rv$blocks, "server", "state"),
+      lapply,
+      reval_if
     )
 
     json <- jsonlite::prettify(

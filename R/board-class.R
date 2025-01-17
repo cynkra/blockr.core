@@ -179,8 +179,12 @@ board_id <- function(x) {
 #' @rdname new_board
 #' @export
 board_blocks <- function(x) {
+
   stopifnot(is_board(x))
-  validate_board_blocks(x[["blocks"]])
+
+  res <- validate_board_blocks(x[["blocks"]])
+
+  set_names(res, chr_ply(res, block_uid))
 }
 
 #' @param value Replacement value

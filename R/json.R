@@ -6,14 +6,14 @@
 #' @param ... Generic consistency
 #'
 #' @export
-to_json <- function(x, ...) {
-  UseMethod("to_json")
+blockr_ser <- function(x, ...) {
+  UseMethod("blockr_ser")
 }
 
 #' @param state Object state (as returned from an `expr_server`)
-#' @rdname to_json
+#' @rdname blockr_ser
 #' @export
-to_json.block <- function(x, state, ...) {
+blockr_ser.block <- function(x, state, ...) {
 
   pkg <- attr(x, "ctor_pkg")
 
@@ -30,71 +30,51 @@ to_json.block <- function(x, state, ...) {
 }
 
 #' @param blocks JSON-serialized blocks
-#' @rdname to_json
+#' @rdname blockr_ser
 #' @export
-to_json.board <- function(x, blocks, ...) {
+blockr_ser.board <- function(x, blocks, ...) {
 
-  stopifnot(all(lgl_ply(blocks, inherits, "json")))
+  blks <- board_blocks(x)
 
-  vers <- utils::packageVersion(utils::packageName())
+  stopifnot(
+    length(blocks) == length(blks), setequal(names(blocks), names(blks))
+  )
 
-  paste0(
-    "{",
-    "\"object\":[", paste0("\"", class(x), "\"", collapse = ", "), "],",
-    "\"blocks\":[", paste0(blocks, collapse = ", "), "],",
-    "\"links\":", to_json(board_links(x)), ",",
-    "\"id\":\"", attr(x, "id"), "\",",
-    "\"version\":\"", as.character(vers), "\"",
-    "}"
+  list(
+    object = class(x),
+    blocks = Map(blockr_ser, blks, blocks[names(blks)]),
+    links = blockr_ser(board_links(x)),
+    id = attr(x, "id"),
+    version = as.character(utils::packageVersion(utils::packageName()))
   )
 }
 
-#' @rdname to_json
+#' @rdname blockr_ser
 #' @export
-to_json.link <- function(x, ...) {
-
-  res <- list(
+blockr_ser.link <- function(x, ...) {
+  list(
     object = class(x),
     payload = as.list(x)
   )
-
-  jsonlite::toJSON(res, auto_unbox = TRUE)
 }
 
-#' @rdname to_json
+#' @rdname blockr_ser
 #' @export
-from_json <- function(x, ...) {
-  UseMethod("from_json")
+blockr_deser <- function(x, ...) {
+  UseMethod("blockr_deser")
 }
 
-#' @rdname to_json
+#' @rdname blockr_ser
 #' @export
-from_json.json <- function(x, ...) {
-  from_json(as.character(x), ...)
-}
-
-#' @rdname to_json
-#' @export
-from_json.character <- function(x, ...) {
-  from_json(
-    jsonlite::fromJSON(
-      paste0(x, collapse = ""),
-      simplifyDataFrame = FALSE
-    )
-  )
-}
-
-#' @rdname to_json
-#' @export
-from_json.list <- function(x, ...) {
+blockr_deser.list <- function(x, ...) {
   stopifnot("object" %in% names(x))
-  from_json(structure(list(), class = x[["object"]]), data = x)
+  blockr_deser(structure(list(), class = x[["object"]]), data = x)
 }
 
 #' @param data List valued data (converted from JSON)
-#' @rdname to_json
+#' @rdname blockr_ser
 #' @export
-from_json.block <- function(x, data, ...) {
+blockr_deser.block <- function(x, data, ...) {
 
   stopifnot(
     all(c("constructor", "payload", "package", "uid") %in% names(data))
@@ -118,19 +98,42 @@ from_json.block <- function(x, data, ...) {
   do.call(ctor, args)
 }
 
-#' @rdname to_json
+#' @rdname blockr_ser
 #' @export
-from_json.board <- function(x, data, ...) {
+blockr_deser.board <- function(x, data, ...) {
   new_board(
-    lapply(data[["blocks"]], from_json),
-    from_json(data[["links"]]),
+    lapply(data[["blocks"]], blockr_deser),
+    blockr_deser(data[["links"]]),
     id = data[["id"]],
     class = setdiff(class(x), "board")
   )
 }
 
-#' @rdname to_json
+#' @rdname blockr_ser
 #' @export
-from_json.link <- function(x, data, ...) {
+blockr_deser.link <- function(x, data, ...) {
   as_link(data[["payload"]])
+}
+
+#' @rdname blockr_ser
+#' @export
+to_json <- function(x, ...) {
+  jsonlite::toJSON(blockr_ser(x, ...), auto_unbox = TRUE)
+}
+
+#' @rdname blockr_ser
+#' @export
+from_json <- function(x) {
+
+  if (inherits(x, "json")) {
+    x <- jsonlite::parse_json(x)
+  } else if (is_string(x) && file.exists(x)) {
+    x <- readLines(x)
+  } else if (is.character(x) && length(x) > 1L) {
+    x <- paste0(x, collapse = "")
+  }
+
+  blockr_deser(
+    jsonlite::fromJSON(x, simplifyDataFrame = FALSE)
+  )
 }

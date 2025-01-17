@@ -156,7 +156,7 @@ block_server.block <- function(x, data, ...) {
       list(
         result = res,
         expr = exp$expr,
-        json = reactive(to_json(x, lapply(exp$state, reval_if))),
+        state = exp$state,
         cond = reactive(
           list(
             data = rv$data_cond,
