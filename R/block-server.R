@@ -44,7 +44,7 @@ block_server.block <- function(x, data, ...) {
       )
 
       rv <- reactiveValues(
-        data_valid = if (block_has_dat_val(x)) NULL else TRUE,
+        data_valid = if (block_has_data_validator(x)) NULL else TRUE,
         data_cond = empty_cond,
         state_set = NULL,
         state_cond = empty_cond,
@@ -58,7 +58,7 @@ block_server.block <- function(x, data, ...) {
         x
       )
 
-      if (block_has_dat_val(x)) {
+      if (block_has_data_validator(x)) {
 
         observeEvent(
           lapply(data, reval),

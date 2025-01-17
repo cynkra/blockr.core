@@ -9,13 +9,13 @@
 #' @param class Block subclass
 #' @param ctor Constructor name (or function/frame number)
 #' @param ctor_pkg Package name (or `NULL`)
-#' @param dat_val (Optioanl) input validator
+#' @param dat_valid (Optioanl) input data validator
 #' @param uid Unique block ID
 #' @param name Block name
 #' @param ... Further (metadata) attributes
 #'
 #' @export
-new_block <- function(server, ui, class, ctor, ctor_pkg, dat_val = NULL,
+new_block <- function(server, ui, class, ctor, ctor_pkg, dat_valid = NULL,
                       uid = rand_names(), name = NULL, ...) {
 
   stopifnot(
@@ -66,7 +66,7 @@ new_block <- function(server, ui, class, ctor, ctor_pkg, dat_val = NULL,
       list(
         expr_server = validate_block_server(server),
         expr_ui = validate_block_ui(ui),
-        dat_val = validate_data_validator(dat_val, server)
+        dat_valid = validate_data_validator(dat_valid, server)
       ),
       ...,
       uid = uid,
@@ -231,12 +231,14 @@ block_expr_ui <- function(x) {
 
 #' @rdname new_block
 #' @export
-block_dat_val <- function(x) {
-  x[["dat_val"]]
+block_dat_valid <- function(x) {
+  x[["dat_valid"]]
 }
 
-block_has_dat_val <- function(x) {
-  not_null(block_dat_val(x))
+#' @rdname new_block
+#' @export
+block_has_data_validator <- function(x) {
+  not_null(block_dat_valid(x))
 }
 
 #' @param data Data inputs
@@ -244,8 +246,8 @@ block_has_dat_val <- function(x) {
 #' @export
 validate_data_inputs <- function(x, data) {
 
-  if (block_has_dat_val(x)) {
-    return(do.call(block_dat_val(x), data))
+  if (block_has_data_validator(x)) {
+    return(do.call(block_dat_valid(x), data))
   }
 
   NULL
