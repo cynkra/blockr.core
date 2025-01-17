@@ -61,7 +61,8 @@ add_rm_link_server <- function(rv) {
         {
           ids <- names(upd$curr)
 
-          upd <- create_dt_observers(setdiff(ids, names(upd$obs)), input, upd)
+          upd <- create_dt_observers(setdiff(ids, names(upd$obs)), input, upd,
+                                     board_blocks(rv$board), session)
           upd <- destroy_dt_observers(setdiff(names(upd$obs), ids), upd)
         }
       )
@@ -189,15 +190,27 @@ add_rm_link_ui <- function(id, board) {
 
 dt_board_link <- function(lnk, ns, rv) {
 
-  ids <- list(choices = board_block_ids(rv$board))
+  ids <- rep(list(c("", board_block_ids(rv$board))), length(lnk))
 
   data.frame(
-    From = chr_mply(dt_selectize, lapply(paste0(lnk$id, "_from"), ns),
-                    lnk$from, MoreArgs = ids),
-    To = chr_mply(dt_selectize, lapply(paste0(lnk$id, "_to"), ns),
-                  lnk$to, MoreArgs = ids),
-    Input = chr_mply(dt_selectize, lapply(paste0(lnk$id, "_input"), ns),
-                     lnk$input, block_inputs(rv$board)[lnk$to])
+    From = chr_mply(
+      dt_selectize,
+      lapply(paste0(lnk$id, "_from"), ns),
+      lnk$from,
+      Map(setdiff, ids, lnk$to)
+    ),
+    To = chr_mply(
+      dt_selectize,
+      lapply(paste0(lnk$id, "_to"), ns),
+      lnk$to,
+      Map(setdiff, ids, lnk$from)
+    ),
+    Input = chr_mply(
+      dt_selectize,
+      lapply(paste0(lnk$id, "_input"), ns),
+      lnk$input,
+      block_inputs(rv$board)[lnk$to]
+    )
   )
 }
 
@@ -207,29 +220,59 @@ dt_selectize <- function(id, val, choices) {
   )
 }
 
-create_dt_observers <- function(ids, input, update) {
-  update$obs[ids] <- lapply(ids, create_dt_observers_for_id, input, update)
+create_dt_observers <- function(ids, input, update, blks, sess) {
+  update$obs[ids] <- lapply(ids, create_dt_observers_for_id, input, update,
+                            blks, sess)
   update
 }
 
-create_dt_observers_for_id <- function(id, input, update) {
+create_dt_observers_for_id <- function(id, input, update, blks, sess) {
 
   obs <- set_names(nm = c("from", "to", "input"))
 
-  lapply(obs, create_dt_observer, id, input, update)
+  lapply(obs, create_dt_observer, id, input, update, blks, sess)
 }
 
-create_dt_observer <- function(col, row, input, upd) {
+create_dt_observer <- function(col, row, input, upd, blks, sess) {
 
   inp <- paste0(row, "_", col)
 
   observeEvent(
     input[[inp]],
     {
-      val <- input[[inp]]
-      if (val != upd$curr[[row]][[col]]) {
-        upd$edit <- list(row = row, col = col, val = val)
+      new <- input[[inp]]
+      cur <- upd$curr[[row]][[col]]
+
+      if (new == cur) {
+        return()
       }
+
+      if (col == "from") {
+        updateSelectInput(
+          sess,
+          inputId = paste0(row, "_to"),
+          choices = setdiff(chr_ply(blks, block_uid), new)
+        )
+      }
+
+      if (col == "to") {
+
+        ids <- chr_ply(blks, block_uid)
+
+        updateSelectInput(
+          sess,
+          inputId = paste0(row, "_from"),
+          choices = setdiff(ids, new)
+        )
+
+        updateSelectInput(
+          sess,
+          inputId = paste0(row, "_input"),
+          choices = block_inputs(blks[[which(ids == new)]])
+        )
+      }
+
+      upd$edit <- list(row = row, col = col, val = new)
     },
     ignoreInit = TRUE
   )
@@ -287,14 +330,9 @@ check_add_rm_link_val <- function(val, rv) {
   observeEvent(
     val()$add,
     {
-      if (!is.data.frame(val()$add)) {
+      if (!is_link(val()$add)) {
         stop("Expecting the `add` component of the `add_rm_link` return ",
-             "value to be `NULL` or a `data.frame`.")
-      }
-
-      if (!all(c("id", "from", "to", "input") %in% colnames(val()$add))) {
-        stop("Expecting the `add` component of the `add_rm_link` return ",
-             "value to contain columns `id`, `from`, `to` and `input`.")
+             "value to be `NULL` or a `link` object.")
       }
     },
     once = TRUE
@@ -302,11 +340,7 @@ check_add_rm_link_val <- function(val, rv) {
 
   observeEvent(
     val()$add,
-    {
-      if (any(val()$add %in% board_link_ids(rv$board))) {
-        stop("Expecting unique link IDs for new links.")
-      }
-    },
+    validate_link(val()$add),
     priority = 1
   )
 

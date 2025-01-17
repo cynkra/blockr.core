@@ -297,7 +297,7 @@ validate_link <- function(x) {
     }
   }
 
-  self_ref <- field(x, "from") == field(x, "to")
+  self_ref <- field(x, "from") == field(x, "to") & field(x, "from") != ""
 
   if (any(!is.na(self_ref) & self_ref)) {
     stop("Self-referencing blocks are not allowed.")

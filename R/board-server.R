@@ -101,13 +101,8 @@ board_server.board <- function(x,
           {
             updates <- links()
 
-            old <- board_links(rv$board)
-
-            rv <- update_block_links(
-              rv,
-              add = updates$add,
-              rm = old[old$id %in% updates$rm, ]
-            )
+            rm <- board_links(rv$board)[updates$rm]
+            rv <- update_block_links(rv, updates$add, rm)
 
             rv$board <- modify_links(rv$board, updates$add, updates$rm)
           },
@@ -187,9 +182,10 @@ destroy_block <- function(id, rv) {
 
   links <- board_links(rv$board)
 
-  for (row in which(links$from %in% id | links$to %in% id)) {
-    rv <- do.call(destroy_link, c(list(rv), links[row, ]))
-  }
+  rv <- update_block_links(
+    rv,
+    rm = links[links$from %in% id | links$to %in% id]
+  )
 
   rv$inputs[[id]] <- NULL
   rv$blocks[[id]] <- NULL
@@ -226,16 +222,12 @@ destroy_link <- function(rv, id, from, to, input) {
 
 update_block_links <- function(rv, add = NULL, rm = NULL) {
 
-  if (not_null(rm)) {
-    for (i in seq_len(nrow(rm))) {
-      rv <- do.call(destroy_link, c(list(rv), rm[i, ]))
-    }
+  for (x in as.list(rm)) {
+    rv <- do.call(destroy_link, c(list(rv), x))
   }
 
-  if (not_null(add)) {
-    for (i in seq_len(nrow(add))) {
-      rv <- do.call(setup_link, c(list(rv), add[i, ]))
-    }
+  for (x in as.list(add)) {
+    rv <- do.call(setup_link, c(list(rv), x))
   }
 
   rv

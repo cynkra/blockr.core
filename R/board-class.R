@@ -254,17 +254,16 @@ modify_links <- function(x, add = NULL, rm = NULL) {
 
   links <- board_links(x)
 
-  if (not_null(rm)) {
+  if (is_link(rm)) {
+    rm <- names(rm)
+  }
+
+  if (length(rm)) {
     stopifnot(is.character(rm), all(rm %in% names(links)))
     links <- links[!names(links) %in% rm, ]
   }
 
-  if (not_null(add)) {
-    stopifnot(is_link(add))
-    links <- c(links, add)
-  }
-
-  board_links(x) <- links
+  board_links(x) <- c(links, add)
 
   x
 }
