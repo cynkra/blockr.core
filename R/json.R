@@ -37,20 +37,30 @@ blockr_ser.block <- function(x, state = NULL, ...) {
   jsonlite::toJSON(res, auto_unbox = TRUE)
 }
 
-#' @param blocks JSON-serialized blocks
+#' @param blocks Block states (`NULL` defaults to values from ctor scope)
 #' @rdname blockr_ser
 #' @export
-blockr_ser.board <- function(x, blocks, ...) {
+blockr_ser.board <- function(x, blocks = NULL, ...) {
 
   blks <- board_blocks(x)
 
-  stopifnot(
-    length(blocks) == length(blks), setequal(names(blocks), names(blks))
-  )
+  if (is.null(blocks)) {
+
+    blks <- lapply(blks, blockr_ser)
+
+  } else {
+
+    stopifnot(
+      length(blocks) == length(blks), setequal(names(blocks), names(blks))
+    )
+
+    blks <- Map(blockr_ser, blks, blocks[names(blks)])
+  }
+
 
   list(
     object = class(x),
-    blocks = Map(blockr_ser, blks, blocks[names(blks)]),
+    blocks = blks,
     links = blockr_ser(board_links(x)),
     id = attr(x, "id"),
     version = as.character(utils::packageVersion(utils::packageName()))

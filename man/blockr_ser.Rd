@@ -18,7 +18,7 @@ blockr_ser(x, ...)
 
 \method{blockr_ser}{block}(x, state = NULL, ...)
 
-\method{blockr_ser}{board}(x, blocks, ...)
+\method{blockr_ser}{board}(x, blocks = NULL, ...)
 
 \method{blockr_ser}{link}(x, ...)
 
@@ -43,7 +43,7 @@ from_json(x)
 
 \item{state}{Object state (as returned from an \code{expr_server})}
 
-\item{blocks}{JSON-serialized blocks}
+\item{blocks}{Block states (\code{NULL} defaults to values from ctor scope)}
 
 \item{data}{List valued data (converted from JSON)}
 }
