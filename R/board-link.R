@@ -72,8 +72,8 @@ add_rm_link_server <- function(rv) {
         row <- upd$edit$row
         col <- upd$edit$col
 
-        if (!row %in% upd$row && row %in% board_link_ids(rv$board)) {
-          upd$row <- c(upd$row, row)
+        if (!row %in% upd$rm && row %in% board_link_ids(rv$board)) {
+          upd$rm <- c(upd$rm, row)
         }
 
         new <- upd$curr[[row]]
@@ -190,26 +190,38 @@ add_rm_link_ui <- function(id, board) {
 
 dt_board_link <- function(lnk, ns, rv) {
 
-  ids <- rep(list(c("", board_block_ids(rv$board))), length(lnk))
+  from_ids <- rep(list(board_block_ids(rv$board)), length(lnk))
+
+  rm_inp <- lapply(
+    seq_along(lnk),
+    function(i) split(lnk$input[-i], lnk$to[-i])[[lnk$to[i]]]
+  )
+
+  to_avail <- block_arity(rv$board)
+  cnt_to <- c(table(lnk$to))
+
+  to_avail[names(cnt_to)] <- int_mply(`-`, to_avail[names(cnt_to)], cnt_to)
+
+  to_avail <- lapply(lnk$to, union, names(to_avail)[to_avail > 0L])
 
   data.frame(
     From = chr_mply(
       dt_selectize,
       lapply(paste0(lnk$id, "_from"), ns),
       lnk$from,
-      Map(setdiff, ids, lnk$to)
+      Map(setdiff, from_ids, lnk$to)
     ),
     To = chr_mply(
       dt_selectize,
       lapply(paste0(lnk$id, "_to"), ns),
       lnk$to,
-      Map(setdiff, ids, lnk$from)
+      Map(setdiff, to_avail, lnk$from)
     ),
     Input = chr_mply(
       dt_selectize,
       lapply(paste0(lnk$id, "_input"), ns),
       lnk$input,
-      block_inputs(rv$board)[lnk$to]
+      Map(setdiff, block_inputs(rv$board)[lnk$to], rm_inp)
     )
   )
 }
@@ -248,10 +260,21 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
       }
 
       if (col == "from") {
+
+        to_avail <- set_names(
+          int_ply(blks, block_arity),
+          chr_ply(blks, block_uid)
+        )
+
+        cnt <- c(table(setdiff(upd$curr$to, "")))
+
+        to_avail[names(cnt)] <- int_mply(`-`, to_avail[names(cnt)], cnt)
+
         updateSelectInput(
           sess,
           inputId = paste0(row, "_to"),
-          choices = setdiff(chr_ply(blks, block_uid), new)
+          choices = setdiff(names(to_avail)[to_avail > 0L], new),
+          selected = upd$curr[[row]][["to"]]
         )
       }
 
@@ -262,14 +285,32 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
         updateSelectInput(
           sess,
           inputId = paste0(row, "_from"),
-          choices = setdiff(ids, new)
+          choices = setdiff(ids, new),
+          selected = upd$curr[[row]][["from"]]
         )
 
-        updateSelectInput(
-          sess,
-          inputId = paste0(row, "_input"),
-          choices = block_inputs(blks[[which(ids == new)]])
-        )
+        if (identical(new, "")) {
+
+          updateSelectInput(
+            sess,
+            inputId = paste0(row, "_input"),
+            choices = list()
+          )
+
+        } else {
+
+          inp <- setdiff(
+            block_inputs(blks[[which(ids == new)]]),
+            upd$curr$input[upd$curr$to == new]
+          )
+
+          updateSelectInput(
+            sess,
+            inputId = paste0(row, "_input"),
+            choices = inp,
+            selected = upd$curr[[row]][["input"]]
+          )
+        }
       }
 
       upd$edit <- list(row = row, col = col, val = new)

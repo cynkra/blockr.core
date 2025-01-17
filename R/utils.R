@@ -107,15 +107,15 @@ chr_mply <- function(...) {
   chr_ply(Map(...), identity)
 }
 
-lgl_mply <- function(fun, ...) {
+lgl_mply <- function(...) {
   lgl_ply(Map(...), identity)
 }
 
-int_mply <- function(fun, ...) {
+int_mply <- function(...) {
   int_ply(Map(...), identity)
 }
 
-dbl_mply <- function(fun, ...) {
+dbl_mply <- function(...) {
   dbl_ply(Map(...), identity)
 }
 

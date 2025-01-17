@@ -305,6 +305,12 @@ initial_block_state <- function(x) {
 #' @export
 block_arity <- function(x) {
 
+  if (is_board(x)) {
+    return(
+      set_names(int_ply(board_blocks(x), block_arity), board_block_ids(x))
+    )
+  }
+
   args <- block_inputs(x)
 
   if ("..." %in% args) {
