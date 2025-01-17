@@ -16,7 +16,7 @@
 \usage{
 blockr_ser(x, ...)
 
-\method{blockr_ser}{block}(x, state, ...)
+\method{blockr_ser}{block}(x, state = NULL, ...)
 
 \method{blockr_ser}{board}(x, blocks, ...)
 

@@ -13,9 +13,17 @@ blockr_ser <- function(x, ...) {
 #' @param state Object state (as returned from an `expr_server`)
 #' @rdname blockr_ser
 #' @export
-blockr_ser.block <- function(x, state, ...) {
+blockr_ser.block <- function(x, state = NULL, ...) {
 
   pkg <- attr(x, "ctor_pkg")
+
+  if (is.null(state)) {
+    state <- lapply(
+      set_names(nm = block_ctor_inputs(x)),
+      get,
+      envir = environment(block_expr_server(x))
+    )
+  }
 
   res <- list(
     object = class(x),
