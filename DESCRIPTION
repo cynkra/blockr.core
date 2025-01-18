@@ -27,7 +27,8 @@ Imports:
     bslib,
     utils,
     jsonlite,
-    vctrs
+    vctrs,
+    generics
 Suggests:
     testthat (>= 3.0.0),
     blockr.dplyr

@@ -4,6 +4,7 @@ test_that("stacks", {
   y <- new_stack(letters[6:8])
 
   expect_length(c(x, y), 8L)
+  expect_s3_class(c(x, y), "stack")
 
   expect_error(c(x, x), "Stack blocks have to be unique")
 

@@ -109,15 +109,15 @@ as_stack.character <- function(x) new_stack(x)
 
 #' @export
 intersect.stack <- function(x, y, ...) {
-  vec_restore(NextMethod(), vec_ptype2(x, y))
+  vec_set_intersect(x, y, ...)
 }
 
 #' @export
 union.stack <- function(x, y, ...) {
-  vec_restore(NextMethod(), vec_ptype2(x, y))
+  vec_set_union(x, y, ...)
 }
 
 #' @export
 setdiff.stack <- function(x, y, ...) {
-  vec_restore(NextMethod(), vec_ptype2(x, y))
+  vec_set_difference(x, y, ...)
 }
