@@ -5,7 +5,9 @@
 
 <!-- badges: start -->
 
-[![check](https://github.com/cynkra/blockr.core/actions/workflows/check.yaml/badge.svg)](https://github.com/cynkra/blockr.core/actions/workflows/check.yaml)
+[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![status](https://github.com/cynkra/blockr.core/actions/workflows/ci.yaml/badge.svg)](https://github.com/cynkra/blockr.core/actions/workflows/ci.yaml)
+[![coverage](https://codecov.io/gh/cynkra/blockr.core/graph/badge.svg?token=VoOPRU65KA)](https://codecov.io/gh/cynkra/blockr.core)
 <!-- badges: end -->
 
 Designed to democratize data analysis, `blockr.core` provides a
