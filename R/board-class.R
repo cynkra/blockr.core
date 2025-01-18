@@ -277,3 +277,40 @@ modify_links <- function(x, add = NULL, rm = NULL) {
 block_inputs.board <- function(x) {
   lapply(set_names(board_blocks(x), board_block_ids(x)), block_inputs)
 }
+
+#' @export
+format.board <- function(x, ...) {
+
+  out <- ""
+
+  for (cl in rev(class(x))) {
+    out <- paste0("<", cl, out, ">")
+  }
+
+  blk <- board_blocks(x)
+
+  out <- c(
+    paste0(board_id(x), out),
+    "",
+    paste0("Blocks [", length(blk), "]:"),
+    ""
+  )
+
+  blk <- lapply(blk, format, ...)
+  blk <- lapply(blk, c, "")
+
+  lnk <- board_links(x)
+
+  out <- c(
+    out,
+    unlst(blk),
+    paste0("Links [", length(lnk), "]:"),
+    "",
+    paste0(names(lnk), ": ", format(lnk))
+  )
+}
+
+#' @export
+print.board <- function(x, ...) {
+  cat(format(x, ...), sep = "\n")
+}

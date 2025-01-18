@@ -329,30 +329,38 @@ format.block <- function(x, ...) {
     out <- paste0("<", cl, out, ">")
   }
 
-  out <- paste0(block_uid(x), out, "\nName: \"", attr(x, "name"), "\"")
+  out <- c(
+    paste0(block_uid(x), out),
+    paste0("Name: \"", attr(x, "name"), "\"")
+  )
 
   if (block_arity(x)) {
-    out <- paste0(out, "\nData inputs: ", paste_enum(block_inputs(x)))
+    dat <- paste0("Data inputs: ", paste_enum(block_inputs(x), quotes = "\""))
   } else {
-    out <- paste0(out, "\nNo data inputs")
+    dat <- "No data inputs"
   }
+
+  out <- c(out, dat)
 
   if (length(block_ctor_inputs(x))) {
 
     args <- initial_block_state(x)
     args <- trimws(utils::capture.output(utils::str(args))[-1L], "right")
 
-    out <- paste0(
-      out, "\nInitial block state:\n", paste0(args, collapse = "\n")
-    )
+    out <- c(out, "Initial block state:", args)
+
+  } else {
+
+    out <- c(out, "Stateless block")
   }
 
-  paste0(
-    out, "\nConstructor: ", attr(x, "ctor_pkg"), "::", attr(x, "ctor"), "()"
+  c(
+    out,
+    paste0("Constructor: ", attr(x, "ctor_pkg"), "::", attr(x, "ctor"), "()")
   )
 }
 
 #' @export
 print.block <- function(x, ...) {
-  cat(format(x, ...), "\n", sep = "")
+  cat(format(x, ...), sep = "\n")
 }

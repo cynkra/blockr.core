@@ -162,8 +162,12 @@ set_names <- function(object = nm, nm) {
 
 paste_enum <- function(x, sep = ", ", conj = " and ", quotes = "`") {
 
-  if (length(x) <= 1L) {
+  if (length(x) == 0L) {
     return(x)
+  }
+
+  if (length(x) == 1L) {
+    return(paste0(quotes, x, quotes))
   }
 
   paste0(
@@ -228,3 +232,7 @@ is_empty <- function(x) {
 }
 
 filter_empty <- function(x) Filter(Negate(is_empty), x)
+
+unlst <- function(x, recursive = FALSE, use_names = FALSE) {
+  unlist(x, recursive = recursive, use.names = use_names)
+}
