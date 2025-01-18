@@ -1,0 +1,52 @@
+is_scalar <- function(x) length(x) == 1L
+
+is_string <- function(x) {
+  is.character(x) && is_scalar(x)
+}
+
+is_bool <- function(x) {
+  is_scalar(x) && (identical(x, TRUE) || identical(x, FALSE))
+}
+
+is_intish <- function(x) {
+  is.integer(x) || (is.numeric(x) && all(x == trunc(x)) && !is.na(x))
+}
+
+is_count <- function(x, allow_zero = TRUE) {
+
+  if (!is_scalar(x)) {
+    return(FALSE)
+  }
+
+  if (!is_intish(x)) {
+    return(FALSE)
+  }
+
+  if (isTRUE(allow_zero)) {
+    x >= 0 && !is.na(x)
+  } else {
+    x > 0 && !is.na(x)
+  }
+}
+
+is_number <- function(x) {
+  is.numeric(x) && is_scalar(x) && !is.na(x) && !is.nan(x) && is.finite(x)
+}
+
+not_null <- Negate(is.null)
+
+is_zero_len <- function(x) {
+  length(x) == 0L
+}
+
+all_zero_len <- function(x) {
+  if (is.list(x)) {
+    all(lgl_ply(x, all_zero_len))
+  } else {
+    is_zero_len(x)
+  }
+}
+
+is_empty <- function(x) {
+  is_zero_len(x) || all(is.na(x) | !nchar(x))
+}

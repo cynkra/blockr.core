@@ -1,38 +1,3 @@
-is_scalar <- function(x) length(x) == 1L
-
-is_string <- function(x) {
-  is.character(x) && is_scalar(x)
-}
-
-is_bool <- function(x) {
-  is_scalar(x) && (identical(x, TRUE) || identical(x, FALSE))
-}
-
-is_intish <- function(x) {
-  is.integer(x) || (is.numeric(x) && all(x == trunc(x)) && !is.na(x))
-}
-
-is_count <- function(x, allow_zero = TRUE) {
-
-  if (!is_scalar(x)) {
-    return(FALSE)
-  }
-
-  if (!is_intish(x)) {
-    return(FALSE)
-  }
-
-  if (isTRUE(allow_zero)) {
-    x >= 0 && !is.na(x)
-  } else {
-    x > 0 && !is.na(x)
-  }
-}
-
-is_number <- function(x) {
-  is.numeric(x) && is_scalar(x) && !is.na(x) && !is.nan(x) && is.finite(x)
-}
-
 #' Random IDs
 #'
 #' Generate random unique IDs.
@@ -86,63 +51,13 @@ serve <- function(x, ...) {
   UseMethod("serve")
 }
 
-chr_ply <- function(x, fun, ..., length = 1L, use_names = FALSE) {
-  vapply(x, fun, character(length), ..., USE.NAMES = use_names)
-}
-
-#' @keywords internal
-lgl_ply <- function(x, fun, ..., length = 1L, use_names = FALSE) {
-  vapply(x, fun, logical(length), ..., USE.NAMES = use_names)
-}
-
-int_ply <- function(x, fun, ..., length = 1L, use_names = FALSE) {
-  vapply(x, fun, integer(length), ..., USE.NAMES = use_names)
-}
-
-dbl_ply <- function(x, fun, ..., length = 1L, use_names = FALSE) {
-  vapply(x, fun, double(length), ..., USE.NAMES = use_names)
-}
-
-chr_mply <- function(...) {
-  chr_ply(Map(...), identity)
-}
-
-lgl_mply <- function(...) {
-  lgl_ply(Map(...), identity)
-}
-
-int_mply <- function(...) {
-  int_ply(Map(...), identity)
-}
-
-dbl_mply <- function(...) {
-  dbl_ply(Map(...), identity)
-}
-
-chr_xtr <- function(x, i, ...) chr_ply(x, `[[`, i, ...)
-
-lgl_xtr <- function(x, i, ...) lgl_ply(x, `[[`, i, ...)
-
-int_xtr <- function(x, i, ...) int_ply(x, `[[`, i, ...)
-
-dbl_xtr <- function(x, i, ...) dbl_ply(x, `[[`, i, ...)
-
-lst_xtr <- function(x, ...) {
-
-  for (i in c(...)) {
-    x <- lapply(x, `[[`, i)
-  }
-
-  x
-}
-
-map <- function(f, ..., use_names = FALSE) Map(f, ..., USE.NAMES = use_names)
-
-not_null <- Negate(is.null)
-
 reval <- function(x) x()
 
 reval_if <- function(x) if (is.function(x)) x() else x
+
+lst_xtr_reval <- function(x, ...) {
+  lapply(lst_xtr(x, ...), reval)
+}
 
 inherits <- function(x, ..., agg = NULL) {
 
@@ -191,18 +106,6 @@ coal <- function(..., fail_null = TRUE) {
   NULL
 }
 
-is_zero_len <- function(x) {
-  length(x) == 0L
-}
-
-all_zero_len <- function(x) {
-  if (is.list(x)) {
-    all(lgl_ply(x, all_zero_len))
-  } else {
-    is_zero_len(x)
-  }
-}
-
 filter_all_zero_len <- function(x) {
   if (all_zero_len(x)) {
     NULL
@@ -213,10 +116,6 @@ filter_all_zero_len <- function(x) {
   }
 }
 
-lst_xtr_reval <- function(x, ...) {
-  lapply(lst_xtr(x, ...), reval)
-}
-
 int_to_chr <- function(x) {
 
   stopifnot(is_intish(x))
@@ -225,10 +124,6 @@ int_to_chr <- function(x) {
     lapply(strsplit(as.character(x), ""), as.integer),
     function(i) paste0(letters[i + 1L], collapse = "")
   )
-}
-
-is_empty <- function(x) {
-  !length(x) || all(is.na(x) | !nchar(x))
 }
 
 filter_empty <- function(x) Filter(Negate(is_empty), x)
