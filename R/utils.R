@@ -222,3 +222,9 @@ int_to_chr <- function(x) {
     function(i) paste0(letters[i + 1L], collapse = "")
   )
 }
+
+is_empty <- function(x) {
+  !length(x) || all(is.na(x) | !nchar(x))
+}
+
+filter_empty <- function(x) Filter(Negate(is_empty), x)

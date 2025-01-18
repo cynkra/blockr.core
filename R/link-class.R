@@ -120,7 +120,14 @@ c.link <- function(...) {
 
 #' @export
 `[.link` <- function(x, i, ...) {
-  link_slice(x, vec_as_location(i, length(x), names(x)))
+
+  res <- link_slice(x, vec_as_location(i, length(x), names(x)))
+
+  if (is.null(res)) {
+    return(new_link())
+  }
+
+  res
 }
 
 #' @export

@@ -49,8 +49,7 @@ add_rm_link_server <- function(rv) {
               ordering = FALSE
             ),
             rownames = FALSE,
-            escape = FALSE,
-            editable = TRUE
+            escape = FALSE
           )
         },
         server = TRUE
@@ -90,10 +89,20 @@ add_rm_link_server <- function(rv) {
 
       observeEvent(input$add_link, {
 
-        new <- new_link(from = "", to = "", input = "")
+        if (length(upd$curr) < sum(block_arity(rv$board))) {
 
-        upd$curr <- c(upd$curr, new)
-        upd$add <- c(upd$add, new)
+          new <- new_link(from = "", to = "", input = "")
+
+          upd$curr <- c(upd$curr, new)
+          upd$add <- c(upd$add, new)
+
+        } else {
+
+          showNotification(
+            "No new links can be added. Remove a row first.",
+            type = "warning"
+          )
+        }
       })
 
       observeEvent(input$rm_link, {
@@ -116,7 +125,11 @@ add_rm_link_server <- function(rv) {
       })
 
       observeEvent(input$cancel_links, {
+
         removeModal()
+
+        upd$add <- new_link()
+        upd$rm <- character()
         upd$curr <- board_links(rv$board)
       })
 
@@ -156,8 +169,8 @@ add_rm_link_server <- function(rv) {
             )
           )
 
-          upd$add <- NULL
-          upd$rm <- NULL
+          upd$add <- new_link()
+          upd$rm <- character()
           upd$curr <- board_links(new)
 
           removeModal()
@@ -198,11 +211,15 @@ dt_board_link <- function(lnk, ns, rv) {
   )
 
   to_avail <- block_arity(rv$board)
-  cnt_to <- c(table(lnk$to))
+  cnt_to <- c(table(filter_empty(lnk$to)))
 
   to_avail[names(cnt_to)] <- int_mply(`-`, to_avail[names(cnt_to)], cnt_to)
 
-  to_avail <- lapply(lnk$to, union, names(to_avail)[to_avail > 0L])
+  to_avail <- lapply(
+    lapply(lnk$to, filter_empty),
+    union,
+    names(to_avail)[to_avail > 0L]
+  )
 
   data.frame(
     From = chr_mply(
@@ -255,7 +272,7 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
       new <- input[[inp]]
       cur <- upd$curr[[row]][[col]]
 
-      if (new == cur) {
+      if (new == cur || new == "") {
         return()
       }
 
@@ -266,14 +283,19 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
           chr_ply(blks, block_uid)
         )
 
-        cnt <- c(table(setdiff(upd$curr$to, "")))
+        cnt <- c(table(filter_empty(upd$curr$to)))
 
         to_avail[names(cnt)] <- int_mply(`-`, to_avail[names(cnt)], cnt)
+
+        to_avail <- c(
+          upd$curr[[row]][["to"]],
+          names(to_avail)[to_avail > 0L]
+        )
 
         updateSelectInput(
           sess,
           inputId = paste0(row, "_to"),
-          choices = setdiff(names(to_avail)[to_avail > 0L], new),
+          choices = c("", setdiff(to_avail, new)),
           selected = upd$curr[[row]][["to"]]
         )
       }
@@ -285,7 +307,7 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
         updateSelectInput(
           sess,
           inputId = paste0(row, "_from"),
-          choices = setdiff(ids, new),
+          choices = c("", setdiff(ids, new)),
           selected = upd$curr[[row]][["from"]]
         )
 
@@ -307,7 +329,7 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
           updateSelectInput(
             sess,
             inputId = paste0(row, "_input"),
-            choices = inp,
+            choices = c("", inp),
             selected = upd$curr[[row]][["input"]]
           )
         }
