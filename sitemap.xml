@@ -17,10 +17,12 @@
 <url><loc>/reference/new_board.html</loc></url>
 <url><loc>/reference/new_dataset_block.html</loc></url>
 <url><loc>/reference/new_link.html</loc></url>
+<url><loc>/reference/new_stack.html</loc></url>
 <url><loc>/reference/new_subset_block.html</loc></url>
 <url><loc>/reference/rand_names.html</loc></url>
 <url><loc>/reference/register_block.html</loc></url>
 <url><loc>/reference/ser_deser.html</loc></url>
 <url><loc>/reference/serve.html</loc></url>
+<url><loc>/reference/setops.html</loc></url>
 </urlset>
 
