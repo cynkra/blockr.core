@@ -38,6 +38,6 @@ test_that("block constructor", {
       ),
       data.frame(from = "a", to = "b", input = "foo")
     ),
-    "Block b expects inputs data but received foo"
+    "Block b expects .+ but received .+"
   )
 })

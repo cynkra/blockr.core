@@ -292,7 +292,7 @@ format.board <- function(x, ...) {
   out <- c(
     paste0(board_id(x), out),
     "",
-    paste0("Blocks [", length(blk), "]:"),
+    paste0("Blocks[", length(blk), "]:"),
     ""
   )
 
@@ -304,7 +304,7 @@ format.board <- function(x, ...) {
   out <- c(
     out,
     unlst(blk),
-    paste0("Links [", length(lnk), "]:"),
+    paste0("Links[", length(lnk), "]:"),
     "",
     paste0(names(lnk), ": ", format(lnk))
   )
