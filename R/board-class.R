@@ -313,4 +313,5 @@ format.board <- function(x, ...) {
 #' @export
 print.board <- function(x, ...) {
   cat(format(x, ...), sep = "\n")
+  invisible(x)
 }

@@ -363,4 +363,5 @@ format.block <- function(x, ...) {
 #' @export
 print.block <- function(x, ...) {
   cat(format(x, ...), sep = "\n")
+  invisible(x)
 }

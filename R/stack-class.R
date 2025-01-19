@@ -16,7 +16,7 @@ new_stack <- function(blocks, id = rand_names(), name = NULL, ...,
     blocks <- chr_ply(blocks, block_uid)
   }
 
-  stack_counter <- get("counter", envir = stacks)
+  stack_counter <- get("counter", envir = stacks_env)
 
   if (is.null(name)) {
     name <- paste0("Stack ", stack_counter)
@@ -26,12 +26,12 @@ new_stack <- function(blocks, id = rand_names(), name = NULL, ...,
     new_vctr(blocks, id = id, name = name, ..., class = c(class, "stack"))
   )
 
-  assign("counter", stack_counter + 1L, envir = stacks)
+  assign("counter", stack_counter + 1L, envir = stacks_env)
 
   res
 }
 
-stacks <- list2env(
+stacks_env <- list2env(
   list(counter = 1L)
 )
 
