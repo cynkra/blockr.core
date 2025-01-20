@@ -18,7 +18,7 @@
 \usage{
 new_board(
   blocks = list(),
-  links = new_link(),
+  links = NULL,
   ...,
   id = "board",
   class = character()

@@ -131,3 +131,5 @@ filter_empty <- function(x) Filter(Negate(is_empty), x)
 unlst <- function(x, recursive = FALSE, use_names = FALSE) {
   unlist(x, recursive = recursive, use.names = use_names)
 }
+
+na_to_empty <- function(x) replace(x, is.na(x), "")

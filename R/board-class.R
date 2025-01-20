@@ -9,7 +9,7 @@
 #' @param class Board sub-class
 #'
 #' @export
-new_board <- function(blocks = list(), links = new_link(), ...,
+new_board <- function(blocks = list(), links = NULL, ...,
                       id = "board", class = character()) {
 
   if (is_block(blocks)) {
@@ -18,7 +18,7 @@ new_board <- function(blocks = list(), links = new_link(), ...,
 
   validate_board_blocks(blocks)
 
-  links <- as_link(links)
+  links <- as_links(links)
 
   ids <- chr_ply(blocks, block_uid)
 
@@ -105,7 +105,7 @@ validate_board <- function(x) {
 
   validate_board_blocks_links(
     validate_board_blocks(x),
-    validate_link(x)
+    validate_links(x)
   )
 
   x
@@ -200,7 +200,7 @@ board_blocks <- function(x) {
 #' @export
 board_links <- function(x) {
   stopifnot(is_board(x))
-  validate_link(x[["links"]])
+  validate_links(x[["links"]])
 }
 
 #' @rdname new_board

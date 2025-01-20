@@ -1,80 +1,168 @@
 #' Board links
 #'
-#' Blocks on a board are linked by board links.
+#' Blocks on a board are linksed by board links.
 #'
-#' @param from,to Block IDs
+#' @param from,to Block ID(s)
 #' @param input Block argument
-#' @param id Link ID
 #' @param ... Extensibility
+#' @param class (Optional) link sub-class
 #'
 #' @export
-new_link <- function(from = character(), to = character(), input = NULL,
-                     id = NULL, ...) {
+new_link <- function(from = "", to = "", input = "", ...,
+                     class = character()) {
 
-  if (is.null(input) || all(is.na(input))) {
-    input <- rep("", length(from))
+  stopifnot(length(from) == length(to))
+
+  if (length(from) && is_empty(input)) {
+    input <- ""
   }
-
-  if (is.null(id)) {
-    if (length(from)) {
-      id <- rand_names(n = length(from))
-    } else {
-      id <- character()
-    }
-  }
-
-  vals <- list(id = id, from = from, to = to, input = input, ...)
 
   validate_link(
-    vctrs::new_rcrd(vals, class = "link")
+    new_vctr(
+      list(from = from, to = to, input = input, ...),
+      class = c(class, "link")
+    )
   )
 }
 
-#' @param x Link object
+validate_link <- function(x) {
+
+  if (!is_link(x)) {
+    stop("Expecting a link to inherit from \"link\".")
+  }
+
+  if (!is.list(x)) {
+    stop("Expecting a link to be represented by a list.")
+  }
+
+  if (all_zero_len(x)) {
+    return(x)
+  }
+
+  fields <- c("from", "to", "input")
+
+  if (!all(fields %in% names(x))) {
+    stop("Expecting a link to contain attributes ", paste_enum(fields), ".")
+  }
+
+  if (!all(lgl_ply(x[fields], is_string))) {
+    stop("Expecting link attributes ", paste_enum(fields), " to be strings.")
+  }
+
+  if (anyNA(x[fields])) {
+    stop("Missing values for ", paste_enum(fields), " are not allowed.")
+  }
+
+  if (x[["from"]] == x[["to"]] && x[["to"]] != "") {
+    stop("Self-referencing links are not allowed.")
+  }
+
+  x
+}
+
 #' @rdname new_link
 #' @export
 is_link <- function(x) {
   inherits(x, "link")
 }
 
+#' @param x Links object
+#' @rdname new_link
 #' @export
-names.link <- function(x) {
-  field(x, "id")
+as_link <- function(x) {
+  UseMethod("as_link")
+}
+
+#' @rdname new_link
+#' @export
+as_link.link <- function(x) {
+  x
+}
+
+#' @rdname new_link
+#' @export
+as_link.character <- function(x) {
+  do.call(new_link, as.list(x))
+}
+
+#' @rdname new_link
+#' @export
+as_link.list <- function(x) {
+  do.call(new_link, x)
+}
+
+#' @method as_link data.frame
+#' @rdname new_link
+#' @export
+as_link.data.frame <- function(x) {
+  do.call(new_link, x)
 }
 
 #' @export
-`names<-.link` <- function(x, value) {
+as.character.link <- function(x, ...) {
+  as.character(as.list(x))
+}
 
-  if (is.null(value)) {
-    value <- rep("", length(x))
-  } else if (anyDuplicated(value) != 0L) {
-    stop("IDs are required to be unique.")
-  }
+#' @export
+as.list.link <- function(x, ...) {
+  vec_data(x)
+}
 
-  field(x, "id") <- value
+#' @method as.data.frame link
+#' @export
+as.data.frame.link <- function(x, ...) {
+  as.data.frame(as.list(x))
+}
 
-  x
+#' @export
+`[.link` <- function(x, i, ...) {
+  x <- vec_data(x)
+  x[vec_as_location(i, length(x), names(x))]
+}
+
+#' @export
+`[[.link` <- function(x, i, ...) {
+  x <- vec_data(x)
+  x[[vec_as_location2(i, length(x), names(x))]]
 }
 
 #' @export
 format.link <- function(x, ...) {
 
-  field_miss <- function(x, field) {
-    res <- field(x, field)
-    replace(res, is.na(res) | !nzchar(res), "?")
+  field_miss <- function(x) {
+    if (is.na(x) | !nzchar(x)) "?" else x
   }
 
-  input <- function(x) {
-    res <- field(x, "input")
-    ifelse(is.na(res) | !nzchar(res), "", paste0(" (", res, ")"))
+  out <- ""
+
+  for (cl in rev(setdiff(class(x), c("list", "vctrs_vctr")))) {
+    out <- paste0("<", cl, out, ">")
   }
 
-  paste0(field_miss(x, "from"), " -> ", field_miss(x, "to"), input(x))
+  if (all_zero_len(x)) {
+    return(out)
+  }
+
+  inp <- x["input"]
+
+  if (is.na(inp) | !nzchar(inp)) {
+    inp <- ""
+  } else {
+    inp <- paste0(" (", inp, ")")
+  }
+
+  c(out, paste0(field_miss(x["from"]), " -> ", field_miss(x["to"]), inp))
 }
 
 #' @export
-vec_ptype_abbr.link <- function(x, ...) {
-  "link"
+print.link <- function(x, ...) {
+  cat(format(x, ...), sep = "\n")
+  invisible(x)
+}
+
+#' @export
+c.link <- function(...) {
+  as_links(lapply(list(...), as_link))
 }
 
 #' @export
@@ -86,19 +174,25 @@ vec_restore.link <- function(x, to, ...) {
 vec_ptype2.link.link <- function(x, y, ...) x
 
 #' @export
+vec_ptype2.character.link <- function(x, y, ...) y
+
+#' @export
+vec_ptype2.link.character <- function(x, y, ...) x
+
+#' @export
 vec_ptype2.list.link <- function(x, y, ...) y
 
 #' @export
 vec_ptype2.link.list <- function(x, y, ...) x
 
 #' @export
-vec_ptype2.data.frame.link <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.link.data.frame <- function(x, y, ...) x
-
-#' @export
 vec_cast.link.link <- function(x, to, ...) x
+
+#' @export
+vec_cast.link.character <- function(x, to, ...) as_link(x)
+
+#' @export
+vec_cast.character.link <- function(x, to, ...) as.character(x)
 
 #' @export
 vec_cast.link.list <- function(x, to, ...) as_link(x)
@@ -112,176 +206,303 @@ vec_cast.link.data.frame <- function(x, to, ...) as_link(x)
 #' @export
 vec_cast.data.frame.link <- function(x, to, ...) as.data.frame(x)
 
+#' @rdname new_link
 #' @export
-c.link <- function(...) {
-  args <- lapply(list(...), as_link)
-  do.call(link_c, c(args, list(.ptype = args[[1L]])))
+links <- function(...) {
+
+  vals <- list_to_list_of_links(list(...))
+
+  if (length(vals)) {
+
+    if (is.null(names(vals))) {
+      names(vals) <- rand_names(n = length(vals))
+    }
+
+    miss <- is.na(names(vals)) | names(vals) == ""
+
+    if (any(miss)) {
+      names(vals)[miss] <- rand_names(names(vals)[!miss], sum(miss))
+    }
+
+  } else {
+
+    vals <- list(lapply(new_link(), `[`, 0L))
+  }
+
+  res <- do.call(rbind, lapply(vals, as.data.frame))
+  res <- cbind(id = rownames(res), res)
+
+  rownames(res) <- NULL
+
+  validate_links(
+    vctrs::new_rcrd(res, class = "links")
+  )
+}
+
+list_to_list_of_links <- function(x) {
+
+  if (length(x) == 1L && is.character(x[[1L]])) {
+    x <- list(as.list(x))
+  }
+
+  if (any(lgl_ply(x, is.atomic))) {
+
+    stopifnot(
+      all(length(x[[1L]]) == lengths(x[-1L]))
+    )
+
+    vals <- lgl_ply(
+      coal(names(x), rep("", length(x))),
+      Negate(identical),
+      "id"
+    )
+
+    res <- do.call(map, c(new_link, x[vals]))
+
+    if ("id" %in% names(x)) {
+      names(res) <- x[["id"]]
+    } else {
+      names(res) <- NULL
+    }
+
+    return(res)
+  }
+
+  lapply(x, as_link)
+}
+
+#' @rdname new_link
+#' @export
+is_links <- function(x) {
+  inherits(x, "links")
 }
 
 #' @export
-`[.link` <- function(x, i, ...) {
+names.links <- function(x) {
+  field(x, "id")
+}
 
-  res <- link_slice(x, vec_as_location(i, length(x), names(x)))
+#' @export
+`names<-.links` <- function(x, value) {
+
+  if (is.null(value)) {
+    value <- rep("", length(x))
+  } else if (anyDuplicated(value) != 0L) {
+    stop("IDs are required to be unique.")
+  }
+
+  field(x, "id") <- value
+
+  x
+}
+
+#' @export
+format.links <- function(x, ...) {
+  res <- chr_ply(as.list(x), format, length = 2L, use_names = TRUE)
+  res[2L, ]
+}
+
+#' @export
+vec_ptype_abbr.links <- function(x, ...) {
+  "lnks"
+}
+
+#' @export
+vec_restore.links <- function(x, to, ...) {
+  validate_links(NextMethod())
+}
+
+#' @export
+vec_ptype2.links.links <- function(x, y, ...) x
+
+#' @export
+vec_ptype2.list.links <- function(x, y, ...) y
+
+#' @export
+vec_ptype2.links.list <- function(x, y, ...) x
+
+#' @export
+vec_ptype2.data.frame.links <- function(x, y, ...) y
+
+#' @export
+vec_ptype2.links.data.frame <- function(x, y, ...) x
+
+#' @export
+vec_ptype2.link.links <- function(x, y, ...) y
+
+#' @export
+vec_ptype2.links.link <- function(x, y, ...) x
+
+#' @export
+vec_cast.links.links <- function(x, to, ...) x
+
+#' @export
+vec_cast.links.list <- function(x, to, ...) as_links(x)
+
+#' @export
+vec_cast.list.links <- function(x, to, ...) as.list(x)
+
+#' @export
+vec_cast.links.data.frame <- function(x, to, ...) as_links(x)
+
+#' @export
+vec_cast.data.frame.links <- function(x, to, ...) as.data.frame(x)
+
+#' @export
+vec_cast.links.link <- function(x, to, ...) as_links(x)
+
+#' @export
+c.links <- function(...) {
+  args <- lapply(list(...), as_links)
+  do.call(links_c, c(args, list(.ptype = args[[1L]])))
+}
+
+#' @export
+`[.links` <- function(x, i, ...) {
+
+  res <- links_slice(x, vec_as_location(i, length(x), names(x)))
 
   if (is.null(res)) {
-    return(new_link())
+    return(links())
   }
 
   res
 }
 
 #' @export
-`[<-.link` <- function(x, i, ..., value) {
+`[<-.links` <- function(x, i, ..., value) {
 
   i <- vec_as_location(i, length(x), names(x))
 
   if (is.null(value)) {
-    return(link_slice(x, -i))
+    return(links_slice(x, -i))
   }
 
-  if (is.character(value)) {
-    value <- as.list(value)
+  value <- list_to_list_of_links(value)
+
+  trg_ids <- field(links_slice(x, i), "id")
+
+  if (is.null(names(value))) {
+    names(value) <- trg_ids
   }
 
-  if (is.list(value)) {
-    value <- list_to_df(value)
+  new_ids <- names(value)
+
+  if (!setequal(new_ids, trg_ids)) {
+    stop(
+      "Replacing IDs ", paste_enum(trg_ids), " with ", paste_enum(new_ids),
+      " is not allowed."
+    )
   }
 
-  trg_ids <- field(link_slice(x, i), "id")
-
-  if (is.data.frame(value)) {
-
-    if (!"id" %in% colnames(value)) {
-      value <- cbind(id = trg_ids, value)
-    }
-
-    value <- as_link(value)
-  }
-
-  stopifnot(is_link(value), setequal(trg_ids, field(value, "id")))
-
-  link_assign(x, i, value[trg_ids])
+  links_assign(x, i, value[trg_ids])
 }
 
 #' @export
-`[[.link` <- function(x, i, ...) {
+`[[.links` <- function(x, i, ...) {
 
   res <- vec_proxy(
-    link_slice(x, vec_as_location2(i, length(x), names(x)))
+    links_slice(x, vec_as_location2(i, length(x), names(x)))
   )
 
-  as.list(res[, colnames(res) != "id"])
+  as_link(res[, colnames(res) != "id"])
 }
 
 #' @export
-`[[<-.link` <- function(x, i, ..., value) {
+`[[<-.links` <- function(x, i, ..., value) {
 
   i <- vec_as_location2(i, length(x), names(x))
+  val <- set_names(list(as_link(value)), x$id[i])
 
-  if (is.null(value)) {
-    return(link_slice(x, -i))
-  }
-
-  if (is.character(value)) {
-    value <- as.list(value)
-  }
-
-  if (is.list(value)) {
-    value <- list_to_df(value)
-  }
-
-  stopifnot(
-    is.data.frame(value), !"id" %in% colnames(value), nrow(value) == 1L
-  )
-
-  value <- as_link(
-    cbind(id = field(link_slice(x, i), "id"), value)
-  )
-
-  link_assign(x, i, value)
+  links_assign(x, i, val)
 }
 
 #' @export
-`$.link` <- function(x, name) {
+`$.links` <- function(x, name) {
   field(x, name)
 }
 
 #' @export
-`$<-.link` <- function(x, name, value) {
+`$<-.links` <- function(x, name, value) {
   `field<-`(x, name, value)
 }
 
 #' @rdname new_link
 #' @export
-as_link <- function(x) {
-  UseMethod("as_link")
+as_links <- function(x) {
+  UseMethod("as_links")
 }
 
 #' @rdname new_link
 #' @export
-as_link.link <- function(x) {
-  validate_link(x)
-}
-
-list_to_df <- function(x) {
-
-  if (!length(x)) {
-    return(data.frame())
-  }
-
-  if (is.atomic(x[[1L]])) {
-    x <- list(x)
-  }
-
-  do.call(rbind.data.frame, x)
+as_links.links <- function(x) {
+  validate_links(x)
 }
 
 #' @rdname new_link
 #' @export
-as_link.list <- function(x) {
-  as_link(list_to_df(x))
+as_links.link <- function(x) {
+  as_links(as.list(x))
 }
 
-#' @method as_link data.frame
 #' @rdname new_link
 #' @export
-as_link.data.frame <- function(x) {
-  do.call(new_link, x)
+as_links.list <- function(x) {
+  do.call(links, x)
 }
 
-#' @method as.data.frame link
+#' @rdname new_link
 #' @export
-as.data.frame.link <- function(x, ...) {
+as_links.NULL <- function(x) {
+  links()
+}
+
+#' @method as_links data.frame
+#' @rdname new_link
+#' @export
+as_links.data.frame <- function(x) {
+  as_links(as.list(x))
+}
+
+#' @method as.data.frame links
+#' @export
+as.data.frame.links <- function(x, ...) {
   vec_proxy(x)
 }
 
 #' @export
-as.list.link <- function(x, ...) {
+as.list.links <- function(x, ...) {
 
   df <- vec_proxy(x)
 
-  res <- split(df, seq_len(nrow(df)))
-  res <- lapply(res, as.list)
-  names(res) <- NULL
+  lst <- split(df, seq_len(nrow(df)))
+
+  res <- map(
+    function(x, cols) as_link(lapply(x[, cols], na_to_empty)),
+    lst,
+    lapply(lapply(lst, colnames), setdiff, "id")
+  )
+
+  names(res) <- chr_xtr(lst, "id")
 
   res
 }
 
-link_slice <- function(...) {
-  validate_link(vec_slice(...))
+links_slice <- function(...) {
+  validate_links(vec_slice(...))
 }
 
-link_assign <- function(...) {
-  validate_link(vec_assign(...))
+links_assign <- function(...) {
+  validate_links(vec_assign(...))
 }
 
-link_c <- function(...) {
-  validate_link(vec_c(...))
+links_c <- function(...) {
+  validate_links(vec_c(...))
 }
 
 #' @rdname new_link
 #' @export
-validate_link <- function(x) {
+validate_links <- function(x) {
 
   any_dup <- function(x) {
     anyDuplicated(Filter(Negate(is.na), x))
@@ -291,33 +512,24 @@ validate_link <- function(x) {
     x <- board_links(x)
   }
 
-  if (!is_link(x)) {
-    stop("Expecting a boad link objects to inherit from `link`.")
+  if (!is_links(x)) {
+    stop("Expecting a board links objects to inherit from \"links\".")
   }
 
-  fields <- c("id", "from", "to", "input")
+  for (y in as.list(x)) {
+    validate_link(y)
+  }
+
+  fields <- c("id", "to", "input")
 
   if (!all(fields %in% fields(x))) {
     stop(
-      "Expecting the link data.frame to contain at least columns ",
-      paste_enum(fields)
+      "Expecting the links to contain at least fields ", paste_enum(fields)
     )
   }
 
-  for (field in fields) {
-    if (!is.character(field(x, field))) {
-      stop("Expecting field `", field, "` to be of type `character`.")
-    }
-  }
-
-  self_ref <- field(x, "from") == field(x, "to") & field(x, "from") != ""
-
-  if (any(!is.na(self_ref) & self_ref)) {
-    stop("Self-referencing blocks are not allowed.")
-  }
-
   if (any_dup(field(x, "id")) != 0L) {
-    stop("Link IDs are required to be unique.")
+    stop("Links IDs are required to be unique.")
   }
 
   dup_inp <- lapply(split(field(x, "input"), field(x, "to")), any_dup)

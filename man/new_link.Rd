@@ -5,12 +5,21 @@
 \alias{is_link}
 \alias{as_link}
 \alias{as_link.link}
+\alias{as_link.character}
 \alias{as_link.list}
 \alias{as_link.data.frame}
-\alias{validate_link}
+\alias{links}
+\alias{is_links}
+\alias{as_links}
+\alias{as_links.links}
+\alias{as_links.link}
+\alias{as_links.list}
+\alias{as_links.NULL}
+\alias{as_links.data.frame}
+\alias{validate_links}
 \title{Board links}
 \usage{
-new_link(from = character(), to = character(), input = NULL, id = NULL, ...)
+new_link(from = "", to = "", input = "", ..., class = character())
 
 is_link(x)
 
@@ -18,23 +27,41 @@ as_link(x)
 
 \method{as_link}{link}(x)
 
+\method{as_link}{character}(x)
+
 \method{as_link}{list}(x)
 
 \method{as_link}{data.frame}(x)
 
-validate_link(x)
+links(...)
+
+is_links(x)
+
+as_links(x)
+
+\method{as_links}{links}(x)
+
+\method{as_links}{link}(x)
+
+\method{as_links}{list}(x)
+
+\method{as_links}{`NULL`}(x)
+
+\method{as_links}{data.frame}(x)
+
+validate_links(x)
 }
 \arguments{
-\item{from, to}{Block IDs}
+\item{from, to}{Block ID(s)}
 
 \item{input}{Block argument}
 
-\item{id}{Link ID}
-
 \item{...}{Extensibility}
 
-\item{x}{Link object}
+\item{class}{(Optional) link sub-class}
+
+\item{x}{Links object}
 }
 \description{
-Blocks on a board are linked by board links.
+Blocks on a board are linksed by board links.
 }

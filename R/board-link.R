@@ -22,7 +22,7 @@ add_rm_link_server <- function(rv) {
       })
 
       upd <- reactiveValues(
-        add = new_link(),
+        add = links(),
         rm = character(),
         curr = isolate(board_links(rv$board)),
         obs = list(),
@@ -91,10 +91,12 @@ add_rm_link_server <- function(rv) {
 
         if (length(upd$curr) < sum(block_arity(rv$board))) {
 
-          new <- new_link(from = "", to = "", input = "")
+          upd$curr <- c(
+            upd$curr,
+            new_link(from = "", to = "", input = "")
+          )
 
-          upd$curr <- c(upd$curr, new)
-          upd$add <- c(upd$add, new)
+          upd$add <- c(upd$add, upd$curr[length(upd$curr)])
 
         } else {
 
@@ -128,7 +130,7 @@ add_rm_link_server <- function(rv) {
 
         removeModal()
 
-        upd$add <- new_link()
+        upd$add <- links()
         upd$rm <- character()
         upd$curr <- board_links(rv$board)
       })
@@ -169,7 +171,7 @@ add_rm_link_server <- function(rv) {
             )
           )
 
-          upd$add <- new_link()
+          upd$add <- links()
           upd$rm <- character()
           upd$curr <- board_links(new)
 
@@ -393,9 +395,9 @@ check_add_rm_link_val <- function(val, rv) {
   observeEvent(
     val()$add,
     {
-      if (!is_link(val()$add)) {
+      if (!is_links(val()$add)) {
         stop("Expecting the `add` component of the `add_rm_link` return ",
-             "value to be `NULL` or a `link` object.")
+             "value to be `NULL` or a `links` object.")
       }
     },
     once = TRUE
@@ -403,7 +405,7 @@ check_add_rm_link_val <- function(val, rv) {
 
   observeEvent(
     val()$add,
-    validate_link(val()$add),
+    validate_links(val()$add),
     priority = 1
   )
 
@@ -411,7 +413,7 @@ check_add_rm_link_val <- function(val, rv) {
     val()$rm,
     {
       if (!is.character(val()$rm)) {
-        stop("Expecting the `add` component of the `add_rm_link` return ",
+        stop("Expecting the `rm` component of the `add_rm_link` return ",
              "value to be a character vector.")
       }
     },

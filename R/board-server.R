@@ -163,8 +163,10 @@ setup_block <- function(blk, rv) {
 
   links <- board_links(rv$board)
 
-  for (x in as.list(links[links$to == id])) {
-    rv <- do.call(setup_link, c(list(rv), x))
+  todo <- as.list(links[links$to == id])
+
+  for (i in names(todo)) {
+    rv <- do.call(setup_link, c(list(rv, i), todo[[i]]))
   }
 
   rv$blocks[[id]] <- list(
@@ -222,12 +224,16 @@ destroy_link <- function(rv, id, from, to, input) {
 
 update_block_links <- function(rv, add = NULL, rm = NULL) {
 
-  for (x in as.list(rm)) {
-    rv <- do.call(destroy_link, c(list(rv), x))
+  todo <- as.list(rm)
+
+  for (i in names(todo)) {
+    rv <- do.call(destroy_link, c(list(rv, i), todo[[i]]))
   }
 
-  for (x in as.list(add)) {
-    rv <- do.call(setup_link, c(list(rv), x))
+  todo <- as.list(add)
+
+  for (i in names(todo)) {
+    rv <- do.call(setup_link, c(list(rv, i), todo[[i]]))
   }
 
   rv
