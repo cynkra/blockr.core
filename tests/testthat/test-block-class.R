@@ -13,7 +13,7 @@ test_that("block constructor", {
           }
         )
       },
-      function(ns) {
+      function(id) {
         tagList()
       },
       class = "identity_block"
