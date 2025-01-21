@@ -176,7 +176,7 @@ setup_block <- function(blk, id, rv) {
 
   rv$blocks[[id]] <- list(
     block = blk,
-    server = block_server(blk, data = rv$inputs[[id]], id = id)
+    server = block_server(id, blk, rv$inputs[[id]])
   )
 
   rv
