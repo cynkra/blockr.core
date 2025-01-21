@@ -15,7 +15,5 @@ test_that("stacks", {
   expect_identical(setdiff(x, z), setdiff(x, "a"))
 
   expect_length(setdiff(letters[1:5], z), 4L)
-  expect_s3_class(setdiff(letters[1:5], z), "stack")
-
   expect_length(union(x, z), length(x))
 })

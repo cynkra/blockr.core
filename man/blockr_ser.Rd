@@ -3,13 +3,17 @@
 \name{blockr_ser}
 \alias{blockr_ser}
 \alias{blockr_ser.block}
+\alias{blockr_ser.blocks}
 \alias{blockr_ser.board}
 \alias{blockr_ser.link}
+\alias{blockr_ser.links}
 \alias{blockr_deser}
 \alias{blockr_deser.list}
 \alias{blockr_deser.block}
+\alias{blockr_deser.blocks}
 \alias{blockr_deser.board}
 \alias{blockr_deser.link}
+\alias{blockr_deser.links}
 \alias{to_json}
 \alias{from_json}
 \title{Serialization utilities}
@@ -18,9 +22,13 @@ blockr_ser(x, ...)
 
 \method{blockr_ser}{block}(x, state = NULL, ...)
 
+\method{blockr_ser}{blocks}(x, blocks = NULL, ...)
+
 \method{blockr_ser}{board}(x, blocks = NULL, ...)
 
 \method{blockr_ser}{link}(x, ...)
+
+\method{blockr_ser}{links}(x, ...)
 
 blockr_deser(x, ...)
 
@@ -28,9 +36,13 @@ blockr_deser(x, ...)
 
 \method{blockr_deser}{block}(x, data, ...)
 
+\method{blockr_deser}{blocks}(x, data, ...)
+
 \method{blockr_deser}{board}(x, data, ...)
 
 \method{blockr_deser}{link}(x, data, ...)
+
+\method{blockr_deser}{links}(x, data, ...)
 
 to_json(x, ...)
 

@@ -14,45 +14,41 @@ blockr_ser <- function(x, ...) {
 #' @rdname blockr_ser
 #' @export
 blockr_ser.block <- function(x, state = NULL, ...) {
-
-  pkg <- attr(x, "ctor_pkg")
-
-  if (is.null(state)) {
-    state <- initial_block_state(x)
-  }
-
-  list(
-    object = class(x),
-    payload = state,
-    constructor = attr(x, "ctor"),
-    package = pkg,
-    version = as.character(utils::packageVersion(pkg))
-  )
+  as.list(x, state)
 }
 
 #' @param blocks Block states (`NULL` defaults to values from ctor scope)
 #' @rdname blockr_ser
 #' @export
-blockr_ser.board <- function(x, blocks = NULL, ...) {
-
-  blks <- board_blocks(x)
+blockr_ser.blocks <- function(x, blocks = NULL, ...) {
 
   if (is.null(blocks)) {
 
-    blks <- lapply(blks, blockr_ser)
+    res <- lapply(x, blockr_ser)
 
   } else {
 
     stopifnot(
-      length(blocks) == length(blks), setequal(names(blocks), names(blks))
+      is.list(blocks), all(lgl_ply(blocks, is.list)),
+      length(blocks) == length(x), setequal(names(blocks), names(x))
     )
 
-    blks <- Map(blockr_ser, blks, blocks[names(blks)])
+    res <- Map(blockr_ser, x, blocks[names(x)])
   }
 
   list(
     object = class(x),
-    blocks = blks,
+    payload = res
+  )
+}
+
+#' @rdname blockr_ser
+#' @export
+blockr_ser.board <- function(x, blocks = NULL, ...) {
+
+  list(
+    object = class(x),
+    blocks = blockr_ser(board_blocks(x)),
     links = lapply(board_links(x), blockr_ser),
     id = attr(x, "id"),
     version = as.character(utils::packageVersion(utils::packageName()))
@@ -65,6 +61,15 @@ blockr_ser.link <- function(x, ...) {
   list(
     object = class(x),
     payload = as.list(x)
+  )
+}
+
+#' @rdname blockr_ser
+#' @export
+blockr_ser.links <- function(x, ...) {
+  list(
+    object = class(x),
+    payload = lapply(x, blockr_ser)
   )
 }
 
@@ -85,34 +90,22 @@ blockr_deser.list <- function(x, ...) {
 #' @rdname blockr_ser
 #' @export
 blockr_deser.block <- function(x, data, ...) {
+  as_block(data)
+}
 
-  stopifnot(
-    all(c("constructor", "payload", "package") %in% names(data))
+#' @rdname blockr_ser
+#' @export
+blockr_deser.blocks <- function(x, data, ...) {
+  as_blocks(
+    lapply(data[["payload"]], blockr_deser)
   )
-
-  ctor <- get(
-    data[["constructor"]],
-    asNamespace(data[["package"]]),
-    mode = "function"
-  )
-
-  args <- setdiff(names(formals(ctor)), "...")
-
-  args <- c(
-    data[["payload"]][args],
-    ctor = data[["constructor"]],
-    ctor_pkg = data[["package"]],
-    uid = data[["uid"]]
-  )
-
-  do.call(ctor, args)
 }
 
 #' @rdname blockr_ser
 #' @export
 blockr_deser.board <- function(x, data, ...) {
   new_board(
-    lapply(data[["blocks"]], blockr_deser),
+    blockr_deser(data[["blocks"]]),
     lapply(data[["links"]], blockr_deser),
     id = data[["id"]],
     class = setdiff(class(x), "board")
@@ -123,6 +116,14 @@ blockr_deser.board <- function(x, data, ...) {
 #' @export
 blockr_deser.link <- function(x, data, ...) {
   as_link(data[["payload"]])
+}
+
+#' @rdname blockr_ser
+#' @export
+blockr_deser.links <- function(x, data, ...) {
+  as_links(
+    lapply(data[["payload"]], blockr_deser)
+  )
 }
 
 #' @rdname blockr_ser
