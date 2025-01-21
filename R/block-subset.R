@@ -9,9 +9,9 @@
 #' @export
 new_subset_block <- function(subset = "", select = "", ...) {
   new_transform_block(
-    function(data) {
+    function(id, data) {
       moduleServer(
-        "expression",
+        id,
         function(input, output, session) {
           list(
             expr = reactive({
@@ -25,15 +25,15 @@ new_subset_block <- function(subset = "", select = "", ...) {
         }
       )
     },
-    function(ns) {
+    function(id) {
       tagList(
         textInput(
-          inputId = ns("expression", "subset"),
+          inputId = NS(id, "subset"),
           label = "Subset",
           value = subset
         ),
         textInput(
-          inputId = ns("expression", "select"),
+          inputId = NS(id, "select"),
           label = "Select",
           value = select
         )

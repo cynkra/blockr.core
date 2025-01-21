@@ -25,9 +25,9 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
   }
 
   new_data_block(
-    function() {
+    function(id) {
       moduleServer(
-        "expression",
+        id,
         function(input, output, session) {
 
           dat <- reactiveVal(dataset)
@@ -51,9 +51,9 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
         }
       )
     },
-    function(ns) {
+    function(id) {
       selectInput(
-        inputId = ns("expression", "dataset"),
+        inputId = NS(id, "dataset"),
         label = "Dataset",
         choices = list_datasets(package),
         selected = dataset

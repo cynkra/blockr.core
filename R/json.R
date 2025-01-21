@@ -45,7 +45,6 @@ blockr_ser.blocks <- function(x, blocks = NULL, ...) {
 #' @rdname blockr_ser
 #' @export
 blockr_ser.board <- function(x, blocks = NULL, ...) {
-
   list(
     object = class(x),
     blocks = blockr_ser(board_blocks(x)),

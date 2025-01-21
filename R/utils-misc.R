@@ -133,35 +133,3 @@ unlst <- function(x, recursive = FALSE, use_names = FALSE) {
 }
 
 na_to_empty <- function(x) replace(x, is.na(x), "")
-
-ns <- function(namespace, ...) {
-
-  if (length(namespace) == 0) {
-    ns_prefix <- character(0)
-  } else {
-    ns_prefix <- paste(namespace, collapse = ns.sep)
-  }
-
-  fun <- function(...) {
-
-    ids <- c(...)
-
-    if (!length(ids)) {
-      return(ns_prefix)
-    }
-
-    ids <- paste(ids, collapse = ns.sep)
-
-    if (!length(ns_prefix)) {
-      return(ids)
-    }
-
-    paste(ns_prefix, ids, sep = ns.sep)
-  }
-
-  if (!...length()) {
-    fun
-  } else {
-    fun(...)
-  }
-}

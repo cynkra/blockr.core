@@ -83,7 +83,10 @@ and `ui` both expect closures with a specific structure.
 
 - A signature with as many arguments as data inputs is expected: zero
   for a data block, one for a transform block such as a select block,
-  two for a join block and `...` for an `rbind` block.
+  two for a join block and `...` for an `rbind` block (excluding the
+  required first argument `id`).
+- The first argument `id` should be passed to the
+  `shiny::moduleServer()` call.
 - As return value a call to `shiny::moduleServer()` is expected,
   containing a `module` function that in turn returns a list with
   entries `expr` and `state`.
@@ -92,16 +95,15 @@ and `ui` both expect closures with a specific structure.
   Data names should match between expressio and the top-level function
   arguments.
 - Block state is defined by the `state` entry which again is a list of
-  reactives. This is a superset of the constructor arguments (and
-  variable names should be aligned such that the constructor can be
-  called again with an appropriately subsetted state).
+  reactives. The set of returned values should match (both in count and
+  names) that of the constructor signature.
 
 The `server` component of an identity transform block could be formed as
 
 ``` r
-function(data) {
+function(id, data) {
   moduleServer(
-    "expression",
+    id,
     function(input, output, session) {
       list(
         expr = reactive(quote(identity(data))),
@@ -117,15 +119,10 @@ function signature.
 
 ### Block `ui`
 
-- The function signature is expected to contain `ns` in first place,
-  followed by an arbitrary number of arguments that are aligned with
-  `state` values such that this function can be called with an updated
-  state.
+- The function signature is expected to contain a single `id` argument,
+  which can be used with `shiny::NS()` to construct namespaced IDs.
 - A call to appropriate shiny UI functions is expected that return
   `shiny.tag` or `shiny.tag.list` objects.
-- Namespaces can be constructed using the `ns` function which should be
-  passed as first argument the `shiny::moduleServer()` ID and as second
-  argument the input ID.
 - The initial evaluation of the `ui` function will be performed in the
   context of the constructor scope (i.e. if a value of name `xyz` is
   bound the the constructor scope or a parent thereof, this value will
@@ -134,7 +131,7 @@ function signature.
 The `ui` component of an identity transform block is trivial:
 
 ``` r
-function(ns) {
+function(id) {
   tagList()
 }
 ```
@@ -153,15 +150,20 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
   ]
 
   new_data_block(
-    function() {
+    function(id) {
       moduleServer(
-        "my_expr",
+        id,
         function(input, output, session) {
+
+          dat <- reactiveVal(dataset)
+
+          observeEvent(input$dataset, dat(input$dataset))
+
           list(
             expr = reactive(
               bquote(
                 `::`(.(pkg), .(dat)),
-                list(pkg = package, dat = input$dataset)
+                list(pkg = package, dat = dat())
               )
             ),
             state = list(
@@ -172,9 +174,9 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
         }
       )
     },
-    function(ns, dataset) {
+    function(id) {
       selectInput(
-        inputId = ns("my_expr", "dataset"),
+        inputId = NS(id, "dataset"),
         label = "Dataset",
         choices = choices,
         selected = dataset
@@ -216,23 +218,25 @@ the blockr.dplyr extension package:
 new_select_block <- function(columns = character(), ...) {
 
   new_transform_block(
-    function(data) {
+    function(id, data) {
       moduleServer(
-        "expression",
+        id,
         function(input, output, session) {
 
           sels <- reactiveVal(columns)
           cols <- reactive(colnames(data()))
 
-          observeEvent(input$columns, sels(input$columns))
-
           observe(
-            updateSelectInput(
-              session,
-              inputId = "columns",
-              choices = cols(),
-              selected = sels()
-            )
+            {
+              sels(intersect(input$columns, cols()))
+
+              updateSelectInput(
+                session,
+                inputId = "columns",
+                choices = cols(),
+                selected = sels()
+              )
+            }
           )
 
           list(
@@ -251,12 +255,11 @@ new_select_block <- function(columns = character(), ...) {
         }
       )
     },
-    function(ns, columns, choices = character()) {
+    function(id) {
       selectInput(
-        inputId = ns("expression", "columns"),
+        inputId = NS(id, "columns"),
         label = "Columns",
-        choices = choices,
-        selected = columns,
+        choices = list(),
         multiple = TRUE
       )
     },

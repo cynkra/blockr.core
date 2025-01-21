@@ -36,7 +36,7 @@ expr_ui.block <- function(x, id = "block", ...) {
     )
   }
 
-  do.call(block_expr_ui(x), list(ns = ns(id)))
+  do.call(block_expr_ui(x), list(id = NS(id, "expr")))
 }
 
 #' @param result Reactive block result

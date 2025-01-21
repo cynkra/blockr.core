@@ -187,9 +187,7 @@ expr_server <- function(x, data, ...) {
 #' @rdname block_server
 #' @export
 expr_server.block <- function(x, data, ...) {
-  res <- do.call(block_expr_server(x), data)
-  stopifnot(setequal(names(res), c("expr", "state")))
-  res
+  do.call(block_expr_server(x), c(list(id = "expr"), data))
 }
 
 check_expr_val <- function(val, x) {

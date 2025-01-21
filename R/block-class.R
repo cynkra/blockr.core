@@ -105,8 +105,8 @@ validate_block_ui <- function(ui) {
     stop("A block UI component is expected to be a function.")
   }
 
-  if (!identical(names(formals(ui)), "ns")) {
-    stop("A block UI function is expected to have a single argument `ns`.")
+  if (!identical(names(formals(ui)), "id")) {
+    stop("A block UI function is expected to have a single argument `id`.")
   }
 
   invisible(ui)
@@ -114,7 +114,7 @@ validate_block_ui <- function(ui) {
 
 validate_data_validator <- function(validator, server) {
 
-  server_args <- names(formals(server))
+  server_args <- setdiff(names(formals(server)), "id")
 
   if (!length(server_args) && not_null(validator)) {
     stop("A nullary server function cannot accopmany a data input validator.")
@@ -382,15 +382,11 @@ block_inputs <- function(x) {
 #' @rdname new_block
 #' @export
 block_inputs.block <- function(x) {
-  names(formals(block_expr_server(x)))
+  setdiff(names(formals(block_expr_server(x))), "id")
 }
 
 block_ctor_inputs <- function(x) {
   setdiff(names(formals(block_ctor(x))), "...")
-}
-
-block_ui_inputs <- function(x) {
-  setdiff(names(formals(block_expr_ui(x))), "ns")
 }
 
 initial_block_state <- function(x) {
