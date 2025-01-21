@@ -27,6 +27,19 @@ test_that("serialization", {
     ignore_function_env = TRUE
   )
 
+  orig <- blocks(
+    a = new_dataset_block("iris", "datasets")
+  )
+
+  json <- to_json(
+    blocks(a = new_dataset_block()),
+    list(
+      a = list(dataset = "iris", package = "datasets")
+    )
+  )
+
+  expect_equal(orig, from_json(json), ignore_function_env = TRUE)
+
   orig <- links(from = "a", to = "b")
 
   expect_equal(orig, from_json(to_json(orig)))
