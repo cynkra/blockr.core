@@ -11,11 +11,13 @@
 #' @param ctor_pkg Package name (or `NULL`)
 #' @param dat_valid (Optioanl) input data validator
 #' @param name Block name
+#' @param allow_empty_state Either `TRUE`, `FALSE` or a character vector of
+#' `state` values that may be empty while still moving forward with block eval
 #' @param ... Further (metadata) attributes
 #'
 #' @export
 new_block <- function(server, ui, class, ctor, ctor_pkg, dat_valid = NULL,
-                      name = NULL, ...) {
+                      name = NULL, allow_empty_state = FALSE, ...) {
 
   stopifnot(is.character(class), length(class) > 0L)
 
@@ -84,6 +86,7 @@ new_block <- function(server, ui, class, ctor, ctor_pkg, dat_valid = NULL,
       ctor = ctor,
       ctor_pkg = ctor_pkg,
       name = name,
+      allow_empty_state = allow_empty_state,
       class = c(class, "block")
     ),
     ui_eval = TRUE
@@ -339,6 +342,10 @@ block_dat_valid <- function(x) {
 #' @export
 block_has_data_validator <- function(x) {
   not_null(block_dat_valid(x))
+}
+
+block_allow_empty_state <- function(x) {
+  attr(x, "allow_empty_state")
 }
 
 #' @param data Data inputs

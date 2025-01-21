@@ -13,14 +13,21 @@ new_subset_block <- function(subset = "", select = "", ...) {
       moduleServer(
         id,
         function(input, output, session) {
+
+          sub <- reactiveVal(subset)
+          sel <- reactiveVal(select)
+
+          observeEvent(
+            input$eval,
+            {
+              sub(input$subset)
+              sel(input$select)
+            }
+          )
+
           list(
-            expr = reactive({
-              subset_expr(input$subset, input$select)
-            }),
-            state = list(
-              subset = reactive(input$subset),
-              select = reactive(input$select)
-            )
+            expr = reactive(subset_expr(sub(), sel())),
+            state = list(subset = sub, select = sel)
           )
         }
       )
@@ -36,12 +43,17 @@ new_subset_block <- function(subset = "", select = "", ...) {
           inputId = NS(id, "select"),
           label = "Select",
           value = select
+        ),
+        actionButton(
+          inputId = NS(id, "eval"),
+          label = "Evaluate",
         )
       )
     },
     dat_val = function(data) {
       stopifnot(is.data.frame(data))
     },
+    allow_empty_state = TRUE,
     class = "subset_block",
     ...
   )

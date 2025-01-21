@@ -35,6 +35,7 @@ new_block(
   ctor_pkg,
   dat_valid = NULL,
   name = NULL,
+  allow_empty_state = FALSE,
   ...
 )
 
@@ -98,6 +99,9 @@ as_blocks(x, ...)
 \item{dat_valid}{(Optioanl) input data validator}
 
 \item{name}{Block name}
+
+\item{allow_empty_state}{Either \code{TRUE}, \code{FALSE} or a character vector of
+\code{state} values that may be empty while still moving forward with block eval}
 
 \item{...}{Further (metadata) attributes}
 

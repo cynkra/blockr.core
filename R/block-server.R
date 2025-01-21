@@ -91,26 +91,38 @@ block_server.block <- function(x, data, id = "block", ...) {
         )
       }
 
-      state <- reactive(
+      state_check <- reactive(
         {
-          if (isTruthy(rv$data_valid)) {
-            lgl_ply(
-              lapply(exp$state, reval_if),
-              isTruthy,
-              use_names = TRUE
-            )
-          } else {
-            NULL
+          if (!isTruthy(rv$data_valid)) {
+            return(NULL)
           }
+
+          allow_empty <- block_allow_empty_state(x)
+
+          if (isTRUE(allow_empty)) {
+            return(TRUE)
+          }
+
+          if (isFALSE(allow_empty)) {
+            check <- TRUE
+          } else {
+            check <- allow_empty
+          }
+
+          lgl_ply(
+            lapply(exp$state[check], reval_if),
+            isTruthy,
+            use_names = TRUE
+          )
         }
       )
 
       observeEvent(
-        state(),
+        state_check(),
         {
           res(NULL)
 
-          ok <- state()
+          ok <- state_check()
 
           rv$state_cond <- empty_cond
           rv$state_set <- NULL
@@ -129,6 +141,7 @@ block_server.block <- function(x, data, id = "block", ...) {
       dat_eval <- reactive(
         {
           req(rv$state_set)
+          lapply(exp$state, reval_if)
           lapply(data, reval)
         }
       )
@@ -140,9 +153,7 @@ block_server.block <- function(x, data, id = "block", ...) {
 
           out <- tryCatch(
             withCallingHandlers(
-              {
-                eval(exp$expr(), dat_eval())
-              },
+              eval(exp$expr(), dat_eval()),
               message = function(m) {
                 rv$eval_cond$message <- c(rv$eval_cond$message, cond_msg(m))
               },

@@ -4,8 +4,6 @@ test_that("dataset block constructor", {
 
   expect_s3_class(blk, c("dataset_block", "data_block", "block"))
 
-  block_expr_server(blk)
-
   testServer(block_expr_server(blk), {
     expect_equal(dat(), "iris")
     session$setInputs(dataset = "mtcars")
