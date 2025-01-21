@@ -107,16 +107,19 @@ as_stack.stack <- function(x) x
 #' @export
 as_stack.character <- function(x) new_stack(x)
 
+#' @importFrom generics intersect
 #' @export
 intersect.stack <- function(x, y, ...) {
   vec_set_intersect(x, y, ...)
 }
 
+#' @importFrom generics union
 #' @export
 union.stack <- function(x, y, ...) {
   vec_set_union(x, y, ...)
 }
 
+#' @importFrom generics setdiff
 #' @export
 setdiff.stack <- function(x, y, ...) {
   vec_set_difference(x, y, ...)
