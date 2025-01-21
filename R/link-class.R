@@ -303,11 +303,6 @@ format.links <- function(x, ...) {
 }
 
 #' @export
-vec_ptype_abbr.links <- function(x, ...) {
-  "lnks"
-}
-
-#' @export
 vec_restore.links <- function(x, to, ...) {
   validate_links(NextMethod())
 }
@@ -353,8 +348,12 @@ vec_cast.links.link <- function(x, to, ...) as_links(x)
 
 #' @export
 c.links <- function(...) {
+
   args <- lapply(list(...), as_links)
-  do.call(links_c, c(args, list(.ptype = args[[1L]])))
+
+  validate_links(
+    do.call(vec_c, c(args, list(.ptype = args[[1L]])))
+  )
 }
 
 #' @export
@@ -494,10 +493,6 @@ links_slice <- function(...) {
 
 links_assign <- function(...) {
   validate_links(vec_assign(...))
-}
-
-links_c <- function(...) {
-  validate_links(vec_c(...))
 }
 
 #' @rdname new_link

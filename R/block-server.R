@@ -4,18 +4,19 @@
 #'
 #' @param x Object for which to generate a [moduleServer()]
 #' @param data Input data (list of reactives)
+#' @param id Block ID
 #' @param ... Generic consistency
 #'
 #' @export
-block_server <- function(x, data, ...) {
+block_server <- function(x, data, id = "block", ...) {
   UseMethod("block_server")
 }
 
 #' @rdname block_server
 #' @export
-block_server.block <- function(x, data, ...) {
+block_server.block <- function(x, data, id = "block", ...) {
   moduleServer(
-    block_uid(x),
+    id,
     function(input, output, session) {
 
       cond_msg <- local(
@@ -133,7 +134,9 @@ block_server.block <- function(x, data, ...) {
 
           out <- tryCatch(
             withCallingHandlers(
-              eval(exp$expr(), lapply(data, reval)),
+              {
+                eval(exp$expr(), lapply(data, reval))
+              },
               message = function(m) {
                 rv$eval_cond$message <- c(rv$eval_cond$message, cond_msg(m))
               },

@@ -3,10 +3,11 @@
 #' Shiny UI function for `board` objects.
 #'
 #' @param x Board
+#' @param id (Optional) parent namespace
 #' @param ... Generic consistency
 #'
 #' @export
-board_ui <- function(x, ...) {
+board_ui <- function(x, id = board_id(x), ...) {
   UseMethod("board_ui")
 }
 
@@ -17,13 +18,12 @@ board_ui <- function(x, ...) {
 #' @rdname board_ui
 #' @export
 board_ui.board <- function(x,
+                           id = board_id(x),
                            ser_deser = NULL,
                            add_rm_block = NULL,
                            add_rm_link = NULL,
                            block_notifications = NULL,
                            ...) {
-
-  id <- board_id(x)
 
   toolbar_args <- c(
     if (length(ser_deser)) ser_deser(id, x),
@@ -44,129 +44,92 @@ board_ui.board <- function(x,
   )
 }
 
-#' @param block (Optional) block (or ID) for which to generate the UI
+#' @param blocks (Additional) blocks (or IDs) for which to generate the UI
 #' @rdname block_ui
 #' @export
-block_ui.board <- function(x, id = NULL, block = NULL, ...) {
+block_ui.board <- function(x, id = board_id(x), blocks = NULL, ...) {
 
-  block_card <- function(x, id) {
-
-    blk_id <- block_uid(x)
+  block_card <- function(x, id, ns) {
 
     div(
       class = "card shadow-sm p-2 mb-2 border",
-      id = paste0(blk_id, "_block"),
+      id = paste0(id, "_block"),
       div(
         class = "card-body p-1",
         h5(
           class = "card-title",
-          paste0(block_name(x), " (", blk_id, ")")
+          paste0(block_name(x), " (", id, ")")
         ),
-        block_ui(x, id)
+        block_ui(x, ns(id))
       )
     )
   }
 
-  if (is.null(id)) {
-    id <- board_id(x)
-  }
-
   stopifnot(is_string(id))
 
-  if (is.null(block)) {
-
-    res <- tagList(
-      lapply(sort(x), block_card, id = id)
-    )
-
-    return(res)
+  if (is.null(blocks)) {
+    blocks <- sort(x)
+  } else if (is.character(blocks)) {
+    blocks <- board_blocks(x)[blocks]
   }
 
-  block_card(resolve_block(block, x), id)
+  stopifnot(is_blocks(blocks))
+
+  tagList(
+    map(block_card, blocks, names(blocks), MoreArgs = list(ns = NS(id)))
+  )
 }
 
-block_id_to_block <- function(id, board) {
-
-  hit <- match(id, board_block_ids(board))
-
-  if (is.na(hit)) {
-    stop("Unknown block ", id)
-  }
-
-  board_blocks(board)[[hit]]
-}
-
-resolve_block <- function(block, board) {
-
-  if (is_string(block)) {
-    block <- block_id_to_block(block, board)
-  }
-
-  stopifnot(is_block(block))
-
-  block
-}
-
-#' @param block (Optional) block (or ID) for which to insert/remove the UI
+#' @param blocks (Additional) blocks (or IDs) for which to generate the UI
 #' @rdname board_ui
 #' @export
-insert_block_ui <- function(x, block = NULL, ...) {
+insert_block_ui <- function(x, id = board_id(x), blocks = NULL, ...) {
   UseMethod("insert_block_ui")
 }
 
 #' @rdname board_ui
 #' @export
-insert_block_ui.board <- function(x, block = NULL, ...) {
+insert_block_ui.board <- function(x, id = board_id(x), blocks = NULL, ...) {
 
-  if (is.null(block)) {
-    insertUI(
-      paste0("#", board_id(x), "_blocks"),
-      "afterBegin",
-      block_ui(x),
-      immediate = TRUE
-    )
-  } else {
-    insertUI(
-      paste0("#", board_id(x), "_blocks"),
-      "beforeEnd",
-      block_ui(x, block = resolve_block(block, x)),
-      immediate = TRUE
-    )
+  stopifnot(is_string(id))
 
-  }
-}
-
-resolve_id <- function(block, board) {
-
-  if (is_block(block)) {
-    block <- block_uid(block)
-  }
-
-  stopifnot(is_string(block), block %in% board_block_ids(board))
-
-  block
+  insertUI(
+    paste0("#", id, "_blocks"),
+    "beforeEnd",
+    block_ui(x, id, blocks),
+    immediate = TRUE
+  )
 }
 
 #' @rdname board_ui
 #' @export
-remove_block_ui <- function(x, block = NULL, ...) {
+remove_block_ui <- function(x, id = board_id(x), blocks = NULL, ...) {
   UseMethod("remove_block_ui")
 }
 
 #' @rdname board_ui
 #' @export
-remove_block_ui.board <- function(x, block = NULL, ...) {
+remove_block_ui.board <- function(x, id = board_id(x), blocks = NULL, ...) {
 
-  if (is.null(block)) {
+  if (is.null(blocks)) {
+
+    stopifnot(is_string(id))
+
     removeUI(
-      paste0("#", board_id(x), "_blocks > div"),
+      paste0("#", id, "_blocks > div"),
       multiple = TRUE,
       immediate = TRUE
     )
+
   } else {
-    removeUI(
-      paste0("#", resolve_id(block, x), "_block"),
-      immediate = TRUE
-    )
+
+    stopifnot(is_string(blocks), blocks %in% board_block_ids(x))
+
+    for (block in blocks) {
+      removeUI(
+        paste0("#", block, "_block"),
+        immediate = TRUE
+      )
+    }
   }
 }

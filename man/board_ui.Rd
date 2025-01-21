@@ -9,10 +9,11 @@
 \alias{remove_block_ui.board}
 \title{Board UI}
 \usage{
-board_ui(x, ...)
+board_ui(x, id = board_id(x), ...)
 
 \method{board_ui}{board}(
   x,
+  id = board_id(x),
   ser_deser = NULL,
   add_rm_block = NULL,
   add_rm_link = NULL,
@@ -20,16 +21,18 @@ board_ui(x, ...)
   ...
 )
 
-insert_block_ui(x, block = NULL, ...)
+insert_block_ui(x, id = board_id(x), blocks = NULL, ...)
 
-\method{insert_block_ui}{board}(x, block = NULL, ...)
+\method{insert_block_ui}{board}(x, id = board_id(x), blocks = NULL, ...)
 
-remove_block_ui(x, block = NULL, ...)
+remove_block_ui(x, id = board_id(x), blocks = NULL, ...)
 
-\method{remove_block_ui}{board}(x, block = NULL, ...)
+\method{remove_block_ui}{board}(x, id = board_id(x), blocks = NULL, ...)
 }
 \arguments{
 \item{x}{Board}
+
+\item{id}{(Optional) parent namespace}
 
 \item{...}{Generic consistency}
 
@@ -41,7 +44,7 @@ remove_block_ui(x, block = NULL, ...)
 
 \item{block_notifications}{UI for block notifications}
 
-\item{block}{(Optional) block (or ID) for which to insert/remove the UI}
+\item{blocks}{(Additional) blocks (or IDs) for which to generate the UI}
 }
 \description{
 Shiny UI function for \code{board} objects.

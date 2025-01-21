@@ -12,8 +12,8 @@
 new_stack <- function(blocks, id = rand_names(), name = NULL, ...,
                       class = character()) {
 
-  if (is.list(blocks) && all(lgl_ply(blocks, is_block))) {
-    blocks <- chr_ply(blocks, block_uid)
+  if (is_blocks(blocks)) {
+    blocks <- names(blocks)
   }
 
   stack_counter <- get("counter", envir = stacks_env)

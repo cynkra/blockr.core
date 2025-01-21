@@ -5,16 +5,28 @@ test_that("serialization", {
 
   expect_equal(orig, from_json(json), ignore_function_env = TRUE)
 
-  id <- "abc"
-
   json <- to_json(
-    new_dataset_block(uid = id),
+    new_dataset_block(),
     list(dataset = "iris", package = "datasets")
   )
 
   expect_equal(
-    new_dataset_block("iris", "datasets", uid = id),
+    new_dataset_block("iris", "datasets"),
     from_json(json),
+    ignore_function_env = TRUE
+  )
+
+  orig <- new_board(
+    blocks = c(
+      a = new_dataset_block(),
+      b = new_subset_block()
+    ),
+    links = links(from = "a", to = "b")
+  )
+
+  expect_equal(
+    orig,
+    from_json(to_json(orig)),
     ignore_function_env = TRUE
   )
 })

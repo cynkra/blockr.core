@@ -4,11 +4,11 @@ test_that("block constructor", {
 
   board <- new_board(
     list(
-      blockr.dplyr::new_join_block(uid = "d"),
-      new_dataset_block(uid = "a"),
-      blockr.dplyr::new_select_block(uid = "c"),
-      blockr.dplyr::new_select_block(uid = "e"),
-      new_dataset_block(uid = "b")
+      d = blockr.dplyr::new_join_block(),
+      a = new_dataset_block(),
+      c = blockr.dplyr::new_select_block(),
+      e = blockr.dplyr::new_select_block(),
+      b = new_dataset_block()
     ),
     data.frame(
       from = c("a", "c", "b", "d"),
@@ -22,8 +22,8 @@ test_that("block constructor", {
   expect_error(
     new_board(
       list(
-        new_dataset_block(uid = "a"),
-        blockr.dplyr::new_select_block(uid = "b")
+        a = new_dataset_block(),
+        b = blockr.dplyr::new_select_block()
       ),
       new_link("a", "b", "foo")
     ),
@@ -33,8 +33,8 @@ test_that("block constructor", {
   expect_error(
     new_board(
       list(
-        new_dataset_block(uid = "a"),
-        blockr.dplyr::new_select_block(uid = "b")
+        a = new_dataset_block(),
+        b = blockr.dplyr::new_select_block()
       ),
       data.frame(from = "a", to = "b", input = "foo")
     ),

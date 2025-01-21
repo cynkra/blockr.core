@@ -5,10 +5,11 @@
 \alias{board_server.board}
 \title{Board server}
 \usage{
-board_server(x, ...)
+board_server(x, id = board_id(x), ...)
 
 \method{board_server}{board}(
   x,
+  id = board_id(x),
   ser_deser = NULL,
   add_rm_block = NULL,
   add_rm_link = NULL,
@@ -18,6 +19,8 @@ board_server(x, ...)
 }
 \arguments{
 \item{x}{Board}
+
+\item{id}{(Optional) parent namespace}
 
 \item{...}{Generic consistency}
 

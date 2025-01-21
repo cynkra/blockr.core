@@ -3,10 +3,11 @@
 #' Shiny server function for `board` objects.
 #'
 #' @param x Board
+#' @param id (Optional) parent namespace
 #' @param ... Generic consistency
 #'
 #' @export
-board_server <- function(x, ...) {
+board_server <- function(x, id = board_id(x), ...) {
   UseMethod("board_server")
 }
 
@@ -17,13 +18,15 @@ board_server <- function(x, ...) {
 #' @rdname board_server
 #' @export
 board_server.board <- function(x,
+                               id = board_id(x),
                                ser_deser = NULL,
                                add_rm_block = NULL,
                                add_rm_link = NULL,
                                block_notifications = NULL,
                                ...) {
+
   moduleServer(
-    board_id(x),
+    id,
     function(input, output, session) {
 
       rv <- reactiveValues(
@@ -50,11 +53,11 @@ board_server.board <- function(x,
         observeEvent(
           board_refresh(),
           {
-            remove_block_ui(rv$board)
+            remove_block_ui(rv$board, id)
 
             rv$board <- board_refresh()
 
-            insert_block_ui(rv$board)
+            insert_block_ui(rv$board, id)
 
             rv <- setup_blocks(rv)
           }
@@ -63,28 +66,30 @@ board_server.board <- function(x,
 
       if (not_null(add_rm_block)) {
 
-        block <- check_add_rm_block_val(
+        blocks <- check_add_rm_block_val(
           add_rm_block(rv),
           rv
         )
 
         observeEvent(
-          block$add,
+          blocks$add,
           {
-            insert_block_ui(rv$board, block$add)
+            insert_block_ui(rv$board, id, blocks$add)
 
-            rv$board <- add_block(rv$board, block$add)
+            board_blocks(rv$board) <- c(board_blocks(x), blocks$add)
 
-            rv <- setup_block(block$add, rv)
+            for (blk in names(blocks$add)) {
+              rv <- setup_block(blocks$add[[blk]], blk, rv)
+            }
           }
         )
 
         observeEvent(
-          block$rm,
+          blocks$rm,
           {
-            remove_block_ui(rv$board, block$rm)
+            remove_block_ui(rv$board, id, blocks$rm)
 
-            rv <- destroy_block(block$rm, rv)
+            rv <- destroy_rm_blocks(blocks$rm, rv)
           }
         )
       }
@@ -145,16 +150,16 @@ setup_blocks <- function(rv) {
   rv$inputs <- list()
   rv$links <- list()
 
-  for (blk in sort(rv$board)) {
-    rv <- setup_block(blk, rv)
+  blks <- sort(rv$board)
+
+  for (i in names(blks)) {
+    rv <- setup_block(blks[[i]], i, rv)
   }
 
   rv
 }
 
-setup_block <- function(blk, rv) {
-
-  id <- block_uid(blk)
+setup_block <- function(blk, id, rv) {
 
   rv$inputs[[id]] <- set_names(
     replicate(block_arity(blk), reactiveVal()),
@@ -171,28 +176,27 @@ setup_block <- function(blk, rv) {
 
   rv$blocks[[id]] <- list(
     block = blk,
-    server = block_server(
-      blk,
-      data = rv$inputs[[id]]
-    )
+    server = block_server(blk, data = rv$inputs[[id]], id = id)
   )
 
   rv
 }
 
-destroy_block <- function(id, rv) {
+destroy_rm_blocks <- function(ids, rv) {
 
   links <- board_links(rv$board)
+  blocks <- board_blocks(rv$board)
 
   rv <- update_block_links(
     rv,
-    rm = links[links$from %in% id | links$to %in% id]
+    rm = links[links$from %in% ids | links$to %in% ids]
   )
 
-  rv$inputs[[id]] <- NULL
-  rv$blocks[[id]] <- NULL
+  rv$inputs <- rv$inputs[!names(rv$inputs) %in% ids]
+  rv$blocks <- rv$blocks[!names(rv$blocks) %in% ids]
 
-  rv$board <- remove_blocks(rv$board, id)
+  board_links(rv$board) <- links[!links$from %in% ids & !links$to %in% ids]
+  board_blocks(rv$board) <- blocks[!names(blocks) %in% ids]
 
   rv
 }

@@ -7,9 +7,9 @@
 \alias{expr_server.block}
 \title{Generics for server generation}
 \usage{
-block_server(x, data, ...)
+block_server(x, data, id = "block", ...)
 
-\method{block_server}{block}(x, data, ...)
+\method{block_server}{block}(x, data, id = "block", ...)
 
 expr_server(x, data, ...)
 
@@ -19,6 +19,8 @@ expr_server(x, data, ...)
 \item{x}{Object for which to generate a \code{\link[=moduleServer]{moduleServer()}}}
 
 \item{data}{Input data (list of reactives)}
+
+\item{id}{Block ID}
 
 \item{...}{Generic consistency}
 }

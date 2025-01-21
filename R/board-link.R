@@ -280,10 +280,7 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
 
       if (col == "from") {
 
-        to_avail <- set_names(
-          int_ply(blks, block_arity),
-          chr_ply(blks, block_uid)
-        )
+        to_avail <- int_ply(blks, block_arity, use_names = TRUE)
 
         cnt <- c(table(filter_empty(upd$curr$to)))
 
@@ -304,7 +301,7 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
 
       if (col == "to") {
 
-        ids <- chr_ply(blks, block_uid)
+        ids <- names(blks)
 
         updateSelectInput(
           sess,

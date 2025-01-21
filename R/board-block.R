@@ -20,7 +20,7 @@ add_rm_block_server <- function(rv) {
       observeEvent(input$add_block, {
 
         req(input$registry_select)
-        res$add <- create_block(input$registry_select)
+        res$add <- as_blocks(create_block(input$registry_select))
       })
 
       observe(
@@ -99,9 +99,9 @@ check_add_rm_block_val <- function(val, rv) {
   observeEvent(
     val$add,
     {
-      if (!is_block(val$add)) {
+      if (!is_blocks(val$add)) {
         stop("Expecting the `add` component of the `add_rm_block` return ",
-             "value to be `NULL` or a `block` object.")
+             "value to be `NULL` or a `blocks` object.")
       }
     },
     once = TRUE
@@ -110,7 +110,7 @@ check_add_rm_block_val <- function(val, rv) {
   observeEvent(
     val$add,
     {
-      if (block_uid(val$add) %in% board_block_ids(rv$board)) {
+      if (any(names(val$add) %in% board_block_ids(rv$board))) {
         stop("Expecting the newly added block to have a unique ID.")
       }
     },

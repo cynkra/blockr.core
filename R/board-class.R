@@ -12,15 +12,10 @@
 new_board <- function(blocks = list(), links = NULL, ...,
                       id = "board", class = character()) {
 
-  if (is_block(blocks)) {
-    blocks <- list(blocks)
-  }
-
-  validate_board_blocks(blocks)
-
+  blocks <- as_blocks(blocks)
   links <- as_links(links)
 
-  ids <- chr_ply(blocks, block_uid)
+  ids <- names(blocks)
 
   to_complete <- links$to %in% ids[int_ply(blocks, block_arity) == 1L] & (
     is.na(links$input) | nchar(links$input) == 0L
@@ -39,28 +34,9 @@ new_board <- function(blocks = list(), links = NULL, ...,
   )
 }
 
-validate_board_blocks <- function(x) {
-
-  if (is_board(x)) {
-    x <- board_blocks(x)
-  }
-
-  if (!is.list(x) || !all(lgl_ply(x, is_block))) {
-    stop("Expecting the board to contain a set of blocks.")
-  }
-
-  ids <- chr_ply(x, block_uid)
-
-  if (anyDuplicated(ids) != 0) {
-    stop("Block IDs are required to be unique.")
-  }
-
-  invisible(x)
-}
-
 validate_board_blocks_links <- function(blocks, links) {
 
-  ids <- chr_ply(blocks, block_uid)
+  ids <- names(blocks)
 
   if (!all(links$from %in% ids) || !all(links$to %in% ids)) {
     stop("Expecting all links to refer to known block IDs.")
@@ -104,8 +80,8 @@ validate_board_blocks_links <- function(blocks, links) {
 validate_board <- function(x) {
 
   validate_board_blocks_links(
-    validate_board_blocks(x),
-    validate_links(x)
+    board_blocks(x),
+    board_links(x)
   )
 
   x
@@ -121,9 +97,7 @@ is_board <- function(x) {
 sort.board <- function(x, decreasing = FALSE, ...) {
 
   res <- topo_sort(as.matrix(x))
-
-  blk <- x[["blocks"]]
-  ids <- chr_ply(blk, block_uid)
+  ids <- board_block_ids(x)
 
   ind <- match(res, ids)
 
@@ -131,7 +105,7 @@ sort.board <- function(x, decreasing = FALSE, ...) {
     ind <- rev(ind)
   }
 
-  blk[ind]
+  board_blocks(x)[ind]
 }
 
 #' @export
@@ -147,9 +121,12 @@ as.matrix.board <- function(x, ...) {
 #' @export
 serve.board <- function(x, ...) {
 
+  id <- rand_names()
+
   ui <- bslib::page_fluid(
     board_ui(
       x,
+      id,
       ser_deser = ser_deser_ui,
       add_rm_block = add_rm_block_ui,
       add_rm_link = add_rm_link_ui
@@ -159,6 +136,7 @@ serve.board <- function(x, ...) {
   server <- function(input, output, session) {
     board_server(
       x,
+      id,
       ser_deser = ser_deser_server,
       add_rm_block = add_rm_block_server,
       add_rm_link = add_rm_link_server,
@@ -179,12 +157,8 @@ board_id <- function(x) {
 #' @rdname new_board
 #' @export
 board_blocks <- function(x) {
-
   stopifnot(is_board(x))
-
-  res <- validate_board_blocks(x[["blocks"]])
-
-  set_names(res, chr_ply(res, block_uid))
+  validate_blocks(x[["blocks"]])
 }
 
 #' @param value Replacement value
@@ -214,40 +188,13 @@ board_links <- function(x) {
 #' @rdname new_board
 #' @export
 board_block_ids <- function(x) {
-  chr_ply(board_blocks(x), block_uid)
+  names(board_blocks(x))
 }
 
 #' @rdname new_board
 #' @export
 board_link_ids <- function(x) {
   names(board_links(x))
-}
-
-#' @param blk Block object
-#' @rdname new_board
-#' @export
-add_block <- function(x, blk) {
-
-  stopifnot(is_board(x), is_block(blk))
-
-  board_blocks(x) <- c(board_blocks(x), list(blk))
-
-  x
-}
-
-#' @param ids Block IDs
-#' @rdname new_board
-#' @export
-remove_blocks <- function(x, ids) {
-
-  stopifnot(is_board(x), is.character(ids), all(ids %in% board_block_ids(x)))
-
-  links <- board_links(x)
-
-  board_links(x) <- links[!links$from %in% ids & !links$to %in% ids]
-  board_blocks(x) <- board_blocks(x)[!board_block_ids(x) %in% ids]
-
-  x
 }
 
 #' @param add Links to add

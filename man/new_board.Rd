@@ -11,8 +11,6 @@
 \alias{board_links<-}
 \alias{board_block_ids}
 \alias{board_link_ids}
-\alias{add_block}
-\alias{remove_blocks}
 \alias{modify_links}
 \title{Board}
 \usage{
@@ -42,10 +40,6 @@ board_block_ids(x)
 
 board_link_ids(x)
 
-add_block(x, blk)
-
-remove_blocks(x, ids)
-
 modify_links(x, add = NULL, rm = NULL)
 }
 \arguments{
@@ -62,10 +56,6 @@ modify_links(x, add = NULL, rm = NULL)
 \item{x}{Board object}
 
 \item{value}{Replacement value}
-
-\item{blk}{Block object}
-
-\item{ids}{Block IDs}
 
 \item{add}{Links to add}
 

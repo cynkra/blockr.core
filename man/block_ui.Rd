@@ -10,32 +10,30 @@
 \alias{block_ui.board}
 \title{Generics for UI generation}
 \usage{
-block_ui(x, id = NULL, ...)
+block_ui(x, ...)
 
-\method{block_ui}{block}(x, id = NULL, ...)
+\method{block_ui}{block}(x, id = "block", ...)
 
-expr_ui(x, ns = block_ns(x), ...)
+expr_ui(x, id = "block", ...)
 
-\method{expr_ui}{block}(x, ns = block_ns(x), ...)
+\method{expr_ui}{block}(x, id = "block", ...)
 
 block_output(x, result)
 
 \method{block_output}{block}(x, result)
 
-\method{block_ui}{board}(x, id = NULL, block = NULL, ...)
+\method{block_ui}{board}(x, id = board_id(x), blocks = NULL, ...)
 }
 \arguments{
 \item{x}{Object for which to generate a UI container}
 
-\item{id}{(Optional) parent namespace}
-
 \item{...}{Generic consistency}
 
-\item{ns}{A function for constructing shiny module namespaces}
+\item{id}{(Optional) parent namespace}
 
 \item{result}{Reactive block result}
 
-\item{block}{(Optional) block (or ID) for which to generate the UI}
+\item{blocks}{(Additional) blocks (or IDs) for which to generate the UI}
 }
 \description{
 Generics for creating fields and block UI containers.

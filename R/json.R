@@ -21,16 +21,13 @@ blockr_ser.block <- function(x, state = NULL, ...) {
     state <- initial_block_state(x)
   }
 
-  res <- list(
+  list(
     object = class(x),
-    uid = block_uid(x),
     payload = state,
     constructor = attr(x, "ctor"),
     package = pkg,
     version = as.character(utils::packageVersion(pkg))
   )
-
-  jsonlite::toJSON(res, auto_unbox = TRUE)
 }
 
 #' @param blocks Block states (`NULL` defaults to values from ctor scope)
@@ -53,11 +50,10 @@ blockr_ser.board <- function(x, blocks = NULL, ...) {
     blks <- Map(blockr_ser, blks, blocks[names(blks)])
   }
 
-
   list(
     object = class(x),
     blocks = blks,
-    links = blockr_ser(board_links(x)),
+    links = lapply(board_links(x), blockr_ser),
     id = attr(x, "id"),
     version = as.character(utils::packageVersion(utils::packageName()))
   )
@@ -91,7 +87,7 @@ blockr_deser.list <- function(x, ...) {
 blockr_deser.block <- function(x, data, ...) {
 
   stopifnot(
-    all(c("constructor", "payload", "package", "uid") %in% names(data))
+    all(c("constructor", "payload", "package") %in% names(data))
   )
 
   ctor <- get(
@@ -117,7 +113,7 @@ blockr_deser.block <- function(x, data, ...) {
 blockr_deser.board <- function(x, data, ...) {
   new_board(
     lapply(data[["blocks"]], blockr_deser),
-    blockr_deser(data[["links"]]),
+    lapply(data[["links"]], blockr_deser),
     id = data[["id"]],
     class = setdiff(class(x), "board")
   )
@@ -139,9 +135,7 @@ to_json <- function(x, ...) {
 #' @export
 from_json <- function(x) {
 
-  if (inherits(x, "json")) {
-    x <- jsonlite::parse_json(x)
-  } else if (is_string(x) && file.exists(x)) {
+  if (is_string(x) && file.exists(x)) {
     x <- readLines(x)
   } else if (is.character(x) && length(x) > 1L) {
     x <- paste0(x, collapse = "")

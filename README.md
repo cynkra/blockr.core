@@ -49,14 +49,14 @@ created and passed to `serve()`, e.g.
 ``` r
 serve(
   new_board(
-    blocks = list(
-      blockr.dplyr::new_join_block(uid = "d"),
-      new_dataset_block(uid = "a"),
-      blockr.dplyr::new_select_block(uid = "c"),
-      blockr.dplyr::new_select_block(uid = "e"),
-      new_dataset_block(uid = "b")
+    blocks = c(
+      d = blockr.dplyr::new_join_block(),
+      a = new_dataset_block(),
+      c = blockr.dplyr::new_select_block(),
+      e = blockr.dplyr::new_select_block(),
+      b = new_dataset_block()
     ),
-    links = list(
+    links = links(
       from = c("a", "c", "b", "d"),
       to = c("d", "d", "c", "e"),
       input = c("x", "y", "", "")

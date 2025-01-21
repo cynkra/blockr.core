@@ -3,12 +3,13 @@
 \name{new_block}
 \alias{new_block}
 \alias{is_block}
+\alias{as_block}
+\alias{as_block.block}
+\alias{as_block.list}
 \alias{new_data_block}
 \alias{new_transform_block}
-\alias{block_uid}
 \alias{block_name}
 \alias{block_ctor}
-\alias{block_ns}
 \alias{block_expr_server}
 \alias{block_expr_ui}
 \alias{block_dat_valid}
@@ -17,6 +18,12 @@
 \alias{block_inputs}
 \alias{block_inputs.block}
 \alias{block_arity}
+\alias{blocks}
+\alias{is_blocks}
+\alias{as_blocks}
+\alias{as_blocks.blocks}
+\alias{as_blocks.list}
+\alias{as_blocks.block}
 \alias{block_inputs.board}
 \title{Blocks}
 \usage{
@@ -27,24 +34,25 @@ new_block(
   ctor,
   ctor_pkg,
   dat_valid = NULL,
-  uid = rand_names(),
   name = NULL,
   ...
 )
 
 is_block(x)
 
+as_block(x, ...)
+
+\method{as_block}{block}(x, ...)
+
+\method{as_block}{list}(x, ...)
+
 new_data_block(server, ui, class, ctor = sys.parent(), ...)
 
 new_transform_block(server, ui, class, ctor = sys.parent(), ...)
 
-block_uid(x)
-
 block_name(x)
 
 block_ctor(x)
-
-block_ns(x, ..., namespace = NULL)
 
 block_expr_server(x)
 
@@ -62,6 +70,18 @@ block_inputs(x)
 
 block_arity(x)
 
+blocks(...)
+
+is_blocks(x)
+
+as_blocks(x, ...)
+
+\method{as_blocks}{blocks}(x, ...)
+
+\method{as_blocks}{list}(x, ...)
+
+\method{as_blocks}{block}(x, ...)
+
 \method{block_inputs}{board}(x)
 }
 \arguments{
@@ -77,15 +97,11 @@ block_arity(x)
 
 \item{dat_valid}{(Optioanl) input data validator}
 
-\item{uid}{Unique block ID}
-
 \item{name}{Block name}
 
 \item{...}{Further (metadata) attributes}
 
 \item{x}{An object inheriting from \code{"block"}}
-
-\item{namespace}{(Optional) parent namespace}
 
 \item{data}{Data inputs}
 }
