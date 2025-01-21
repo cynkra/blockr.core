@@ -2,9 +2,9 @@
 #'
 #' Calls shiny modules for the given element (block, fields).
 #'
+#' @param id Block ID
 #' @param x Object for which to generate a [moduleServer()]
 #' @param data Input data (list of reactives)
-#' @param id Block ID
 #' @param ... Generic consistency
 #'
 #' @export

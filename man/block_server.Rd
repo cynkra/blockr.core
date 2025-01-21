@@ -7,20 +7,20 @@
 \alias{expr_server.block}
 \title{Generics for server generation}
 \usage{
-block_server(x, data, id = "block", ...)
+block_server(id, x, data, ...)
 
-\method{block_server}{block}(x, data, id = "block", ...)
+\method{block_server}{block}(id, x, data, ...)
 
 expr_server(x, data, ...)
 
 \method{expr_server}{block}(x, data, ...)
 }
 \arguments{
+\item{id}{Block ID}
+
 \item{x}{Object for which to generate a \code{\link[=moduleServer]{moduleServer()}}}
 
 \item{data}{Input data (list of reactives)}
-
-\item{id}{Block ID}
 
 \item{...}{Generic consistency}
 }
