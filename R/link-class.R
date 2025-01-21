@@ -130,7 +130,7 @@ as.data.frame.link <- function(x, ...) {
 format.link <- function(x, ...) {
 
   field_miss <- function(x) {
-    if (is.na(x) | !nzchar(x)) "?" else x
+    if (is.na(x) || !nzchar(x)) "?" else x
   }
 
   out <- ""
@@ -145,7 +145,7 @@ format.link <- function(x, ...) {
 
   inp <- x["input"]
 
-  if (is.na(inp) | !nzchar(inp)) {
+  if (is.na(inp) || !nzchar(inp)) {
     inp <- ""
   } else {
     inp <- paste0(" (", inp, ")")
