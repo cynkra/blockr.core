@@ -126,16 +126,22 @@ block_server.block <- function(x, data, id = "block", ...) {
         }
       )
 
-      observe(
+      dat_eval <- reactive(
         {
           req(rv$state_set)
+          lapply(data, reval)
+        }
+      )
 
+      observeEvent(
+        dat_eval(),
+        {
           rv$eval_cond <- empty_cond
 
           out <- tryCatch(
             withCallingHandlers(
               {
-                eval(exp$expr(), lapply(data, reval))
+                eval(exp$expr(), dat_eval())
               },
               message = function(m) {
                 rv$eval_cond$message <- c(rv$eval_cond$message, cond_msg(m))
