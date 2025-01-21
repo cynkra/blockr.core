@@ -44,15 +44,15 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">block_ui</span><span class="op">(</span><span class="va">x</span>, id <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">block_ui</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'block'</span></span>
-<span><span class="fu">block_ui</span><span class="op">(</span><span class="va">x</span>, id <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">block_ui</span><span class="op">(</span><span class="va">x</span>, id <span class="op">=</span> <span class="st">"block"</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">expr_ui</span><span class="op">(</span><span class="va">x</span>, ns <span class="op">=</span> <span class="fu"><a href="new_block.html">block_ns</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">expr_ui</span><span class="op">(</span><span class="va">x</span>, id <span class="op">=</span> <span class="st">"block"</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'block'</span></span>
-<span><span class="fu">expr_ui</span><span class="op">(</span><span class="va">x</span>, ns <span class="op">=</span> <span class="fu"><a href="new_block.html">block_ns</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">expr_ui</span><span class="op">(</span><span class="va">x</span>, id <span class="op">=</span> <span class="st">"block"</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span><span class="op">)</span></span>
 <span></span>
@@ -60,7 +60,7 @@
 <span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'board'</span></span>
-<span><span class="fu">block_ui</span><span class="op">(</span><span class="va">x</span>, id <span class="op">=</span> <span class="cn">NULL</span>, block <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">block_ui</span><span class="op">(</span><span class="va">x</span>, id <span class="op">=</span> <span class="fu"><a href="new_board.html">board_id</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, blocks <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -71,24 +71,20 @@
 <dd><p>Object for which to generate a UI container</p></dd>
 
 
-<dt id="arg-id">id<a class="anchor" aria-label="anchor" href="#arg-id"></a></dt>
-<dd><p>(Optional) parent namespace</p></dd>
-
-
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Generic consistency</p></dd>
 
 
-<dt id="arg-ns">ns<a class="anchor" aria-label="anchor" href="#arg-ns"></a></dt>
-<dd><p>A function for constructing shiny module namespaces</p></dd>
+<dt id="arg-id">id<a class="anchor" aria-label="anchor" href="#arg-id"></a></dt>
+<dd><p>(Optional) parent namespace</p></dd>
 
 
 <dt id="arg-result">result<a class="anchor" aria-label="anchor" href="#arg-result"></a></dt>
 <dd><p>Reactive block result</p></dd>
 
 
-<dt id="arg-block">block<a class="anchor" aria-label="anchor" href="#arg-block"></a></dt>
-<dd><p>(Optional) block (or ID) for which to generate the UI</p></dd>
+<dt id="arg-blocks">blocks<a class="anchor" aria-label="anchor" href="#arg-blocks"></a></dt>
+<dd><p>(Additional) blocks (or IDs) for which to generate the UI</p></dd>
 
 </dl></div>
 

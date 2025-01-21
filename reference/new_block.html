@@ -55,24 +55,27 @@ attribute</p>
 <span>  <span class="va">ctor</span>,</span>
 <span>  <span class="va">ctor_pkg</span>,</span>
 <span>  dat_valid <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  uid <span class="op">=</span> <span class="fu"><a href="rand_names.html">rand_names</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">is_block</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">as_block</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'block'</span></span>
+<span><span class="fu">as_block</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'list'</span></span>
+<span><span class="fu">as_block</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">new_data_block</span><span class="op">(</span><span class="va">server</span>, <span class="va">ui</span>, <span class="va">class</span>, ctor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">sys.parent</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">new_transform_block</span><span class="op">(</span><span class="va">server</span>, <span class="va">ui</span>, <span class="va">class</span>, ctor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">sys.parent</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">block_uid</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span></span>
 <span><span class="fu">block_name</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">block_ctor</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">block_ns</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, namespace <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">block_expr_server</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
@@ -90,6 +93,21 @@ attribute</p>
 <span><span class="fu">block_inputs</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">block_arity</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">blocks</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">is_blocks</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">as_blocks</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'blocks'</span></span>
+<span><span class="fu">as_blocks</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'list'</span></span>
+<span><span class="fu">as_blocks</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'block'</span></span>
+<span><span class="fu">as_blocks</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'board'</span></span>
 <span><span class="fu">block_inputs</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
@@ -123,10 +141,6 @@ attribute</p>
 <dd><p>(Optioanl) input data validator</p></dd>
 
 
-<dt id="arg-uid">uid<a class="anchor" aria-label="anchor" href="#arg-uid"></a></dt>
-<dd><p>Unique block ID</p></dd>
-
-
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
 <dd><p>Block name</p></dd>
 
@@ -137,10 +151,6 @@ attribute</p>
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>An object inheriting from <code>"block"</code></p></dd>
-
-
-<dt id="arg-namespace">namespace<a class="anchor" aria-label="anchor" href="#arg-namespace"></a></dt>
-<dd><p>(Optional) parent namespace</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>

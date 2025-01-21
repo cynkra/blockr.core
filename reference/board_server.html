@@ -44,11 +44,12 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">board_server</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">board_server</span><span class="op">(</span><span class="va">x</span>, id <span class="op">=</span> <span class="fu"><a href="new_board.html">board_id</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'board'</span></span>
 <span><span class="fu">board_server</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
+<span>  id <span class="op">=</span> <span class="fu"><a href="new_board.html">board_id</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
 <span>  ser_deser <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  add_rm_block <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  add_rm_link <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -63,6 +64,10 @@
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>Board</p></dd>
+
+
+<dt id="arg-id">id<a class="anchor" aria-label="anchor" href="#arg-id"></a></dt>
+<dd><p>(Optional) parent namespace</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
