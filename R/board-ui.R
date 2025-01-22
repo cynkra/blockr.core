@@ -2,13 +2,13 @@
 #'
 #' Shiny UI function for `board` objects.
 #'
+#' @param id Namespace ID
 #' @param x Board
-#' @param id (Optional) parent namespace
 #' @param ... Generic consistency
 #'
 #' @export
-board_ui <- function(x, id = board_id(x), ...) {
-  UseMethod("board_ui")
+board_ui <- function(id, x, ...) {
+  UseMethod("board_ui", x)
 }
 
 #' @param ser_deser UI for serialization/deserialization
@@ -17,8 +17,8 @@ board_ui <- function(x, id = board_id(x), ...) {
 #' @param block_notifications UI for block notifications
 #' @rdname board_ui
 #' @export
-board_ui.board <- function(x,
-                           id = board_id(x),
+board_ui.board <- function(id,
+                           x,
                            ser_deser = NULL,
                            add_rm_block = NULL,
                            add_rm_link = NULL,
@@ -40,14 +40,14 @@ board_ui.board <- function(x,
   tagList(
     do.call(div, c(class = "d-flex justify-content-center", toolbar_args)),
     do.call(div, block_notifications),
-    do.call(div, c(id = paste0(id, "_blocks"), block_ui(x, id)))
+    do.call(div, c(id = paste0(id, "_blocks"), block_ui(id, x)))
   )
 }
 
 #' @param blocks (Additional) blocks (or IDs) for which to generate the UI
 #' @rdname block_ui
 #' @export
-block_ui.board <- function(x, id = board_id(x), blocks = NULL, ...) {
+block_ui.board <- function(id, x, blocks = NULL, ...) {
 
   block_card <- function(x, id, ns) {
 
@@ -60,7 +60,7 @@ block_ui.board <- function(x, id = board_id(x), blocks = NULL, ...) {
           class = "card-title",
           paste0(block_name(x), " (", id, ")")
         ),
-        block_ui(x, ns(id))
+        block_ui(ns(id), x)
       )
     )
   }
@@ -83,33 +83,33 @@ block_ui.board <- function(x, id = board_id(x), blocks = NULL, ...) {
 #' @param blocks (Additional) blocks (or IDs) for which to generate the UI
 #' @rdname board_ui
 #' @export
-insert_block_ui <- function(x, id = board_id(x), blocks = NULL, ...) {
-  UseMethod("insert_block_ui")
+insert_block_ui <- function(id, x, blocks = NULL, ...) {
+  UseMethod("insert_block_ui", x)
 }
 
 #' @rdname board_ui
 #' @export
-insert_block_ui.board <- function(x, id = board_id(x), blocks = NULL, ...) {
+insert_block_ui.board <- function(id, x, blocks = NULL, ...) {
 
   stopifnot(is_string(id))
 
   insertUI(
     paste0("#", id, "_blocks"),
     "beforeEnd",
-    block_ui(x, id, blocks),
+    block_ui(id, x, blocks),
     immediate = TRUE
   )
 }
 
 #' @rdname board_ui
 #' @export
-remove_block_ui <- function(x, id = board_id(x), blocks = NULL, ...) {
-  UseMethod("remove_block_ui")
+remove_block_ui <- function(id, x, blocks = NULL, ...) {
+  UseMethod("remove_block_ui", x)
 }
 
 #' @rdname board_ui
 #' @export
-remove_block_ui.board <- function(x, id = board_id(x), blocks = NULL, ...) {
+remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
 
   if (is.null(blocks)) {
 

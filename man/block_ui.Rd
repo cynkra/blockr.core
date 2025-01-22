@@ -10,26 +10,26 @@
 \alias{block_ui.board}
 \title{Generics for UI generation}
 \usage{
-block_ui(x, ...)
+block_ui(id, x, ...)
 
-\method{block_ui}{block}(x, id = "block", ...)
+\method{block_ui}{block}(id, x, ...)
 
-expr_ui(x, id = "block", ...)
+expr_ui(id, x, ...)
 
-\method{expr_ui}{block}(x, id = "block", ...)
+\method{expr_ui}{block}(id, x, ...)
 
 block_output(x, result)
 
 \method{block_output}{block}(x, result)
 
-\method{block_ui}{board}(x, id = board_id(x), blocks = NULL, ...)
+\method{block_ui}{board}(id, x, blocks = NULL, ...)
 }
 \arguments{
+\item{id}{Namespace ID}
+
 \item{x}{Object for which to generate a UI container}
 
 \item{...}{Generic consistency}
-
-\item{id}{(Optional) parent namespace}
 
 \item{result}{Reactive block result}
 

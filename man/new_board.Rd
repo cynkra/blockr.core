@@ -4,7 +4,6 @@
 \alias{new_board}
 \alias{validate_board}
 \alias{is_board}
-\alias{board_id}
 \alias{board_blocks}
 \alias{board_blocks<-}
 \alias{board_links}
@@ -14,19 +13,11 @@
 \alias{modify_links}
 \title{Board}
 \usage{
-new_board(
-  blocks = list(),
-  links = NULL,
-  ...,
-  id = "board",
-  class = character()
-)
+new_board(blocks = list(), links = NULL, ..., class = character())
 
 validate_board(x)
 
 is_board(x)
-
-board_id(x)
 
 board_blocks(x)
 
@@ -48,8 +39,6 @@ modify_links(x, add = NULL, rm = NULL)
 \item{links}{Data frame with columns \code{from} and \code{to}}
 
 \item{...}{Further (metadata) attributes}
-
-\item{id}{Board ID}
 
 \item{class}{Board sub-class}
 

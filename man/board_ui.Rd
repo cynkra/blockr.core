@@ -9,11 +9,11 @@
 \alias{remove_block_ui.board}
 \title{Board UI}
 \usage{
-board_ui(x, id = board_id(x), ...)
+board_ui(id, x, ...)
 
 \method{board_ui}{board}(
+  id,
   x,
-  id = board_id(x),
   ser_deser = NULL,
   add_rm_block = NULL,
   add_rm_link = NULL,
@@ -21,18 +21,18 @@ board_ui(x, id = board_id(x), ...)
   ...
 )
 
-insert_block_ui(x, id = board_id(x), blocks = NULL, ...)
+insert_block_ui(id, x, blocks = NULL, ...)
 
-\method{insert_block_ui}{board}(x, id = board_id(x), blocks = NULL, ...)
+\method{insert_block_ui}{board}(id, x, blocks = NULL, ...)
 
-remove_block_ui(x, id = board_id(x), blocks = NULL, ...)
+remove_block_ui(id, x, blocks = NULL, ...)
 
-\method{remove_block_ui}{board}(x, id = board_id(x), blocks = NULL, ...)
+\method{remove_block_ui}{board}(id, x, blocks = NULL, ...)
 }
 \arguments{
-\item{x}{Board}
+\item{id}{Namespace ID}
 
-\item{id}{(Optional) parent namespace}
+\item{x}{Board}
 
 \item{...}{Generic consistency}
 

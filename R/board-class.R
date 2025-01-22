@@ -5,12 +5,10 @@
 #' @param blocks List of blocks
 #' @param links Data frame with columns `from` and `to`
 #' @param ... Further (metadata) attributes
-#' @param id Board ID
 #' @param class Board sub-class
 #'
 #' @export
-new_board <- function(blocks = list(), links = NULL, ...,
-                      id = "board", class = character()) {
+new_board <- function(blocks = list(), links = NULL, ..., class = character()) {
 
   blocks <- as_blocks(blocks)
   links <- as_links(links)
@@ -29,7 +27,6 @@ new_board <- function(blocks = list(), links = NULL, ...,
 
   structure(
     list(blocks = blocks, links = links, ...),
-    id = id,
     class = c(class, "board")
   )
 }
@@ -79,6 +76,22 @@ validate_board_blocks_links <- function(blocks, links) {
 #' @export
 validate_board <- function(x) {
 
+  if (!is_board(x)) {
+    stop("Expecting a board object to inherit from \"baord\".")
+  }
+
+  if (!is.list(x)) {
+    stop("Expecting a board object to be list-like.")
+  }
+
+  cmps <- c("blocks", "links")
+
+  if (all(cmps %in% names(x))) {
+    stop(
+      "Expecting a board object to contain components ", paste_enum(cmps), "."
+    )
+  }
+
   validate_board_blocks_links(
     board_blocks(x),
     board_links(x)
@@ -124,9 +137,7 @@ serve.board <- function(x, ...) {
   id <- rand_names()
 
   ui <- bslib::page_fluid(
-    board_ui(
-      x,
-      id,
+    board_ui(id, x,
       ser_deser = ser_deser_ui,
       add_rm_block = add_rm_block_ui,
       add_rm_link = add_rm_link_ui
@@ -134,9 +145,7 @@ serve.board <- function(x, ...) {
   )
 
   server <- function(input, output, session) {
-    board_server(
-      x,
-      id,
+    board_server(id, x,
       ser_deser = ser_deser_server,
       add_rm_block = add_rm_block_server,
       add_rm_link = add_rm_link_server,
@@ -145,13 +154,6 @@ serve.board <- function(x, ...) {
   }
 
   shinyApp(ui, server)
-}
-
-#' @rdname new_board
-#' @export
-board_id <- function(x) {
-  stopifnot(is_board(x))
-  attr(x, "id")
 }
 
 #' @rdname new_board
@@ -237,7 +239,7 @@ format.board <- function(x, ...) {
   blk <- board_blocks(x)
 
   out <- c(
-    paste0(board_id(x), out),
+    out,
     "",
     paste0("Blocks[", length(blk), "]:"),
     ""

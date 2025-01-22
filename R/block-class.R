@@ -161,7 +161,10 @@ validate_block <- function(x, ui_eval = FALSE) {
   validate_data_validator(block_dat_valid(x), srv)
 
   if (isTRUE(ui_eval)) {
-    if (!inherits(expr_ui(x), "shiny.tag", "shiny.tag.list", agg = any)) {
+
+    ui <- expr_ui("block", x)
+
+    if (!inherits(ui, "shiny.tag", "shiny.tag.list", agg = any)) {
       stop("A block UI function is expected to return a shiny UI object, ",
            "i.e. either a `shiny.tag` or a `shiny.tag.list`.")
     }

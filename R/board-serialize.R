@@ -15,8 +15,8 @@ ser_deser_server <- function(rv) {
     function(input, output, session) {
 
       output$serialize <- downloadHandler(
-        board_filename(rv$board),
-        write_board_to_disk(rv$board, rv)
+        board_filename(rv),
+        write_board_to_disk(rv)
       )
 
       res <- reactiveVal()
@@ -55,15 +55,15 @@ ser_deser_ui <- function(id, board) {
   )
 }
 
-board_filename <- function(x) {
+board_filename <- function(rv) {
   function() {
     paste0(
-      board_id(x), "_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), ".json"
+      rv$board_id, "_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), ".json"
     )
   }
 }
 
-write_board_to_disk <- function(x, rv) {
+write_board_to_disk <- function(rv) {
 
   function(con) {
 
@@ -74,7 +74,7 @@ write_board_to_disk <- function(x, rv) {
     )
 
     json <- jsonlite::prettify(
-      to_json(x, blocks)
+      to_json(rv$board, blocks)
     )
 
     writeLines(json, con)

@@ -8,7 +8,7 @@
 #'
 #' @export
 board_server <- function(id, x, ...) {
-  UseMethod("board_server")
+  UseMethod("board_server", x)
 }
 
 #' @param ser_deser Module for serialization/deserialization
@@ -33,6 +33,7 @@ board_server.board <- function(id,
         blocks = list(),
         inputs = list(),
         board = x,
+        board_id = id,
         links = list()
       )
 
@@ -53,11 +54,11 @@ board_server.board <- function(id,
         observeEvent(
           board_refresh(),
           {
-            remove_block_ui(rv$board, id)
+            remove_block_ui(id, rv$board)
 
             rv$board <- board_refresh()
 
-            insert_block_ui(rv$board, id)
+            insert_block_ui(id, rv$board)
 
             rv <- setup_blocks(rv)
           }
@@ -74,7 +75,7 @@ board_server.board <- function(id,
         observeEvent(
           blocks$add,
           {
-            insert_block_ui(rv$board, id, blocks$add)
+            insert_block_ui(id, rv$board, blocks$add)
 
             board_blocks(rv$board) <- c(board_blocks(x), blocks$add)
 
@@ -87,7 +88,7 @@ board_server.board <- function(id,
         observeEvent(
           blocks$rm,
           {
-            remove_block_ui(rv$board, id, blocks$rm)
+            remove_block_ui(id, rv$board, blocks$rm)
 
             rv <- destroy_rm_blocks(blocks$rm, rv)
           }
@@ -138,7 +139,7 @@ setup_blocks <- function(rv) {
 
   stopifnot(
     is.reactivevalues(rv),
-    setequal(names(rv), c("blocks", "inputs", "board", "links")),
+    all(c("blocks", "inputs", "board", "links") %in% names(rv)),
     is_board(rv$board)
   )
 

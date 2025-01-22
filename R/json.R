@@ -49,7 +49,6 @@ blockr_ser.board <- function(x, blocks = NULL, ...) {
     object = class(x),
     blocks = blockr_ser(board_blocks(x)),
     links = lapply(board_links(x), blockr_ser),
-    id = attr(x, "id"),
     version = as.character(utils::packageVersion(utils::packageName()))
   )
 }
@@ -106,7 +105,6 @@ blockr_deser.board <- function(x, data, ...) {
   new_board(
     blockr_deser(data[["blocks"]]),
     lapply(data[["links"]], blockr_deser),
-    id = data[["id"]],
     class = setdiff(class(x), "board")
   )
 }
