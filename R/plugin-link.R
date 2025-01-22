@@ -167,8 +167,8 @@ add_rm_link_server <- function(id, rv) {
 
           res(
             list(
-              add = if (length(upd$add)) upd$add,
-              rm = if (length(upd$rm)) upd$rm
+              add = if (length(upd$add)) upd$add else links(),
+              rm = if (length(upd$rm)) upd$rm else character()
             )
           )
 
