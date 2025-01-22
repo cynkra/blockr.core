@@ -39,6 +39,6 @@ test_that("add/rm blocks", {
   )
 })
 
-test_that("dummy add/rm block ui", {
+test_that("dummy add/rm block ui test", {
   expect_s3_class(add_rm_block_ui("add_rm", new_board()), "shiny.tag.list")
 })
