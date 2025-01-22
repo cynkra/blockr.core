@@ -7,7 +7,7 @@
 \alias{serve}
 \title{Serve object}
 \usage{
-\method{serve}{block}(x, data, ...)
+\method{serve}{block}(x, data, id = "block", ...)
 
 \method{serve}{data_block}(x, ...)
 
@@ -19,6 +19,8 @@ serve(x, ...)
 \item{x}{Object}
 
 \item{data}{Data inputs}
+
+\item{id}{Block ID}
 
 \item{...}{Generic consistency}
 }

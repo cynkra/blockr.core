@@ -364,14 +364,15 @@ validate_data_inputs <- function(x, data) {
 }
 
 #' @param data Data inputs
+#' @param id Block ID
 #' @rdname serve
 #' @export
-serve.block <- function(x, data, ...) {
+serve.block <- function(x, data, id = "block", ...) {
 
-  ui <- bslib::page_fluid(block_ui(x))
+  ui <- bslib::page_fluid(block_ui(id, x))
 
   server <- function(input, output, session) {
-    block_server(x, lapply(data, reactiveVal))
+    block_server(id, x, lapply(data, reactiveVal))
   }
 
   shinyApp(ui, server)
