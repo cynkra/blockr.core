@@ -238,25 +238,33 @@ format.board <- function(x, ...) {
 
   blk <- board_blocks(x)
 
-  out <- c(
-    out,
-    "",
-    paste0("Blocks[", length(blk), "]:"),
-    ""
-  )
+  if (length(blk)) {
 
-  blk <- lapply(blk, format, ...)
-  blk <- lapply(blk, c, "")
+    blk <- lapply(blk, format, ...)
+    blk <- lapply(blk, c, "")
+
+    out <- c(
+      out,
+      "",
+      paste0("Blocks[", length(blk), "]:"),
+      "",
+      unlst(blk)
+    )
+  }
 
   lnk <- board_links(x)
 
-  out <- c(
-    out,
-    unlst(blk),
-    paste0("Links[", length(lnk), "]:"),
-    "",
-    paste0(names(lnk), ": ", format(lnk))
-  )
+  if (length(lnk)) {
+
+    out <- c(
+      out,
+      paste0("Links[", length(lnk), "]:"),
+      "",
+      paste0(names(lnk), ": ", format(lnk))
+    )
+  }
+
+  out
 }
 
 #' @export
