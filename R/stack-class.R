@@ -16,7 +16,7 @@ new_stack <- function(blocks, id = rand_names(), name = NULL, ...,
     blocks <- names(blocks)
   }
 
-  stack_counter <- get("counter", envir = stacks_env)
+  stack_counter <- get_globals("stack_counter")
 
   if (is.null(name)) {
     name <- paste0("Stack ", stack_counter)
@@ -26,14 +26,10 @@ new_stack <- function(blocks, id = rand_names(), name = NULL, ...,
     new_vctr(blocks, id = id, name = name, ..., class = c(class, "stack"))
   )
 
-  assign("counter", stack_counter + 1L, envir = stacks_env)
+  set_globals("stack_counter", stack_counter + 1L)
 
   res
 }
-
-stacks_env <- list2env(
-  list(counter = 1L)
-)
 
 #' @param x Stack object
 #' @rdname new_stack

@@ -15,16 +15,17 @@ block_notification_server <- function(id, rv) {
     id,
     function(input, output, session) {
 
+      set_globals("notification_ids", list())
+
       cnd <- reactive(
         lst_xtr_reval(rv$blocks, "server", "cond")
       )
-
-      ids <- list()
 
       observeEvent(
         cnd(),
         {
           notf <- cnd()
+          ids <- get_globals("notification_ids")
 
           for (blk in setdiff(names(ids), names(notf))) {
 
@@ -33,6 +34,7 @@ block_notification_server <- function(id, rv) {
             }
 
             ids[[blk]] <- NULL
+            set_globals("notification_ids", ids)
           }
 
           for (blk in names(notf)) {
@@ -43,7 +45,8 @@ block_notification_server <- function(id, rv) {
               removeNotification(id)
             }
 
-            ids[[blk]] <<- cur
+            ids[[blk]] <- cur
+            set_globals("notification_ids", ids)
           }
         }
       )
