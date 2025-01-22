@@ -16,7 +16,6 @@ jobs:
       matrix:
         config:
           - {pkg: 'blockr.dplyr'}
-          - {pkg: 'blockr.ui'}
 
     env:
       GITHUB_PAT: ${{ secrets.BLOCKR_PAT }}
