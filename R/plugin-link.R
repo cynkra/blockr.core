@@ -3,6 +3,7 @@
 #' Customizable logic for adding/removing links between blocks on the
 #' board.
 #'
+#' @param id Namespace ID
 #' @param rv Reactive values object
 #'
 #' @return A reactive value that evaualtes to `NULL` or a list with components
@@ -12,9 +13,9 @@
 #'
 #' @rdname add_rm_link
 #' @export
-add_rm_link_server <- function(rv) {
+add_rm_link_server <- function(id, rv) {
   moduleServer(
-    "add_rm_link",
+    id,
     function(input, output, session) {
 
       observeEvent(input$links, {
@@ -184,19 +185,13 @@ add_rm_link_server <- function(rv) {
   )
 }
 
-#' @param id Namespace ID
 #' @param board The initial `board` object
 #' @rdname add_rm_link
 #' @export
 add_rm_link_ui <- function(id, board) {
-
-  ns <- NS(
-    NS(id, "add_rm_link")
-  )
-
   list(
     actionButton(
-      ns("links"),
+      NS(id, "links"),
       "Edit links",
       icon = icon("table")
     )

@@ -2,6 +2,7 @@
 #'
 #' Object (de)serialization in a board server context.
 #'
+#' @param id Namespace ID
 #' @param rv Reactive values object
 #'
 #' @return A [shiny::reactiveVal()] object that evaluates to `NULL` or a
@@ -9,9 +10,9 @@
 #'
 #' @rdname block_notifications
 #' @export
-block_notification_server <- function(rv) {
+block_notification_server <- function(id, rv) {
   moduleServer(
-    "block_notifications",
+    id,
     function(input, output, session) {
 
       cnd <- reactive(

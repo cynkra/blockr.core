@@ -25,16 +25,18 @@ board_ui.board <- function(id,
                            block_notifications = NULL,
                            ...) {
 
+  ns <- NS(id)
+
   toolbar_args <- c(
-    if (length(ser_deser)) ser_deser(id, x),
-    if (length(add_rm_block)) add_rm_block(id, x),
-    if (length(add_rm_link)) add_rm_link(id, x)
+    if (length(ser_deser)) ser_deser(ns("ser_deser"), x),
+    if (length(add_rm_block)) add_rm_block(ns("add_rm_block"), x),
+    if (length(add_rm_link)) add_rm_link(ns("add_rm_link"), x)
   )
 
   if (is.null(block_notifications)) {
     block_notifications <- list()
   } else {
-    block_notifications <- block_notifications(id, x)
+    block_notifications <- block_notifications(ns("block_notifications"), x)
   }
 
   tagList(

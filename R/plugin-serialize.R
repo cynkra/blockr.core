@@ -2,6 +2,7 @@
 #'
 #' Object (de)serialization in a board server context.
 #'
+#' @param id Namespace ID
 #' @param rv Reactive values object
 #'
 #' @return A [shiny::reactiveVal()] object that evaluates to `NULL` or a
@@ -9,9 +10,9 @@
 #'
 #' @rdname ser_deser
 #' @export
-ser_deser_server <- function(rv) {
+ser_deser_server <- function(id, rv) {
   moduleServer(
-    "ser_deser",
+    id,
     function(input, output, session) {
 
       output$serialize <- downloadHandler(
@@ -32,24 +33,18 @@ ser_deser_server <- function(rv) {
   )
 }
 
-#' @param id Namespace ID
 #' @param board The initial `board` object
 #' @rdname ser_deser
 #' @export
 ser_deser_ui <- function(id, board) {
-
-  ns <- NS(
-    NS(id, "ser_deser")
-  )
-
   list(
     downloadButton(
-      ns("serialize"),
+      NS(id, "serialize"),
       "Save",
       class = "mx-2"
     ),
     fileInput(
-      ns("restore"),
+      NS(id, "restore"),
       "Restore"
     )
   )

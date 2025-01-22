@@ -4,9 +4,11 @@
 \alias{block_notification_server}
 \title{Block notification module}
 \usage{
-block_notification_server(rv)
+block_notification_server(id, rv)
 }
 \arguments{
+\item{id}{Namespace ID}
+
 \item{rv}{Reactive values object}
 }
 \value{

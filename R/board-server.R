@@ -48,7 +48,7 @@ board_server.board <- function(id,
       if (not_null(ser_deser)) {
 
         board_refresh <- check_ser_deser_val(
-          ser_deser(rv)
+          ser_deser("ser_deser", rv)
         )
 
         observeEvent(
@@ -68,7 +68,7 @@ board_server.board <- function(id,
       if (not_null(add_rm_block)) {
 
         blocks <- check_add_rm_block_val(
-          add_rm_block(rv),
+          add_rm_block("add_rm_block", rv),
           rv
         )
 
@@ -98,7 +98,7 @@ board_server.board <- function(id,
       if (not_null(add_rm_link)) {
 
         links <- check_add_rm_link_val(
-          add_rm_link(rv),
+          add_rm_link("add_rm_link", rv),
           rv
         )
 
@@ -122,7 +122,7 @@ board_server.board <- function(id,
         )
       } else {
         notifications <- check_block_notifications_val(
-          block_notification_server(rv)
+          block_notification_server("block_notifications", rv)
         )
       }
 

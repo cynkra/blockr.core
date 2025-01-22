@@ -5,14 +5,14 @@
 \alias{ser_deser_ui}
 \title{Serialization module}
 \usage{
-ser_deser_server(rv)
+ser_deser_server(id, rv)
 
 ser_deser_ui(id, board)
 }
 \arguments{
-\item{rv}{Reactive values object}
-
 \item{id}{Namespace ID}
+
+\item{rv}{Reactive values object}
 
 \item{board}{The initial \code{board} object}
 }

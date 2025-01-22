@@ -2,6 +2,7 @@
 #'
 #' Customizable logic for adding/removing blocks to the board.
 #'
+#' @param id Namespace ID
 #' @param rv Reactive values object
 #'
 #' @return A [shiny::reactiveValues()] object with components `add` and `rm`,
@@ -10,18 +11,20 @@
 #'
 #' @rdname add_rm_block
 #' @export
-add_rm_block_server <- function(rv) {
+add_rm_block_server <- function(id, rv) {
   moduleServer(
-    "add_rm_block",
+    id,
     function(input, output, session) {
 
       res <- reactiveValues(add = NULL, rm = NULL)
 
-      observeEvent(input$add_block, {
-
-        req(input$registry_select)
-        res$add <- as_blocks(create_block(input$registry_select))
-      })
+      observeEvent(
+        input$add_block,
+        {
+          req(input$registry_select)
+          res$add <- as_blocks(create_block(input$registry_select))
+        }
+      )
 
       observe(
         updateSelectInput(
@@ -31,47 +34,42 @@ add_rm_block_server <- function(rv) {
         )
       )
 
-      observeEvent(input$rm_block, {
-
-        req(input$block_select)
-
-        res$rm <- input$block_select
-      })
+      observeEvent(
+        input$rm_block,
+        {
+          req(input$block_select)
+          res$rm <- input$block_select
+        }
+      )
 
       res
     }
   )
 }
 
-#' @param id Namespace ID
 #' @param board The initial `board` object
 #' @rdname add_rm_block
 #' @export
 add_rm_block_ui <- function(id, board) {
-
-  ns <- NS(
-    NS(id, "add_rm_block")
-  )
-
   list(
     selectInput(
-      ns("registry_select"),
+      NS(id, "registry_select"),
       "Select block from registry",
       choices = c("", list_blocks())
     ),
     actionButton(
-      ns("add_block"),
+      NS(id, "add_block"),
       "Add block",
       icon = icon("plus"),
       class = "btn-success"
     ),
     selectInput(
-      ns("block_select"),
+      NS(id, "block_select"),
       "Select block from board",
       choices = c("", board_block_ids(board))
     ),
     actionButton(
-      ns("rm_block"),
+      NS(id, "rm_block"),
       "Remove block",
       icon = icon("minus"),
       class = "btn-danger"

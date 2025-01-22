@@ -23,11 +23,11 @@ new_board <- function(blocks = list(), links = NULL, ..., class = character()) {
 
   links$input[to_complete] <- chr_ply(inputs[links$to[to_complete]], identity)
 
-  validate_board_blocks_links(blocks, links)
-
-  structure(
-    list(blocks = blocks, links = links, ...),
-    class = c(class, "board")
+  validate_board(
+    structure(
+      list(blocks = blocks, links = links, ...),
+      class = c(class, "board")
+    )
   )
 }
 
@@ -86,7 +86,7 @@ validate_board <- function(x) {
 
   cmps <- c("blocks", "links")
 
-  if (all(cmps %in% names(x))) {
+  if (!all(cmps %in% names(x))) {
     stop(
       "Expecting a board object to contain components ", paste_enum(cmps), "."
     )

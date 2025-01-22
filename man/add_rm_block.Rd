@@ -5,14 +5,14 @@
 \alias{add_rm_block_ui}
 \title{Add/remove block module}
 \usage{
-add_rm_block_server(rv)
+add_rm_block_server(id, rv)
 
 add_rm_block_ui(id, board)
 }
 \arguments{
-\item{rv}{Reactive values object}
-
 \item{id}{Namespace ID}
+
+\item{rv}{Reactive values object}
 
 \item{board}{The initial \code{board} object}
 }
