@@ -7,7 +7,7 @@
 #' @param ... Generic consistency
 #'
 #' @export
-board_server <- function(x, id = board_id(x), ...) {
+board_server <- function(id, x, ...) {
   UseMethod("board_server")
 }
 
@@ -17,8 +17,8 @@ board_server <- function(x, id = board_id(x), ...) {
 #' @param block_notifications Module for block nptifications
 #' @rdname board_server
 #' @export
-board_server.board <- function(x,
-                               id = board_id(x),
+board_server.board <- function(id,
+                               x,
                                ser_deser = NULL,
                                add_rm_block = NULL,
                                add_rm_link = NULL,
