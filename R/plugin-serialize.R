@@ -37,7 +37,7 @@ ser_deser_server <- function(id, rv) {
 #' @rdname ser_deser
 #' @export
 ser_deser_ui <- function(id, board) {
-  list(
+  tagList(
     downloadButton(
       NS(id, "serialize"),
       "Save",

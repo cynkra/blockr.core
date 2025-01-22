@@ -189,7 +189,7 @@ add_rm_link_server <- function(id, rv) {
 #' @rdname add_rm_link
 #' @export
 add_rm_link_ui <- function(id, board) {
-  list(
+  tagList(
     actionButton(
       NS(id, "links"),
       "Edit links",

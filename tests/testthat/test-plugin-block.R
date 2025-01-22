@@ -38,3 +38,7 @@ test_that("add/rm blocks", {
     args = list(rv = reactiveValues(board = board))
   )
 })
+
+test_that("dummy add/rm block ui", {
+  expect_s3_class(add_rm_block_ui("add_rm", new_board()), "shiny.tag.list")
+})

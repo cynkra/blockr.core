@@ -51,7 +51,7 @@ add_rm_block_server <- function(id, rv) {
 #' @rdname add_rm_block
 #' @export
 add_rm_block_ui <- function(id, board) {
-  list(
+  tagList(
     selectInput(
       NS(id, "registry_select"),
       "Select block from registry",
