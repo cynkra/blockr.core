@@ -17,18 +17,19 @@ board_server <- function(id, x, ...) {
 #' @param block_notifications Module for block nptifications
 #' @rdname board_server
 #' @export
-board_server.board <- function(id,
-                               x,
-                               ser_deser = NULL,
-                               add_rm_block = NULL,
-                               add_rm_link = NULL,
-                               block_notifications = NULL,
-                               ...) {
-
+board_server.board <- function(
+  id,
+  x,
+  ser_deser = NULL,
+  add_rm_block = NULL,
+  add_rm_link = NULL,
+  block_notifications = NULL,
+  ...
+) {
   moduleServer(
     id,
     function(input, output, session) {
-
+      ns <- session$ns
       rv <- reactiveValues(
         blocks = list(),
         inputs = list(),
@@ -46,7 +47,6 @@ board_server.board <- function(id,
       )
 
       if (not_null(ser_deser)) {
-
         board_refresh <- check_ser_deser_val(
           ser_deser("ser_deser", rv)
         )
@@ -54,11 +54,11 @@ board_server.board <- function(id,
         observeEvent(
           board_refresh(),
           {
-            remove_block_ui(id, rv$board)
+            remove_block_ui(ns(NULL), rv$board)
 
             rv$board <- board_refresh()
 
-            insert_block_ui(id, rv$board)
+            insert_block_ui(ns(NULL), rv$board)
 
             rv <- setup_blocks(rv)
           }
@@ -66,7 +66,6 @@ board_server.board <- function(id,
       }
 
       if (not_null(add_rm_block)) {
-
         blocks <- check_add_rm_block_val(
           add_rm_block("add_rm_block", rv),
           rv
@@ -75,7 +74,7 @@ board_server.board <- function(id,
         observeEvent(
           blocks$add,
           {
-            insert_block_ui(id, rv$board, blocks$add)
+            insert_block_ui(ns(NULL), rv$board, blocks$add)
 
             board_blocks(rv$board) <- c(board_blocks(x), blocks$add)
 
@@ -88,7 +87,7 @@ board_server.board <- function(id,
         observeEvent(
           blocks$rm,
           {
-            remove_block_ui(id, rv$board, blocks$rm)
+            remove_block_ui(ns(NULL), rv$board, blocks$rm)
 
             rv <- destroy_rm_blocks(blocks$rm, rv)
           }
@@ -96,7 +95,6 @@ board_server.board <- function(id,
       }
 
       if (not_null(add_rm_link)) {
-
         links <- check_add_rm_link_val(
           add_rm_link("add_rm_link", rv),
           rv
@@ -136,7 +134,6 @@ board_server.board <- function(id,
 }
 
 setup_blocks <- function(rv) {
-
   stopifnot(
     is.reactivevalues(rv),
     all(c("blocks", "inputs", "board", "links") %in% names(rv)),
@@ -161,7 +158,6 @@ setup_blocks <- function(rv) {
 }
 
 setup_block <- function(blk, id, rv) {
-
   rv$inputs[[id]] <- set_names(
     replicate(block_arity(blk), reactiveVal()),
     block_inputs(blk)
@@ -184,7 +180,6 @@ setup_block <- function(blk, id, rv) {
 }
 
 destroy_rm_blocks <- function(ids, rv) {
-
   links <- board_links(rv$board)
   blocks <- board_blocks(rv$board)
 
@@ -203,7 +198,6 @@ destroy_rm_blocks <- function(ids, rv) {
 }
 
 setup_link <- function(rv, id, from, to, input) {
-
   rv$links[[id]] <- observeEvent(
     rv$blocks[[from]]$server$result(),
     {
@@ -218,7 +212,6 @@ setup_link <- function(rv, id, from, to, input) {
 }
 
 destroy_link <- function(rv, id, from, to, input) {
-
   rv$links[[id]]$destroy()
   rv$links[[id]] <- NULL
 
@@ -228,7 +221,6 @@ destroy_link <- function(rv, id, from, to, input) {
 }
 
 update_block_links <- function(rv, add = NULL, rm = NULL) {
-
   todo <- as.list(rm)
 
   for (i in names(todo)) {
