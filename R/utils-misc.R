@@ -133,3 +133,31 @@ unlst <- function(x, recursive = FALSE, use_names = FALSE) {
 }
 
 na_to_empty <- function(x) replace(x, is.na(x), "")
+
+get_option <- function(name, default) {
+
+  opt <- tolower(paste0("blockr.", name))
+  env <- toupper(paste0("blockr_", name))
+
+  res_opt <- getOption(opt, default = default)
+  res_env <- Sys.getenv(env, unset = "")
+
+  if (identical(res_env, "")) {
+    res_env <- default
+  }
+
+  if (identical(res_opt, res_env)) {
+    return(res_opt)
+  }
+
+  if (identical(res_opt, default) && !identical(res_env, default)) {
+    return(res_env)
+  }
+
+  if (identical(res_env, default) && !identical(res_opt, default)) {
+    return(res_opt)
+  }
+
+  stop("Conflicting options set for ", name, ": check environment variable `",
+       env, "` and option `", opt, "`.")
+}
