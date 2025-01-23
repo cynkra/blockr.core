@@ -43,7 +43,7 @@ get_mem_use <- function(prefix = "", suffix = "") {
 }
 
 get_timmestamp <- function(prefix = "", suffix = "") {
-  paste0(prefix, Sys.time(), suffix)
+  paste0(prefix, format(Sys.time()), suffix)
 }
 
 #' @rdname write_log

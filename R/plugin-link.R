@@ -18,9 +18,10 @@ add_rm_link_server <- function(id, rv) {
     id,
     function(input, output, session) {
 
-      observeEvent(input$links, {
+      observeEvent(
+        input$links,
         showModal(links_modal(session$ns))
-      })
+      )
 
       upd <- reactiveValues(
         add = links(),
@@ -30,9 +31,12 @@ add_rm_link_server <- function(id, rv) {
         edit = NULL
       )
 
-      observeEvent(board_links(rv$board), {
-        upd$curr <- board_links(rv$board)
-      })
+      observeEvent(
+        board_links(rv$board),
+        {
+          upd$curr <- board_links(rv$board)
+        }
+      )
 
       output$links <- DT::renderDT(
         {
@@ -76,13 +80,15 @@ add_rm_link_server <- function(id, rv) {
           upd$rm <- c(upd$rm, row)
         }
 
-        new <- upd$curr[[row]]
-        new[[col]] <- coal(upd$edit$val, "")
+        new <- do.call(
+          `$<-`,
+          list(upd$curr[row], col, coal(upd$edit$val, ""))
+        )
 
-        upd$curr[[row]] <- new
+        upd$curr[row] <- new
 
         if (row %in% names(upd$add)) {
-          upd$add[[row]] <- new
+          upd$add[row] <- new
         } else {
           upd$add <- c(upd$add, new)
         }
@@ -262,6 +268,8 @@ create_dt_observers_for_id <- function(id, input, update, blks, sess) {
 create_dt_observer <- function(col, row, input, upd, blks, sess) {
 
   inp <- paste0(row, "_", col)
+
+  log_debug("creating link DT observer ", inp)
 
   observeEvent(
     input[[inp]],

@@ -61,6 +61,53 @@ test_that("add/rm links", {
     args = list(rv = reactiveValues(board = board))
   )
 
+  testServer(
+    add_rm_link_server,
+    {
+      expect_null(upd$edit)
+      expect_length(upd$add, 0L)
+
+      session$flushReact()
+
+      expect_length(upd$obs, 1L)
+      expect_named(upd$obs, "ac")
+      expect_type(upd$obs, "list")
+
+      expect_length(upd$obs[["ac"]], 3L)
+      expect_named(upd$obs[["ac"]], c("from", "to", "input"))
+      expect_type(upd$obs[["ac"]], "list")
+
+      for (i in c("from", "to", "input")) {
+        expect_s3_class(upd$obs[["ac"]][[i]], "Observer")
+      }
+
+      session$setInputs(ac_input = "data")
+      expect_null(upd$edit)
+      expect_length(upd$add, 0L)
+
+      session$setInputs(ac_to = "d")
+      expect_identical(upd$edit, list(row = "ac", col = "to", val = "d"))
+      expect_length(upd$add, 1L)
+
+      session$setInputs(ac_from = "b")
+      expect_identical(upd$edit, list(row = "ac", col = "from", val = "b"))
+      expect_length(upd$add, 1L)
+    },
+    args = list(
+      rv = list(
+        board = new_board(
+          blocks = c(
+            a = new_dataset_block("iris"),
+            b = new_dataset_block("mtcars"),
+            c = new_subset_block(),
+            d = new_subset_block()
+          ),
+          links = links(ac = new_link(from = "a", to = "c"))
+        )
+      )
+    )
+  )
+
   board <- new_board(
     blocks = c(
       a = new_dataset_block("iris"),
