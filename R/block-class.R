@@ -540,7 +540,7 @@ as.list.blocks <- function(x, ...) {
     stop("IDs are required to be unique.")
   }
 
-  names(x) <- value
+  attr(x, "names") <- value
 
   x
 }

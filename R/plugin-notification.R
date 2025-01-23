@@ -15,6 +15,12 @@ block_notification_server <- function(id, rv) {
     id,
     function(input, output, session) {
 
+      onStop(function() set_globals("notification_ids", list()))
+
+      if (length(get_globals("notification_ids"))) {
+        warning("Existing notification IDs will be purged.")
+      }
+
       set_globals("notification_ids", list())
 
       cnd <- reactive(
