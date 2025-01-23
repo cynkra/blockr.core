@@ -28,7 +28,8 @@ Imports:
     utils,
     jsonlite,
     vctrs,
-    generics
+    generics,
+    rlang
 Suggests:
     testthat (>= 3.0.0),
     blockr.dplyr

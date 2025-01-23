@@ -130,6 +130,12 @@ as.matrix.board <- function(x, ...) {
   as_adjacency_matrix(links$from, links$to, block_ids)
 }
 
+#' @rdname topo_sort
+#' @export
+is_acyclic.board <- function(x) {
+  is_acyclic(as.matrix(x))
+}
+
 #' @rdname serve
 #' @export
 serve.board <- function(x, ...) {

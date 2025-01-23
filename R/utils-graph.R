@@ -1,3 +1,10 @@
+#' Graph utils
+#'
+#' Utilities for handling block dependency DAGs.
+#'
+#' @param adj_matrix Adjacency matrix
+#'
+#' @export
 topo_sort <- function(adj_matrix) {
 
   stopifnot(
@@ -20,7 +27,10 @@ topo_sort <- function(adj_matrix) {
     function(node, adj, stack) {
 
       if (on_stack[node]) {
-        stop("The graph contains a cycle and is not a DAG.")
+        abort(
+          "The graph contains a cycle and is not a DAG.",
+          class = "graph_has_cycle"
+        )
       }
 
       if (visited[node]) {
@@ -49,7 +59,7 @@ topo_sort <- function(adj_matrix) {
   rownames(adj_matrix)[stack]
 }
 
-as_adjacency_matrix <- function(from, to, nodes = unique(c(from, to))) {
+as_adjacency_matrix <- function(from, to, nodes = union(from, to)) {
 
   stopifnot(
     all(from %in% nodes), all(to %in% nodes), anyDuplicated(nodes) == 0L
@@ -61,4 +71,23 @@ as_adjacency_matrix <- function(from, to, nodes = unique(c(from, to))) {
   res[cbind(from, to)] <- 1L
 
   res
+}
+
+#' @param x Object
+#' @rdname topo_sort
+#' @export
+is_acyclic <- function(x) {
+  UseMethod("is_acyclic")
+}
+
+#' @rdname topo_sort
+#' @export
+is_acyclic.matrix <- function(x) {
+  tryCatch(
+    {
+      topo_sort(x)
+      TRUE
+    },
+    graph_has_cycle = function(e) FALSE
+  )
 }

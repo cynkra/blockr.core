@@ -25,3 +25,15 @@ test_that("block constructor", {
     c("identity_block", "transform_block", "block")
   )
 })
+
+test_that("block class", {
+
+  x <- new_dataset_block()
+
+  expect_s3_class(x, "block")
+  expect_true(is_block(x))
+  expect_false(is_block("x"))
+
+  expect_identical(x, as_block(x))
+  expect_equal(x, as_block(as.list(x)), ignore_function_env = TRUE)
+})
