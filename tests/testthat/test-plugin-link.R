@@ -144,6 +144,34 @@ test_that("add/rm links", {
   )
 })
 
+test_that("add/rm links retun validation", {
+
+  withReactiveDomain(
+    MockShinySession$new(),
+    {
+      val <- reactiveVal(list(add = links(from = "a", to = "b"), rm = "ab"))
+
+      res <- check_add_rm_link_val(
+        val,
+        list(
+          board = new_board(
+            blocks = c(
+              a = new_dataset_block("iris"),
+              b = new_subset_block()
+            ),
+            links = links(ab = new_link(from = "a", to = "b"))
+          )
+        )
+      )
+
+      expect_identical(val, res)
+
+      getDefaultReactiveDomain()$flushReact()
+    }
+  )
+})
+
 test_that("dummy ad/rm link ui test", {
   expect_s3_class(add_rm_link_ui("link", new_board()), "shiny.tag.list")
+  expect_s3_class(links_modal(NS("links")), "shiny.tag")
 })
