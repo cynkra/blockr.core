@@ -10,3 +10,7 @@ get_s3_method <- function(generic, object) {
   stop("No function found for generic `", generic, "()` and classes ",
        paste_enum(class(object)))
 }
+
+sink_msg <- function(...) {
+  invisible(capture.output(..., type = "message"))
+}

@@ -149,24 +149,108 @@ test_that("add/rm links retun validation", {
   withReactiveDomain(
     MockShinySession$new(),
     {
-      val <- reactiveVal(list(add = links(from = "a", to = "b"), rm = "ab"))
+      session <- getDefaultReactiveDomain()
 
-      res <- check_add_rm_link_val(
-        val,
-        list(
-          board = new_board(
-            blocks = c(
-              a = new_dataset_block("iris"),
-              b = new_subset_block()
-            ),
-            links = links(ab = new_link(from = "a", to = "b"))
-          )
+      val <- reactiveVal(
+        list(add = links(from = "a", to = "b"), rm = "ab")
+      )
+
+      rv <- list(
+        board = new_board(
+          blocks = c(
+            a = new_dataset_block("iris"),
+            b = new_subset_block()
+          ),
+          links = links(ab = new_link(from = "a", to = "b"))
         )
       )
 
-      expect_identical(val, res)
+      res <- check_add_rm_link_val(val, rv)
 
-      getDefaultReactiveDomain()$flushReact()
+      expect_s3_class(isolate(res()$add), "links")
+      expect_length(isolate(res()$add), 1L)
+
+      expect_type(isolate(res()$rm), "character")
+      expect_length(isolate(res()$rm), 1L)
+
+
+      val(list(add = NULL, rm = "bc"))
+
+      sink_msg(
+        expect_warning(
+          getDefaultReactiveDomain()$flushReact(),
+          "Error in observe"
+        )
+      )
+    }
+  )
+
+  withReactiveDomain(
+    MockShinySession$new(),
+    {
+      check_add_rm_link_val(list(), list())
+      sink_msg(
+        expect_warning(
+          getDefaultReactiveDomain()$flushReact(),
+          "Error in observe"
+        )
+      )
+    }
+  )
+
+  withReactiveDomain(
+    MockShinySession$new(),
+    {
+      check_add_rm_link_val(reactiveVal(1), list())
+      sink_msg(
+        expect_warning(
+          getDefaultReactiveDomain()$flushReact(),
+          "Error in observe"
+        )
+      )
+    }
+  )
+
+  withReactiveDomain(
+    MockShinySession$new(),
+    {
+      check_add_rm_link_val(reactiveVal(list(add = 1)), list())
+      sink_msg(
+        expect_warning(
+          getDefaultReactiveDomain()$flushReact(),
+          "Error in observe"
+        )
+      )
+    }
+  )
+
+  withReactiveDomain(
+    MockShinySession$new(),
+    {
+      check_add_rm_link_val(
+        reactiveVal(list(add = structure(1, class = "links"))),
+        list()
+      )
+
+      sink_msg(
+        expect_warning(
+          getDefaultReactiveDomain()$flushReact(),
+          "Error in observe"
+        )
+      )
+    }
+  )
+
+  withReactiveDomain(
+    MockShinySession$new(),
+    {
+      check_add_rm_link_val(reactiveVal(list(rm = 1)), list())
+      sink_msg(
+        expect_warning(
+          getDefaultReactiveDomain()$flushReact(),
+          "Error in observe"
+        )
+      )
     }
   )
 })

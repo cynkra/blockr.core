@@ -378,7 +378,8 @@ check_add_rm_link_val <- function(val, rv) {
         stop("Expecting `add_rm_link` to return a reactive value.")
       }
     },
-    once = TRUE
+    once = TRUE,
+    priority = 4
   )
 
   observeEvent(
@@ -389,7 +390,8 @@ check_add_rm_link_val <- function(val, rv) {
              "with components `add` and `rm`.")
       }
     },
-    once = TRUE
+    once = TRUE,
+    priority = 3
   )
 
   observeEvent(
@@ -400,7 +402,8 @@ check_add_rm_link_val <- function(val, rv) {
              "value to be `NULL` or a `links` object.")
       }
     },
-    once = TRUE
+    once = TRUE,
+    priority = 2
   )
 
   observeEvent(
@@ -417,7 +420,8 @@ check_add_rm_link_val <- function(val, rv) {
              "value to be a character vector.")
       }
     },
-    once = TRUE
+    once = TRUE,
+    priority = 1
   )
 
   observeEvent(
