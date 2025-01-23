@@ -118,9 +118,9 @@ check_add_rm_block_val <- function(val, rv) {
   observeEvent(
     val$rm,
     {
-      if (!is_string(val$rm)) {
+      if (!is.character(val$rm)) {
         stop("Expecting the `rm` component of the `add_rm_block` return ",
-             "value to be `NULL` or a string.")
+             "value to be `NULL` or a character vector.")
       }
     },
     once = TRUE
@@ -129,7 +129,7 @@ check_add_rm_block_val <- function(val, rv) {
   observeEvent(
     val$rm,
     {
-      if (!val$rm %in% board_block_ids(rv$board)) {
+      if (all(!val$rm %in% board_block_ids(rv$board))) {
         stop("Expecting the removed block to be specified by a known ID.")
       }
     },

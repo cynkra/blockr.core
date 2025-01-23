@@ -76,7 +76,7 @@ board_server.board <- function(
           {
             insert_block_ui(ns(NULL), rv$board, blocks$add)
 
-            board_blocks(rv$board) <- c(board_blocks(x), blocks$add)
+            board_blocks(rv$board) <- c(board_blocks(rv$board), blocks$add)
 
             for (blk in names(blocks$add)) {
               rv <- setup_block(blocks$add[[blk]], blk, rv)

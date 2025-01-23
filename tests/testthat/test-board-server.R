@@ -18,4 +18,33 @@ test_that("board server", {
     },
     args = list(x = board)
   )
+
+  empty <- new_board()
+
+  testServer(
+    get_s3_method("board_server", empty),
+    {
+      expect_length(board_blocks(x), 0L)
+      expect_length(board_blocks(rv$board), 0L)
+
+      blocks$add <- as_blocks(new_dataset_block())
+      session$flushReact()
+
+      expect_length(board_blocks(x), 0L)
+      expect_length(board_blocks(rv$board), 1L)
+
+      blocks$add <- as_blocks(new_subset_block())
+      session$flushReact()
+
+      expect_length(board_blocks(x), 0L)
+      expect_length(board_blocks(rv$board), 2L)
+
+      blocks$rm <- board_block_ids(rv$board)
+      session$flushReact()
+
+      expect_length(board_blocks(x), 0L)
+      expect_length(board_blocks(rv$board), 0L)
+    },
+    args = list(x = empty, add_rm_block = add_rm_block_server)
+  )
 })
