@@ -16,4 +16,6 @@ test_that("blocks utils", {
   names(ab)[2] <- "c"
 
   expect_named(ab, c("a", "c"))
+
+  expect_snapshot(print(ab))
 })

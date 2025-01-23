@@ -36,4 +36,6 @@ test_that("block class", {
 
   expect_identical(x, as_block(x))
   expect_equal(x, as_block(as.list(x)), ignore_function_env = TRUE)
+
+  expect_snapshot(print(x))
 })
