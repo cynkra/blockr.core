@@ -106,16 +106,6 @@ coal <- function(..., fail_null = TRUE) {
   NULL
 }
 
-filter_all_zero_len <- function(x) {
-  if (all_zero_len(x)) {
-    NULL
-  } else if (is.list(x)) {
-    Filter(Negate(is.null), lapply(x, filter_all_zero_len))
-  } else {
-    x
-  }
-}
-
 int_to_chr <- function(x) {
 
   stopifnot(is_intish(x))
@@ -125,8 +115,6 @@ int_to_chr <- function(x) {
     function(i) paste0(letters[i + 1L], collapse = "")
   )
 }
-
-filter_empty <- function(x) Filter(Negate(is_empty), x)
 
 unlst <- function(x, recursive = FALSE, use_names = FALSE) {
   unlist(x, recursive = recursive, use.names = use_names)
@@ -139,22 +127,22 @@ get_option <- function(name, default) {
   opt <- tolower(paste0("blockr.", name))
   env <- toupper(paste0("blockr_", name))
 
-  res_opt <- getOption(opt, default = default)
+  res_opt <- getOption(opt, default = NULL)
   res_env <- Sys.getenv(env, unset = "")
 
-  if (identical(res_env, "")) {
-    res_env <- default
+  if (is.null(res_opt) && identical(res_env, "")) {
+    return(default)
   }
 
   if (identical(res_opt, res_env)) {
     return(res_opt)
   }
 
-  if (identical(res_opt, default) && !identical(res_env, default)) {
+  if (is.null(res_opt) && !identical(res_env, "")) {
     return(res_env)
   }
 
-  if (identical(res_env, default) && !identical(res_opt, default)) {
+  if (identical(res_env, "") && !is.null(res_opt)) {
     return(res_opt)
   }
 

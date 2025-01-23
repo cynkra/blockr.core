@@ -33,6 +33,7 @@ Imports:
 Suggests:
     testthat (>= 3.0.0),
     blockr.dplyr,
-    memuse
+    memuse,
+    withr
 Remotes: cynkra/blockr.dplyr
 Config/testthat/edition: 3

@@ -50,3 +50,15 @@ all_zero_len <- function(x) {
 is_empty <- function(x) {
   is_zero_len(x) || all(is.na(x) | !nchar(x))
 }
+
+filter_all_zero_len <- function(x) {
+  if (all_zero_len(x)) {
+    NULL
+  } else if (is.list(x)) {
+    Filter(Negate(is.null), lapply(x, filter_all_zero_len))
+  } else {
+    x
+  }
+}
+
+filter_empty <- function(x) Filter(Negate(is_empty), x)
