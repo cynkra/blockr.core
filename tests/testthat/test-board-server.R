@@ -64,4 +64,50 @@ test_that("board server", {
       }
     )
   )
+
+  test_xtra_args <- function(id, board, plugin_a, plugin_b) {
+    moduleServer(
+      id,
+      function(input, output, session) {
+
+        parent <- reactiveVal()
+
+        board_server(
+          "board",
+          board,
+          list(preseve_board = plugin_a, manage_blocks = plugin_b),
+          parent = parent
+        )
+      }
+    )
+  }
+
+  testServer(
+    test_xtra_args,
+    session$flushReact(),
+    args = list(
+      board = empty,
+      plugin_a = function(id, rv, parent) {
+        moduleServer(
+          id,
+          function(input, output, session) {
+            observeEvent(TRUE, parent(1L), once = TRUE)
+            reactiveVal()
+          }
+        )
+      },
+      plugin_b = function(id, rv, parent) {
+        moduleServer(
+          id,
+          function(input, output, session) {
+            observeEvent(
+              parent(),
+              expect_identical(parent(), 1L)
+            )
+            reactiveValues(add = NULL, rm = NULL)
+          }
+        )
+      }
+    )
+  )
 })

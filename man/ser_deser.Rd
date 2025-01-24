@@ -5,7 +5,7 @@
 \alias{ser_deser_ui}
 \title{Serialization module}
 \usage{
-ser_deser_server(id, rv)
+ser_deser_server(id, rv, ...)
 
 ser_deser_ui(id, board)
 }
@@ -13,6 +13,8 @@ ser_deser_ui(id, board)
 \item{id}{Namespace ID}
 
 \item{rv}{Reactive values object}
+
+\item{...}{Extra arguments passed from parent scope}
 
 \item{board}{The initial \code{board} object}
 }

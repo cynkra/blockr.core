@@ -27,6 +27,8 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
 
   validate_callbacks(callbacks)
 
+  dot_args <- list(...)
+
   moduleServer(
     id,
     function(input, output, session) {
@@ -53,7 +55,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
 
       if (not_null(ser_deser)) {
         board_refresh <- check_ser_deser_val(
-          ser_deser("preseve_board", rv)
+          do.call(ser_deser, c(list("preseve_board", rv), dot_args))
         )
 
         observeEvent(
@@ -74,7 +76,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
 
       if (not_null(add_rm_block)) {
         blocks <- check_add_rm_block_val(
-          add_rm_block("manage_blocks", rv),
+          do.call(add_rm_block, c(list("manage_blocks", rv), dot_args)),
           rv
         )
 
@@ -105,7 +107,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
 
       if (not_null(add_rm_link)) {
         links <- check_add_rm_link_val(
-          add_rm_link("manage_links", rv),
+          do.call(add_rm_link, c(list("manage_links", rv), dot_args)),
           rv
         )
 
@@ -131,13 +133,16 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         )
       } else {
         notifications <- check_block_notifications_val(
-          block_notification_server("notify_user", rv)
+          do.call(
+            block_notification_server,
+            c(list("notify_user", rv), dot_args)
+          )
         )
       }
 
       for (callback in callbacks) {
 
-        res <- callback(rv)
+        res <- do.call(callback, c(list(rv), dot_args))
 
         if (!is.null(res)) {
           warning(

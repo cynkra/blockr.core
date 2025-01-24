@@ -4,13 +4,14 @@
 #'
 #' @param id Namespace ID
 #' @param rv Reactive values object
+#' @param ... Extra arguments passed from parent scope
 #'
 #' @return A [shiny::reactiveVal()] object that evaluates to `NULL` or a
 #' `board` obejct.
 #'
 #' @rdname ser_deser
 #' @export
-ser_deser_server <- function(id, rv) {
+ser_deser_server <- function(id, rv, ...) {
   moduleServer(
     id,
     function(input, output, session) {

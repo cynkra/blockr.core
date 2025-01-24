@@ -4,12 +4,14 @@
 \alias{block_notification_server}
 \title{Block notification module}
 \usage{
-block_notification_server(id, rv)
+block_notification_server(id, rv, ...)
 }
 \arguments{
 \item{id}{Namespace ID}
 
 \item{rv}{Reactive values object}
+
+\item{...}{Extra arguments passed from parent scope}
 }
 \value{
 A \code{\link[shiny:reactiveVal]{shiny::reactiveVal()}} object that evaluates to \code{NULL} or a

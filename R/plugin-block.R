@@ -4,6 +4,7 @@
 #'
 #' @param id Namespace ID
 #' @param rv Reactive values object
+#' @param ... Extra arguments passed from parent scope
 #'
 #' @return A [shiny::reactiveValues()] object with components `add` and `rm`,
 #' where `add` may be `NULL` or a `block` object and `rm` be `NULL` or a string
@@ -11,7 +12,7 @@
 #'
 #' @rdname add_rm_block
 #' @export
-add_rm_block_server <- function(id, rv) {
+add_rm_block_server <- function(id, rv, ...) {
   moduleServer(
     id,
     function(input, output, session) {

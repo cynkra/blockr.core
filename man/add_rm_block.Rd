@@ -5,7 +5,7 @@
 \alias{add_rm_block_ui}
 \title{Add/remove block module}
 \usage{
-add_rm_block_server(id, rv)
+add_rm_block_server(id, rv, ...)
 
 add_rm_block_ui(id, board)
 }
@@ -13,6 +13,8 @@ add_rm_block_ui(id, board)
 \item{id}{Namespace ID}
 
 \item{rv}{Reactive values object}
+
+\item{...}{Extra arguments passed from parent scope}
 
 \item{board}{The initial \code{board} object}
 }

@@ -5,7 +5,7 @@
 \alias{add_rm_link_ui}
 \title{Add/remove block links module}
 \usage{
-add_rm_link_server(id, rv)
+add_rm_link_server(id, rv, ...)
 
 add_rm_link_ui(id, board)
 }
@@ -13,6 +13,8 @@ add_rm_link_ui(id, board)
 \item{id}{Namespace ID}
 
 \item{rv}{Reactive values object}
+
+\item{...}{Extra arguments passed from parent scope}
 
 \item{board}{The initial \code{board} object}
 }

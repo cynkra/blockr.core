@@ -5,6 +5,7 @@
 #'
 #' @param id Namespace ID
 #' @param rv Reactive values object
+#' @param ... Extra arguments passed from parent scope
 #'
 #' @return A reactive value that evaualtes to `NULL` or a list with components
 #' `add` and `rm`, where `add` is either `NULL` or a `data.frame` with columns
@@ -13,7 +14,7 @@
 #'
 #' @rdname add_rm_link
 #' @export
-add_rm_link_server <- function(id, rv) {
+add_rm_link_server <- function(id, rv, ...) {
   moduleServer(
     id,
     function(input, output, session) {
