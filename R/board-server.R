@@ -40,7 +40,8 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         inputs = list(),
         board = x,
         board_id = id,
-        links = list()
+        links = list(),
+        msgs = list()
       )
 
       observeEvent(
@@ -128,11 +129,11 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
       block_notifications <- get_plugin("notify_user", plugins)
 
       if (is.null(block_notifications)) {
-        notifications <- reactive(
+        rv$msgs <- reactive(
           filter_all_zero_len(lst_xtr_reval(rv$blocks, "server", "cond"))
         )
       } else {
-        notifications <- check_block_notifications_val(
+        rv$msgs <- check_block_notifications_val(
           do.call(
             block_notification_server,
             c(list("notify_user", rv), dot_args)
@@ -152,11 +153,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         }
       }
 
-      list(
-        board = reactive(rv$board),
-        blocks = reactive(rv$blocks),
-        notifications = notifications
-      )
+      rv
     }
   )
 }

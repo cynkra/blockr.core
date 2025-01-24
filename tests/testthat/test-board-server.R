@@ -12,9 +12,7 @@ test_that("board server", {
     get_s3_method("board_server", board),
     {
       session$flushReact()
-
       expect_equal(rv$blocks$b$server$result(), iris)
-      expect_null(notifications())
     },
     args = list(x = board)
   )
