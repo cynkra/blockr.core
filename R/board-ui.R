@@ -11,32 +11,30 @@ board_ui <- function(id, x, ...) {
   UseMethod("board_ui", x)
 }
 
-#' @param ser_deser UI for serialization/deserialization
-#' @param add_rm_block UI for block addition/removal
-#' @param add_rm_link UI for block link addition/removal
-#' @param block_notifications UI for block notifications
+#' @param plugins UI for board plugins
 #' @rdname board_ui
 #' @export
-board_ui.board <- function(id,
-                           x,
-                           ser_deser = NULL,
-                           add_rm_block = NULL,
-                           add_rm_link = NULL,
-                           block_notifications = NULL,
-                           ...) {
+board_ui.board <- function(id, x, plugins = list(), ...) {
+
+  validate_plugins(plugins)
+
+  ser_deser <- get_plugin("preseve_board", plugins)
+  add_rm_block <- get_plugin("manage_blocks", plugins)
+  add_rm_link <- get_plugin("manage_links", plugins)
+  block_notifications <- get_plugin("notify_user", plugins)
 
   ns <- NS(id)
 
   toolbar_args <- list(
-    if (length(ser_deser)) ser_deser(ns("ser_deser"), x),
-    if (length(add_rm_block)) add_rm_block(ns("add_rm_block"), x),
-    if (length(add_rm_link)) add_rm_link(ns("add_rm_link"), x)
+    if (length(ser_deser)) ser_deser(ns("preseve_board"), x),
+    if (length(add_rm_block)) add_rm_block(ns("manage_blocks"), x),
+    if (length(add_rm_link)) add_rm_link(ns("manage_links"), x)
   )
 
   toolbar_args <- do.call(tagList, toolbar_args)
 
   if (length(block_notifications)) {
-    block_notifications <- block_notifications(ns("block_notifications"), x)
+    block_notifications <- block_notifications(ns("notify_user"), x)
   } else {
     block_notifications <- tagList()
   }

@@ -11,15 +11,7 @@
 \usage{
 board_ui(id, x, ...)
 
-\method{board_ui}{board}(
-  id,
-  x,
-  ser_deser = NULL,
-  add_rm_block = NULL,
-  add_rm_link = NULL,
-  block_notifications = NULL,
-  ...
-)
+\method{board_ui}{board}(id, x, plugins = list(), ...)
 
 insert_block_ui(id, x, blocks = NULL, ...)
 
@@ -36,13 +28,7 @@ remove_block_ui(id, x, blocks = NULL, ...)
 
 \item{...}{Generic consistency}
 
-\item{ser_deser}{UI for serialization/deserialization}
-
-\item{add_rm_block}{UI for block addition/removal}
-
-\item{add_rm_link}{UI for block link addition/removal}
-
-\item{block_notifications}{UI for block notifications}
+\item{plugins}{UI for board plugins}
 
 \item{blocks}{(Additional) blocks (or IDs) for which to generate the UI}
 }

@@ -213,7 +213,7 @@ test_that("add/rm links retun validation", {
           list(
             add = structure(
               list(id = "x", from = "a", to = "a", input = ""),
-              class = c("links", "vctrs_rcrd", "vctrs_vctr")
+              class = class(links())
             ),
             rm = NULL
           )

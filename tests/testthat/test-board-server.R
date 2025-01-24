@@ -45,6 +45,9 @@ test_that("board server", {
       expect_length(board_blocks(x), 0L)
       expect_length(board_blocks(rv$board), 0L)
     },
-    args = list(x = empty, add_rm_block = add_rm_block_server)
+    args = list(
+      x = empty,
+      plugins = list(manage_blocks = add_rm_block_server)
+    )
   )
 })

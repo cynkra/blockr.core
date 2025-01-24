@@ -11,25 +11,19 @@ board_server <- function(id, x, ...) {
   UseMethod("board_server", x)
 }
 
-#' @param ser_deser Module for serialization/deserialization
-#' @param add_rm_block Module for addition/removal of blocks
-#' @param add_rm_link Module for addition/removal of links between blocks
-#' @param block_notifications Module for block nptifications
+#' @param plugins Board plugins as modules
 #' @rdname board_server
 #' @export
-board_server.board <- function(
-  id,
-  x,
-  ser_deser = NULL,
-  add_rm_block = NULL,
-  add_rm_link = NULL,
-  block_notifications = NULL,
-  ...
-) {
+board_server.board <- function(id, x, plugins = list(), ...) {
+
+  validate_plugins(plugins)
+
   moduleServer(
     id,
     function(input, output, session) {
+
       ns <- session$ns
+
       rv <- reactiveValues(
         blocks = list(),
         inputs = list(),
@@ -46,9 +40,11 @@ board_server.board <- function(
         once = TRUE
       )
 
+      ser_deser <- get_plugin("preseve_board", plugins)
+
       if (not_null(ser_deser)) {
         board_refresh <- check_ser_deser_val(
-          ser_deser("ser_deser", rv)
+          ser_deser("preseve_board", rv)
         )
 
         observeEvent(
@@ -65,9 +61,11 @@ board_server.board <- function(
         )
       }
 
+      add_rm_block <- get_plugin("manage_blocks", plugins)
+
       if (not_null(add_rm_block)) {
         blocks <- check_add_rm_block_val(
-          add_rm_block("add_rm_block", rv),
+          add_rm_block("manage_blocks", rv),
           rv
         )
 
@@ -94,9 +92,11 @@ board_server.board <- function(
         )
       }
 
+      add_rm_link <- get_plugin("manage_links", plugins)
+
       if (not_null(add_rm_link)) {
         links <- check_add_rm_link_val(
-          add_rm_link("add_rm_link", rv),
+          add_rm_link("manage_links", rv),
           rv
         )
 
@@ -114,13 +114,15 @@ board_server.board <- function(
         )
       }
 
+      block_notifications <- get_plugin("notify_user", plugins)
+
       if (is.null(block_notifications)) {
         notifications <- reactive(
           filter_all_zero_len(lst_xtr_reval(rv$blocks, "server", "cond"))
         )
       } else {
         notifications <- check_block_notifications_val(
-          block_notification_server("block_notifications", rv)
+          block_notification_server("notify_user", rv)
         )
       }
 
@@ -234,4 +236,35 @@ update_block_links <- function(rv, add = NULL, rm = NULL) {
   }
 
   rv
+}
+
+validate_plugins <- function(plugins) {
+
+  if (!is.list(plugins)) {
+    stop("Expecting a list of plugins.")
+  }
+
+  unknown <- setdiff(
+    names(plugins),
+    c("preseve_board", "manage_blocks", "manage_links", "notify_user")
+  )
+
+  if (length(unknown)) {
+    stop("Cannot deal with plungin(s) ", paste_enum(unknown), ".")
+  }
+
+  for (plugin in plugins) {
+    if (!is.function(plugin)) {
+      stop("Expecting plugings to be passed as functions.")
+    }
+  }
+}
+
+get_plugin <- function(plugin, plugins) {
+
+  if (plugin %in% names(plugins)) {
+    return(plugins[[plugin]])
+  }
+
+  NULL
 }

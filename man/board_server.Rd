@@ -7,15 +7,7 @@
 \usage{
 board_server(id, x, ...)
 
-\method{board_server}{board}(
-  id,
-  x,
-  ser_deser = NULL,
-  add_rm_block = NULL,
-  add_rm_link = NULL,
-  block_notifications = NULL,
-  ...
-)
+\method{board_server}{board}(id, x, plugins = list(), ...)
 }
 \arguments{
 \item{id}{(Optional) parent namespace}
@@ -24,13 +16,7 @@ board_server(id, x, ...)
 
 \item{...}{Generic consistency}
 
-\item{ser_deser}{Module for serialization/deserialization}
-
-\item{add_rm_block}{Module for addition/removal of blocks}
-
-\item{add_rm_link}{Module for addition/removal of links between blocks}
-
-\item{block_notifications}{Module for block nptifications}
+\item{plugins}{Board plugins as modules}
 }
 \description{
 Shiny server function for \code{board} objects.
