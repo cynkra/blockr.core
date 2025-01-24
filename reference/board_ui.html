@@ -47,15 +47,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">board_ui</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'board'</span></span>
-<span><span class="fu">board_ui</span><span class="op">(</span></span>
-<span>  <span class="va">id</span>,</span>
-<span>  <span class="va">x</span>,</span>
-<span>  ser_deser <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  add_rm_block <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  add_rm_link <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  block_notifications <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span>
+<span><span class="fu">board_ui</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, plugins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">insert_block_ui</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, blocks <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -84,20 +76,8 @@
 <dd><p>Generic consistency</p></dd>
 
 
-<dt id="arg-ser-deser">ser_deser<a class="anchor" aria-label="anchor" href="#arg-ser-deser"></a></dt>
-<dd><p>UI for serialization/deserialization</p></dd>
-
-
-<dt id="arg-add-rm-block">add_rm_block<a class="anchor" aria-label="anchor" href="#arg-add-rm-block"></a></dt>
-<dd><p>UI for block addition/removal</p></dd>
-
-
-<dt id="arg-add-rm-link">add_rm_link<a class="anchor" aria-label="anchor" href="#arg-add-rm-link"></a></dt>
-<dd><p>UI for block link addition/removal</p></dd>
-
-
-<dt id="arg-block-notifications">block_notifications<a class="anchor" aria-label="anchor" href="#arg-block-notifications"></a></dt>
-<dd><p>UI for block notifications</p></dd>
+<dt id="arg-plugins">plugins<a class="anchor" aria-label="anchor" href="#arg-plugins"></a></dt>
+<dd><p>UI for board plugins</p></dd>
 
 
 <dt id="arg-blocks">blocks<a class="anchor" aria-label="anchor" href="#arg-blocks"></a></dt>
