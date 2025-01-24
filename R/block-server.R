@@ -106,12 +106,12 @@ block_server.block <- function(id, x, data, ...) {
           if (isFALSE(allow_empty)) {
             check <- TRUE
           } else {
-            check <- allow_empty
+            check <- setdiff(names(exp$state), allow_empty)
           }
 
           lgl_ply(
             lapply(exp$state[check], reval_if),
-            isTruthy,
+            Negate(is_empty),
             use_names = TRUE
           )
         }
