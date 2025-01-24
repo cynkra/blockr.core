@@ -11,6 +11,7 @@ test_that("block constructor", {
       b = new_dataset_block()
     ),
     data.frame(
+      id = c("ad", "cd", "bc", "de"),
       from = c("a", "c", "b", "d"),
       to = c("d", "d", "c", "e"),
       input = c("x", "y", "", "")
@@ -18,6 +19,7 @@ test_that("block constructor", {
   )
 
   expect_s3_class(board, "board")
+  expect_snapshot(print(board))
 
   expect_error(
     new_board(

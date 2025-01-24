@@ -17,4 +17,6 @@ test_that("links class", {
 
   expect_error(links(x = x, x = y), class = "links_names_unique_invalid")
   expect_error(c(lnk, z), class = "links_acyclic_invalid")
+
+  expect_snapshot(print(links(a = x, b = y)))
 })
