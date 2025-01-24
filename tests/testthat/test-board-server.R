@@ -50,4 +50,18 @@ test_that("board server", {
       plugins = list(manage_blocks = add_rm_block_server)
     )
   )
+
+  testServer(
+    get_s3_method("board_server", empty),
+    {
+      expect_length(board_blocks(x), 0L)
+    },
+    args = list(
+      x = empty,
+      callbacks = function(rv) {
+        expect_length(board_blocks(rv$board), 0L)
+        NULL
+      }
+    )
+  )
 })

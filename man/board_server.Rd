@@ -7,7 +7,7 @@
 \usage{
 board_server(id, x, ...)
 
-\method{board_server}{board}(id, x, plugins = list(), ...)
+\method{board_server}{board}(id, x, plugins = list(), callbacks = list(), ...)
 }
 \arguments{
 \item{id}{(Optional) parent namespace}
@@ -17,6 +17,9 @@ board_server(id, x, ...)
 \item{...}{Generic consistency}
 
 \item{plugins}{Board plugins as modules}
+
+\item{callbacks}{Single (or list of) callback function(s), called only
+for their side-effects)}
 }
 \description{
 Shiny server function for \code{board} objects.

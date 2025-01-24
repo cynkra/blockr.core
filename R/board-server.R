@@ -12,11 +12,20 @@ board_server <- function(id, x, ...) {
 }
 
 #' @param plugins Board plugins as modules
+#' @param callbacks Single (or list of) callback function(s), called only
+#' for their side-effects)
 #' @rdname board_server
 #' @export
-board_server.board <- function(id, x, plugins = list(), ...) {
+board_server.board <- function(id, x, plugins = list(), callbacks = list(),
+                               ...) {
 
   validate_plugins(plugins)
+
+  if (is.function(callbacks)) {
+    callbacks <- list(callbacks)
+  }
+
+  validate_callbacks(callbacks)
 
   moduleServer(
     id,
@@ -124,6 +133,18 @@ board_server.board <- function(id, x, plugins = list(), ...) {
         notifications <- check_block_notifications_val(
           block_notification_server("notify_user", rv)
         )
+      }
+
+      for (callback in callbacks) {
+
+        res <- callback(rv)
+
+        if (!is.null(res)) {
+          warning(
+            "Callbacks are only called for their side-effects and are ",
+            "expected to return `NULL`."
+          )
+        }
       }
 
       list(
@@ -258,6 +279,8 @@ validate_plugins <- function(plugins) {
       stop("Expecting plugings to be passed as functions.")
     }
   }
+
+  invisible()
 }
 
 get_plugin <- function(plugin, plugins) {
@@ -267,4 +290,19 @@ get_plugin <- function(plugin, plugins) {
   }
 
   NULL
+}
+
+validate_callbacks <- function(x) {
+
+  if (!is.list(x)) {
+    stop("Expecting a list of callbacks.")
+  }
+
+  for (f in x) {
+    if (!is.function(f)) {
+      stop("Expecting callbacks to be passed as functions.")
+    }
+  }
+
+  invisible()
 }

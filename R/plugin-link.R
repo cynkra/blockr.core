@@ -375,7 +375,10 @@ check_add_rm_link_val <- function(val, rv) {
     TRUE,
     {
       if (!is.reactive(val)) {
-        stop("Expecting `add_rm_link` to return a reactive value.")
+        abort(
+          "Expecting `add_rm_link` to return a reactive value.",
+          class = ""
+        )
       }
     },
     once = TRUE,
