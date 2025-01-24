@@ -47,7 +47,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">board_server</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'board'</span></span>
-<span><span class="fu">board_server</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, plugins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">board_server</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, plugins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, callbacks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -68,6 +68,11 @@
 
 <dt id="arg-plugins">plugins<a class="anchor" aria-label="anchor" href="#arg-plugins"></a></dt>
 <dd><p>Board plugins as modules</p></dd>
+
+
+<dt id="arg-callbacks">callbacks<a class="anchor" aria-label="anchor" href="#arg-callbacks"></a></dt>
+<dd><p>Single (or list of) callback function(s), called only
+for their side-effects)</p></dd>
 
 </dl></div>
 
