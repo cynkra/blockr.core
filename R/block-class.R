@@ -386,7 +386,7 @@ block_inputs.block <- function(x, inds = seq_len(block_arity(x)), ...) {
     args <- setdiff(args, "...")
     args <- c(
       args,
-      paste0("..", inds[inds > length(args)] - length(args))
+      paste0("...", inds[inds > length(args)] - length(args))
     )
   }
 

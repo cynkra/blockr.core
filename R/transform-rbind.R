@@ -8,7 +8,15 @@
 new_rbind_block <- function(...) {
   new_transform_block(
     function(id, ...) {
+
       dot_args <- ...names()
+
+      if (is.null(dot_args)) {
+        dot_args <- paste0("...", seq_len(...length()))
+      } else {
+        names(dot_args) <- dot_args
+      }
+
       moduleServer(
         id,
         function(input, output, session) {
