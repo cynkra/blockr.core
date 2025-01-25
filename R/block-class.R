@@ -371,13 +371,31 @@ serve.data_block <- function(x, ...) {
 
 #' @rdname new_block
 #' @export
-block_inputs <- function(x) {
+block_inputs <- function(x, ...) {
   UseMethod("block_inputs")
 }
 
+#' @param inds Argument indexes to return
 #' @rdname new_block
 #' @export
-block_inputs.block <- function(x) {
+block_inputs.block <- function(x, inds = seq_len(block_arity(x)), ...) {
+
+  args <- block_expr_inputs(x)
+
+  if ("..." %in% args) {
+    args <- setdiff(args, "...")
+    args <- c(
+      args,
+      paste0("..", inds[inds > length(args)] - length(args))
+    )
+  }
+
+  stopifnot(all(inds %in% seq_along(args)))
+
+  args[inds]
+}
+
+block_expr_inputs <- function(x) {
   setdiff(names(formals(block_expr_server(x))), "id")
 }
 
@@ -403,7 +421,7 @@ block_arity <- function(x) {
     )
   }
 
-  args <- block_inputs(x)
+  args <- block_expr_inputs(x)
 
   if ("..." %in% args) {
     return(NA_integer_)

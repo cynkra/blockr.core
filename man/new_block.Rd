@@ -63,9 +63,9 @@ block_has_data_validator(x)
 
 validate_data_inputs(x, data)
 
-block_inputs(x)
+block_inputs(x, ...)
 
-\method{block_inputs}{block}(x)
+\method{block_inputs}{block}(x, inds = seq_len(block_arity(x)), ...)
 
 block_arity(x)
 
@@ -81,7 +81,7 @@ as_blocks(x, ...)
 
 \method{as_blocks}{block}(x, ...)
 
-\method{block_inputs}{board}(x)
+\method{block_inputs}{board}(x, ...)
 
 new_data_block(server, ui, class, ctor = sys.parent(), ...)
 
@@ -112,6 +112,8 @@ new_transform_block(server, ui, class, ctor = sys.parent(), ...)
 \item{x}{An object inheriting from \code{"block"}}
 
 \item{data}{Data inputs}
+
+\item{inds}{Argument indexes to return}
 }
 \description{
 Blocks consist of an expression that defines what the block produces (given
