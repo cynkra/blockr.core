@@ -122,19 +122,31 @@ register_core_blocks <- function() {
   register_blocks(
     c(
       "new_dataset_block",
-      "new_subset_block"
+      "new_subset_block",
+      "new_merge_block",
+      "new_rbind_block",
+      "new_scatter_block"
     ),
     name = c(
       "dataset block",
-      "subset block"
+      "subset block",
+      "merge block",
+      "rbind block",
+      "scatter plot block"
     ),
     description = c(
       "Choose a dataset from a package",
-      "Row and column subsetting"
+      "Row and column subsetting",
+      "Joining or datasets",
+      "Row-binding of datasets",
+      "Scatter plotting"
     ),
     category = c(
       "data",
-      "transform"
+      "transform",
+      "transform",
+      "transform",
+      "plot"
     ),
     package = utils::packageName(),
     overwrite = TRUE
