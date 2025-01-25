@@ -1,8 +1,8 @@
-test_that("subset block constructor", {
+test_that("merge block constructor", {
 
   blk <- new_merge_block()
 
-  expect_s3_class(blk, c("merge_block", "data_block", "block"))
+  expect_s3_class(blk, "merge_block")
 
   testServer(
     block_expr_server(blk),

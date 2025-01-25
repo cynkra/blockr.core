@@ -13,15 +13,6 @@ block_ui <- function(id, x, ...) {
 
 #' @rdname block_ui
 #' @export
-block_ui.block <- function(id, x, ...) {
-  tagList(
-    expr_ui(id, x, ...),
-    DT::dataTableOutput(NS(id, "result"))
-  )
-}
-
-#' @rdname block_ui
-#' @export
 expr_ui <- function(id, x, ...) {
   UseMethod("expr_ui", x)
 }
@@ -44,20 +35,4 @@ expr_ui.block <- function(id, x, ...) {
 #' @export
 block_output <- function(x, result) {
   UseMethod("block_output")
-}
-
-#' @rdname block_ui
-#' @export
-block_output.block <- function(x, result) {
-  DT::renderDT(
-    DT::datatable(
-      result(),
-      selection = "none",
-      options = list(
-        pageLength = 5L,
-        processing = FALSE
-      )
-    ),
-    server = TRUE
-  )
 }

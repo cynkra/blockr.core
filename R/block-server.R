@@ -153,7 +153,7 @@ block_server.block <- function(id, x, data, ...) {
 
           out <- tryCatch(
             withCallingHandlers(
-              eval(exp$expr(), dat_eval()),
+              block_eval(x, exp$expr(), dat_eval()),
               message = function(m) {
                 rv$eval_cond$message <- c(rv$eval_cond$message, cond_msg(m))
               },
@@ -171,7 +171,12 @@ block_server.block <- function(id, x, data, ...) {
         }
       )
 
-      output$result <- block_output(x, res)
+      observeEvent(
+        res(),
+        {
+          output$result <- block_output(x, res())
+        }
+      )
 
       list(
         result = res,
@@ -199,6 +204,19 @@ expr_server <- function(x, data, ...) {
 #' @export
 expr_server.block <- function(x, data, ...) {
   do.call(block_expr_server(x), c(list(id = "expr"), data))
+}
+
+#' @rdname block_server
+#' @export
+block_eval <- function(x, expr, data, ...) {
+  UseMethod("block_eval")
+}
+
+#' @param expr Quoted expression to evaluate in the context of `data`
+#' @rdname block_server
+#' @export
+block_eval.block <- function(x, expr, data, ...) {
+  eval(expr, data)
 }
 
 check_expr_val <- function(val, x) {

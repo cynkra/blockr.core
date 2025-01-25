@@ -1,0 +1,75 @@
+#' Scatter plot block constructor
+#'
+#' This block draws a scattter plot using [base::plot()].
+#'
+#' @param x,y Columns to place on respective axes
+#' @param ... Forwarded to [new_block()]
+#'
+#' @export
+new_scatter_block <- function(x = character(), y = character(), ...) {
+  new_plot_block(
+    function(id, data) {
+      moduleServer(
+        id,
+        function(input, output, session) {
+
+          cols <- reactive(colnames(data()))
+
+          x_col <- reactiveVal(x)
+          y_col <- reactiveVal(y)
+
+          observeEvent(input$xcol, x_col(input$xcol))
+          observeEvent(input$ycol, y_col(input$ycol))
+
+          observeEvent(
+            cols(),
+            {
+              updateSelectInput(
+                session,
+                inputId = "xcol",
+                choices = cols(),
+                selected = x_col()
+              )
+              updateSelectInput(
+                session,
+                inputId = "ycol",
+                choices = cols(),
+                selected = y_col()
+              )
+            }
+          )
+
+          list(
+            expr = reactive(
+              bquote(
+                plot(data[[.(x)]], data[[.(y)]],
+                     xlab = .(xcol), ylab = .(ycol)),
+                list(x = x_col(), y = y_col(), xcol = x_col(), ycol = y_col())
+              )
+            ),
+            state = list(x = x_col, y = y_col)
+          )
+        }
+      )
+    },
+    function(id) {
+      tagList(
+        selectInput(
+          inputId = NS(id, "xcol"),
+          label = "X-axis",
+          choices = list()
+        ),
+        selectInput(
+          inputId = NS(id, "ycol"),
+          label = "Y-axis",
+          choices = list()
+        )
+      )
+    },
+    dat_valid = function(data) {
+      stopifnot(is.data.frame(data) || is.matrix(data))
+    },
+    class = "scatter_block",
+    ...
+  )
+}
