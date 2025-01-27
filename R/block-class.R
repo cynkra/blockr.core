@@ -444,7 +444,11 @@ format.block <- function(x, ...) {
     paste0("Name: \"", attr(x, "name"), "\"")
   )
 
-  if (block_arity(x)) {
+  arity <- block_arity(x)
+
+  if (is.na(arity)) {
+    dat <- "Indefinite arity"
+  } else if (arity > 0L) {
     dat <- paste0("Data inputs: ", paste_enum(block_inputs(x), quotes = "\""))
   } else {
     dat <- "No data inputs"

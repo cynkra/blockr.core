@@ -309,7 +309,7 @@ links_assign <- function(...) {
 validate_links <- function(x) {
 
   any_dup <- function(x) {
-    anyDuplicated(Filter(Negate(is.na), x))
+    anyDuplicated(filter_empty(x))
   }
 
   if (is_board(x)) {

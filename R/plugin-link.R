@@ -97,7 +97,9 @@ add_rm_link_server <- function(id, rv, ...) {
 
       observeEvent(input$add_link, {
 
-        if (length(upd$curr) < sum(block_arity(rv$board))) {
+        total <- sum(block_arity(rv$board))
+
+        if (is.na(total) || length(upd$curr) < total) {
 
           upd$curr <- c(
             upd$curr,
@@ -207,22 +209,34 @@ add_rm_link_ui <- function(id, board) {
 
 dt_board_link <- function(lnk, ns, rv) {
 
-  from_ids <- rep(list(board_block_ids(rv$board)), length(lnk))
+  blks <- board_blocks(rv$board)
+  arity <- int_ply(blks, block_arity, use_names = TRUE)
 
-  rm_inp <- lapply(
-    seq_along(lnk),
-    function(i) split(lnk$input[-i], lnk$to[-i])[[lnk$to[i]]]
-  )
+  from_ids <- rep(list(names(blks)), length(lnk))
 
-  to_avail <- block_arity(rv$board)
+  to_avail <- arity
   cnt_to <- c(table(filter_empty(lnk$to)))
 
   to_avail[names(cnt_to)] <- int_mply(`-`, to_avail[names(cnt_to)], cnt_to)
+  to_avail[is.na(to_avail)] <- 1L
 
   to_avail <- lapply(
     lapply(lnk$to, filter_empty),
     union,
     names(to_avail)[to_avail > 0L]
+  )
+
+  in_avail <- c(
+    lapply(blks[!is.na(arity)], block_inputs),
+    lapply(
+      lapply(table(lnk$to)[names(blks[is.na(arity)])], seq_len),
+      as.character
+    )
+  )
+
+  rm_inp <- lapply(
+    seq_along(lnk),
+    function(i) split(lnk$input[-i], lnk$to[-i])[[lnk$to[i]]]
   )
 
   data.frame(
@@ -242,7 +256,7 @@ dt_board_link <- function(lnk, ns, rv) {
       dt_selectize,
       lapply(paste0(lnk$id, "_input"), ns),
       lnk$input,
-      Map(setdiff, block_inputs(rv$board)[lnk$to], rm_inp)
+      Map(setdiff, in_avail[lnk$to], rm_inp)
     )
   )
 }
@@ -289,6 +303,7 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
         cnt <- c(table(filter_empty(upd$curr$to)))
 
         to_avail[names(cnt)] <- int_mply(`-`, to_avail[names(cnt)], cnt)
+        to_avail[is.na(to_avail)] <- 1L
 
         to_avail <- c(
           upd$curr[[row]][["to"]],
@@ -324,10 +339,15 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
 
         } else {
 
-          inp <- setdiff(
-            block_inputs(blks[[which(ids == new)]]),
-            upd$curr$input[upd$curr$to == new]
-          )
+          blk <- blks[[which(ids == new)]]
+          ary <- block_arity(blk)
+          hit <- upd$curr$to == new
+
+          if (is.na(ary)) {
+            inp <- as.character(sum(hit) + 1L)
+          } else {
+            inp <- setdiff(block_inputs(blk), upd$curr$input[hit])
+          }
 
           updateSelectInput(
             sess,
