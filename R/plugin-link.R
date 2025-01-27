@@ -226,12 +226,12 @@ dt_board_link <- function(lnk, ns, rv) {
     names(to_avail)[to_avail > 0L]
   )
 
+  cnt_to <- table(lnk$to)[names(blks[is.na(arity)])]
+  cnt_to[is.na(cnt_to)] <- 0L
+
   in_avail <- c(
     lapply(blks[!is.na(arity)], block_inputs),
-    lapply(
-      lapply(table(lnk$to)[names(blks[is.na(arity)])], seq_len),
-      as.character
-    )
+    lapply(lapply(cnt_to, seq_len), as.character)
   )
 
   rm_inp <- lapply(
