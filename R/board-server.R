@@ -159,6 +159,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
 }
 
 setup_blocks <- function(rv) {
+
   stopifnot(
     is.reactivevalues(rv),
     all(c("blocks", "inputs", "board", "links") %in% names(rv)),
@@ -183,12 +184,21 @@ setup_blocks <- function(rv) {
 }
 
 setup_block <- function(blk, id, rv) {
-  rv$inputs[[id]] <- set_names(
-    replicate(block_arity(blk), reactiveVal()),
-    block_inputs(blk)
-  )
 
   links <- board_links(rv$board)
+
+  arity <- block_arity(blk)
+  hits <- links$to == id
+
+  if (is.na(arity)) {
+    n_inp <- sum(hits)
+    nmes <- NULL
+  } else {
+    n_inp <- arity
+    nmes <- block_inputs(blk)
+  }
+
+  rv$inputs[[id]] <- set_names(replicate(n_inp, reactiveVal()), nmes)
 
   todo <- as.list(links[links$to == id])
 
@@ -205,6 +215,7 @@ setup_block <- function(blk, id, rv) {
 }
 
 destroy_rm_blocks <- function(ids, rv) {
+
   links <- board_links(rv$board)
   blocks <- board_blocks(rv$board)
 
@@ -223,6 +234,30 @@ destroy_rm_blocks <- function(ids, rv) {
 }
 
 setup_link <- function(rv, id, from, to, input) {
+
+  inp_exists <- function(i, x) {
+    if (is.integer(i)) {
+      i <= length(x)
+    } else if (is.character(i)) {
+      i %in% names(x)
+    } else stop("Unexpected input type.")
+  }
+
+  if (grepl("^[1-9][0-9]*$", input)) {
+    input <- as.integer(input)
+  }
+
+  if (!inp_exists(input, rv$inputs[[to]])) {
+
+    new <- list(reactiveVal())
+
+    if (is.character(input)) {
+      names(new) <- input
+    }
+
+    rv$inputs[[to]] <- c(rv$inputs[[to]], new)
+  }
+
   rv$links[[id]] <- observeEvent(
     rv$blocks[[from]]$server$result(),
     {
@@ -237,8 +272,13 @@ setup_link <- function(rv, id, from, to, input) {
 }
 
 destroy_link <- function(rv, id, from, to, input) {
+
   rv$links[[id]]$destroy()
   rv$links[[id]] <- NULL
+
+  if (grepl("^[1-9][0-9]*$", input)) {
+    input <- as.integer(input)
+  }
 
   rv$inputs[[to]][[input]](NULL)
 
@@ -246,6 +286,7 @@ destroy_link <- function(rv, id, from, to, input) {
 }
 
 update_block_links <- function(rv, add = NULL, rm = NULL) {
+
   todo <- as.list(rm)
 
   for (i in names(todo)) {
