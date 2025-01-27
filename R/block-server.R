@@ -93,6 +93,8 @@ block_server.block <- function(id, x, data, ...) {
 
       state_check <- reactive(
         {
+          lapply(data, reval)
+
           if (!isTruthy(rv$data_valid)) {
             return(NULL)
           }
