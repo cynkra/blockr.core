@@ -240,7 +240,9 @@ setup_link <- function(rv, id, from, to, input) {
       i <= length(x)
     } else if (is.character(i)) {
       i %in% names(x)
-    } else stop("Unexpected input type.")
+    } else {
+      stop("Unexpected input type.")
+    }
   }
 
   if (grepl("^[1-9][0-9]*$", input)) {
