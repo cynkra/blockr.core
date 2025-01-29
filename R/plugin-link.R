@@ -229,9 +229,15 @@ dt_board_link <- function(lnk, ns, rv) {
   cnt_to <- table(lnk$to)[names(blks[is.na(arity)])]
   cnt_to[is.na(cnt_to)] <- 0L
 
+  cur_inp <- split(lnk$input, lnk$to)
+
   in_avail <- c(
     lapply(blks[!is.na(arity)], block_inputs),
-    lapply(lapply(cnt_to, seq_len), as.character)
+    Map(
+      union,
+      lapply(lapply(cnt_to, seq_len), as.character),
+      cur_inp[names(cnt_to)]
+    )
   )
 
   rm_inp <- lapply(
@@ -256,15 +262,24 @@ dt_board_link <- function(lnk, ns, rv) {
       dt_selectize,
       lapply(paste0(lnk$id, "_input"), ns),
       lnk$input,
-      Map(setdiff, in_avail[lnk$to], rm_inp)
+      Map(setdiff, in_avail[lnk$to], rm_inp),
+      is.na(arity[lnk$to])
     )
   )
 }
 
-dt_selectize <- function(id, val, choices) {
-  as.character(
-    selectInput(id, label = "", choices = c("", choices), selected = val)
-  )
+dt_selectize <- function(id, val, choices, create = FALSE) {
+
+  if (isTRUE(create)) {
+    opts <- list(create = TRUE)
+  } else {
+    opts <- NULL
+  }
+
+  res <- selectizeInput(id, label = "", choices = c("", choices),
+                        selected = val, options = opts)
+
+  as.character(res)
 }
 
 create_dt_observers <- function(ids, input, update, blks, sess) {
@@ -310,7 +325,7 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
           names(to_avail)[to_avail > 0L]
         )
 
-        updateSelectInput(
+        updateSelectizeInput(
           sess,
           inputId = paste0(row, "_to"),
           choices = c("", setdiff(to_avail, new)),
@@ -322,7 +337,7 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
 
         ids <- names(blks)
 
-        updateSelectInput(
+        updateSelectizeInput(
           sess,
           inputId = paste0(row, "_from"),
           choices = c("", setdiff(ids, new)),
@@ -331,7 +346,7 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
 
         if (identical(new, "")) {
 
-          updateSelectInput(
+          updateSelectizeInput(
             sess,
             inputId = paste0(row, "_input"),
             choices = list()
@@ -345,15 +360,18 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
 
           if (is.na(ary)) {
             inp <- as.character(sum(hit) + 1L)
+            opt <- list(create = TRUE)
           } else {
             inp <- setdiff(block_inputs(blk), upd$curr$input[hit])
+            opt <-  NULL
           }
 
-          updateSelectInput(
+          updateSelectizeInput(
             sess,
             inputId = paste0(row, "_input"),
             choices = c("", inp),
-            selected = upd$curr[[row]][["input"]]
+            selected = upd$curr[[row]][["input"]],
+            options = opt
           )
         }
       }

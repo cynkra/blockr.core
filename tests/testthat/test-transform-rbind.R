@@ -43,4 +43,24 @@ test_that("rbind block constructor", {
       )
     )
   )
+
+  testServer(
+    get_s3_method("block_server", blk),
+    {
+      session$flushReact()
+      expect_identical(
+        session$returned$result(),
+        rbind(iris[1:3, ], a = iris[4:6, ])
+      )
+    },
+    args = list(
+      x = blk,
+      data = list(
+        ...args = reactiveValues(
+          `1` = iris[1:3, ],
+          a = iris[4:6, ]
+        )
+      )
+    )
+  )
 })

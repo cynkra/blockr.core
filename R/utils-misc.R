@@ -149,3 +149,24 @@ get_option <- function(name, default) {
   stop("Conflicting options set for ", name, ": check environment variable `",
        env, "` and option `", opt, "`.")
 }
+
+dot_args_names <- function(x) {
+
+  res <- names(x)
+
+  unnamed <- grepl("^[1-9][0-9]*$", res)
+
+  if (all(unnamed)) {
+    return(NULL)
+  }
+
+  if (any(unnamed)) {
+    return(replace(res, unnamed, ""))
+  }
+
+  res
+}
+
+dot_args_to_list <- function(x) {
+  set_names(reactiveValuesToList(x), dot_args_names(x))
+}

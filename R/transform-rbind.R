@@ -13,14 +13,7 @@ new_rbind_block <- function(...) {
         function(input, output, session) {
 
           arg_names <- reactive(
-            {
-              dot_args <- names(...args)
-
-              named <- !grepl("^[1-9][0-9]*$", dot_args)
-              names(dot_args)[named] <- dot_args[named]
-
-              dot_args
-            }
+            set_names(names(...args), dot_args_names(...args))
           )
 
           list(
