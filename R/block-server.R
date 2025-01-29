@@ -59,11 +59,26 @@ block_server.block <- function(id, x, data, ...) {
         x
       )
 
+      dat <- reactive(
+        {
+          res <- lapply(data[names(data) != "...args"], reval)
+
+          if ("...args" %in% names(data)) {
+            tmp <- list(`...args` = reactiveValuesToList(data[["...args"]]))
+            res <- c(res, tmp)
+          }
+
+          res
+        }
+      )
+
       if (block_has_data_validator(x)) {
 
         observeEvent(
-          lapply(data, reval),
+          dat(),
           {
+            log_debug("performing input validation for block ", id)
+
             res(NULL)
 
             rv$data_cond <- empty_cond
@@ -72,7 +87,7 @@ block_server.block <- function(id, x, data, ...) {
             rv$data_valid <- tryCatch(
               withCallingHandlers(
                 {
-                  validate_data_inputs(x, lapply(data, reval))
+                  validate_data_inputs(x, dat())
                   TRUE
                 },
                 message = function(m) {
@@ -93,7 +108,7 @@ block_server.block <- function(id, x, data, ...) {
 
       state_check <- reactive(
         {
-          lapply(data, reval)
+          dat()
 
           if (!isTruthy(rv$data_valid)) {
             return(NULL)
@@ -122,6 +137,8 @@ block_server.block <- function(id, x, data, ...) {
       observeEvent(
         state_check(),
         {
+          log_debug("checking returned state values of block ", id)
+
           res(NULL)
 
           ok <- state_check()
@@ -144,18 +161,29 @@ block_server.block <- function(id, x, data, ...) {
         {
           req(rv$state_set)
           lapply(exp$state, reval_if)
-          lapply(data, reval)
+
+          res <- dat()
+
+          if ("...args" %in% names(res)) {
+            res <- c(res[names(res) != "...args"], res[["...args"]])
+          }
+
+          res
         }
       )
 
       observeEvent(
         dat_eval(),
         {
+          log_debug("evaluating block ", id)
+
           rv$eval_cond <- empty_cond
 
           out <- tryCatch(
             withCallingHandlers(
-              block_eval(x, exp$expr(), dat_eval()),
+              {
+                block_eval(x, exp$expr(), dat_eval())
+              },
               message = function(m) {
                 rv$eval_cond$message <- c(rv$eval_cond$message, cond_msg(m))
               },

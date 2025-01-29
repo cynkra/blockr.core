@@ -7,24 +7,27 @@
 #' @export
 new_rbind_block <- function(...) {
   new_transform_block(
-    function(id, ...) {
-
-      dot_args <- ...names()
-
-      if (is.null(dot_args)) {
-        dot_args <- paste0("...", seq_len(...length()))
-      } else {
-        names(dot_args) <- dot_args
-      }
-
+    function(id, ...args) {
       moduleServer(
         id,
         function(input, output, session) {
+
+          arg_names <- reactive(
+            {
+              dot_args <- names(...args)
+
+              named <- !grepl("^[1-9][0-9]*$", dot_args)
+              names(dot_args)[named] <- dot_args[named]
+
+              dot_args
+            }
+          )
+
           list(
             expr = reactive(
               bquote(
                 rbind(..(dat)),
-                list(dat = lapply(dot_args, as.name)),
+                list(dat = lapply(arg_names(), as.name)),
                 splice = TRUE
               )
             ),
@@ -34,8 +37,8 @@ new_rbind_block <- function(...) {
       )
     },
     function(id) tagList(),
-    dat_valid = function(...) {
-      stopifnot(...length() >= 1L)
+    dat_valid = function(...args) {
+      stopifnot(length(...args) >= 1L)
     },
     allow_empty_state = TRUE,
     class = "rbind_block",

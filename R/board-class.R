@@ -49,7 +49,7 @@ complete_variadic_inputs <- function(x, blocks) {
 
   to_todo <- x$to[to_complete]
 
-  x$input[to_complete] <- ave(to_todo, to_todo, FUN = seq_along)
+  x$input[to_complete] <- stats::ave(to_todo, to_todo, FUN = seq_along)
 
   x
 }

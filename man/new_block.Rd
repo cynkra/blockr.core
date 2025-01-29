@@ -65,7 +65,7 @@ validate_data_inputs(x, data)
 
 block_inputs(x, ...)
 
-\method{block_inputs}{block}(x, inds = seq_len(block_arity(x)), ...)
+\method{block_inputs}{block}(x, ...)
 
 block_arity(x)
 
@@ -112,8 +112,6 @@ new_transform_block(server, ui, class, ctor = sys.parent(), ...)
 \item{x}{An object inheriting from \code{"block"}}
 
 \item{data}{Data inputs}
-
-\item{inds}{Argument indexes to return}
 }
 \description{
 Blocks consist of an expression that defines what the block produces (given

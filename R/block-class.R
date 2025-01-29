@@ -99,6 +99,22 @@ validate_block_server <- function(server) {
     stop("A block server component is expected to be a function.")
   }
 
+  args <- names(formals(server))
+
+  if (!identical(args[1L], "id")) {
+    stop(
+      "A block server function is expected to have an argument `id` in ",
+      "first poistion."
+    )
+  }
+
+  if ("..." %in% args) {
+    stop(
+      "Variadic blocks are supported not by passing arguments as `...` ",
+      "but using a special argument `...args`."
+    )
+  }
+
   invisible(server)
 }
 
@@ -375,24 +391,10 @@ block_inputs <- function(x, ...) {
   UseMethod("block_inputs")
 }
 
-#' @param inds Argument indexes to return
 #' @rdname new_block
 #' @export
-block_inputs.block <- function(x, inds = seq_len(block_arity(x)), ...) {
-
-  args <- block_expr_inputs(x)
-
-  if ("..." %in% args) {
-    args <- setdiff(args, "...")
-    args <- c(
-      args,
-      paste0("...", inds[inds > length(args)] - length(args))
-    )
-  }
-
-  stopifnot(all(inds %in% seq_along(args)))
-
-  args[inds]
+block_inputs.block <- function(x, ...) {
+  setdiff(block_expr_inputs(x), "...args")
 }
 
 block_expr_inputs <- function(x) {
@@ -423,7 +425,7 @@ block_arity <- function(x) {
 
   args <- block_expr_inputs(x)
 
-  if ("..." %in% args) {
+  if ("...args" %in% args) {
     return(NA_integer_)
   }
 

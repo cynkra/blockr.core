@@ -16,8 +16,10 @@ test_that("rbind block constructor", {
     args = list(
       x = blk,
       data = list(
-        function() iris[1:3, ],
-        function() iris[4:6, ]
+        ...args = reactiveValues(
+          `1` = iris[1:3, ],
+          `2` = iris[4:6, ]
+        )
       )
     )
   )
@@ -34,8 +36,10 @@ test_that("rbind block constructor", {
     args = list(
       x = blk,
       data = list(
-        a = function() iris[1:3, ],
-        b = function() iris[4:6, ]
+        ...args = reactiveValues(
+          a = iris[1:3, ],
+          b = iris[4:6, ]
+        )
       )
     )
   )

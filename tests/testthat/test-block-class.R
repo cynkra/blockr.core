@@ -2,7 +2,7 @@ test_that("block constructor", {
 
   new_identity_block <- function() {
     new_transform_block(
-      function(data) {
+      function(id, data) {
         moduleServer(
           "expression",
           function(input, output, session) {

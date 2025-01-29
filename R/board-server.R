@@ -185,20 +185,21 @@ setup_blocks <- function(rv) {
 
 setup_block <- function(blk, id, rv) {
 
-  links <- board_links(rv$board)
-
   arity <- block_arity(blk)
-  hits <- links$to == id
+  inpts <- block_inputs(blk)
+
+  inpts <- set_names(
+    replicate(length(inpts), reactiveVal()),
+    inpts
+  )
 
   if (is.na(arity)) {
-    n_inp <- sum(hits)
-    nmes <- NULL
-  } else {
-    n_inp <- arity
-    nmes <- block_inputs(blk)
+    inpts <- c(inpts, list(`...args` = reactiveValues()))
   }
 
-  rv$inputs[[id]] <- set_names(replicate(n_inp, reactiveVal()), nmes)
+  rv$inputs[[id]] <- inpts
+
+  links <- board_links(rv$board)
 
   todo <- as.list(links[links$to == id])
 
@@ -235,40 +236,29 @@ destroy_rm_blocks <- function(ids, rv) {
 
 setup_link <- function(rv, id, from, to, input) {
 
-  inp_exists <- function(i, x) {
-    if (is.integer(i)) {
-      i <= length(x)
-    } else if (is.character(i)) {
-      i %in% names(x)
-    } else {
-      stop("Unexpected input type.")
-    }
+  if (input %in% block_inputs(board_blocks(rv$board)[[to]])) {
+
+    rv$links[[id]] <- observeEvent(
+      rv$blocks[[from]]$server$result(),
+      {
+        rv$inputs[[to]][[input]](
+          rv$blocks[[from]]$server$result()
+        )
+      },
+      ignoreNULL = FALSE
+    )
+
+  } else {
+
+    rv$links[[id]] <- observeEvent(
+      rv$blocks[[from]]$server$result(),
+      {
+        rv$inputs[[to]][["...args"]][[input]] <-
+          rv$blocks[[from]]$server$result()
+      },
+      ignoreNULL = FALSE
+    )
   }
-
-  if (grepl("^[1-9][0-9]*$", input)) {
-    input <- as.integer(input)
-  }
-
-  if (!inp_exists(input, rv$inputs[[to]])) {
-
-    new <- list(reactiveVal())
-
-    if (is.character(input)) {
-      names(new) <- input
-    }
-
-    rv$inputs[[to]] <- c(rv$inputs[[to]], new)
-  }
-
-  rv$links[[id]] <- observeEvent(
-    rv$blocks[[from]]$server$result(),
-    {
-      rv$inputs[[to]][[input]](
-        rv$blocks[[from]]$server$result()
-      )
-    },
-    ignoreNULL = FALSE
-  )
 
   rv
 }
@@ -278,11 +268,11 @@ destroy_link <- function(rv, id, from, to, input) {
   rv$links[[id]]$destroy()
   rv$links[[id]] <- NULL
 
-  if (grepl("^[1-9][0-9]*$", input)) {
-    input <- as.integer(input)
+  if (input %in% block_inputs(board_blocks(rv$board)[[to]])) {
+    rv$inputs[[to]][[input]](NULL)
+  } else {
+    rv$inputs[[to]][["...args"]][[input]] <- NULL
   }
-
-  rv$inputs[[to]][[input]](NULL)
 
   rv
 }
