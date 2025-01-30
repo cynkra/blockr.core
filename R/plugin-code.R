@@ -28,7 +28,8 @@ gen_code_server <- function(id, rv, ...) {
                 verbatimTextOutput(session$ns("code"))
               ),
               easyClose = TRUE,
-              footer = NULL
+              footer = NULL,
+              size = "l"
             )
           )
         }

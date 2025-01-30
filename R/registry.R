@@ -125,28 +125,44 @@ register_core_blocks <- function() {
       "new_subset_block",
       "new_merge_block",
       "new_rbind_block",
-      "new_scatter_block"
+      "new_scatter_block",
+      "new_upload_block",
+      "new_csv_block",
+      "new_static_block",
+      "new_head_block"
     ),
     name = c(
       "dataset block",
       "subset block",
       "merge block",
       "rbind block",
-      "scatter plot block"
+      "scatter plot block",
+      "data upload block",
+      "csv parser block",
+      "static data block",
+      "head/tail block"
     ),
     description = c(
       "Choose a dataset from a package",
       "Row and column subsetting",
       "Joining or datasets",
       "Row-binding of datasets",
-      "Scatter plotting"
+      "Scatter plotting",
+      "Upload data",
+      "Read CSV file",
+      "Static data",
+      "Data head/tail"
     ),
     category = c(
       "data",
       "transform",
       "transform",
       "transform",
-      "plot"
+      "plot",
+      "file",
+      "parse",
+      "data",
+      "transform"
     ),
     package = utils::packageName(),
     overwrite = TRUE
