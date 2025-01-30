@@ -8,13 +8,13 @@
 #' @param ... Generic consistency
 #'
 #' @export
-block_server <- function(id, x, data, ...) {
+block_server <- function(id, x, data = list(), ...) {
   UseMethod("block_server", x)
 }
 
 #' @rdname block_server
 #' @export
-block_server.block <- function(id, x, data, ...) {
+block_server.block <- function(id, x, data = list(), ...) {
   moduleServer(
     id,
     function(input, output, session) {

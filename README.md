@@ -38,8 +38,8 @@ such as
 
 ``` r
 serve(
-  blockr.dplyr::new_join_block(by = "name"),
-  data = list(x = dplyr::band_members, y = dplyr::band_instruments)
+  new_merge_block(by = "name"),
+  data = list(x = datasets::BOD, y = datasets::ChickWeight)
 )
 ```
 
@@ -50,17 +50,11 @@ created and passed to `serve()`, e.g.
 serve(
   new_board(
     blocks = c(
-      d = blockr.dplyr::new_join_block(),
       a = new_dataset_block(),
-      c = blockr.dplyr::new_select_block(),
-      e = blockr.dplyr::new_select_block(),
-      b = new_dataset_block()
+      b = new_dataset_block(),
+      c = new_rbind_block()
     ),
-    links = links(
-      from = c("a", "c", "b", "d"),
-      to = c("d", "d", "c", "e"),
-      input = c("x", "y", "", "")
-    )
+    links = links(from = "a", to = "c")
   )
 )
 ```

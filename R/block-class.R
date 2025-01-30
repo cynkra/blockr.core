@@ -21,6 +21,12 @@ new_block <- function(server, ui, class, ctor, ctor_pkg, dat_valid = NULL,
 
   stopifnot(is.character(class), length(class) > 0L)
 
+  if (missing(ui)) {
+    ui <- function(id) {
+      tagList()
+    }
+  }
+
   if (is.numeric(ctor)) {
 
     fun <- sys.function(ctor)

@@ -10,9 +10,9 @@
 \alias{block_eval.plot_block}
 \title{Generics for server generation}
 \usage{
-block_server(id, x, data, ...)
+block_server(id, x, data = list(), ...)
 
-\method{block_server}{block}(id, x, data, ...)
+\method{block_server}{block}(id, x, data = list(), ...)
 
 expr_server(x, data, ...)
 

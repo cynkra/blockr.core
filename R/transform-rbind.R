@@ -29,7 +29,6 @@ new_rbind_block <- function(...) {
         }
       )
     },
-    function(id) tagList(),
     dat_valid = function(...args) {
       stopifnot(length(...args) >= 1L)
     },
