@@ -42,7 +42,11 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
     do.call(
       div,
       c(
-        class = "d-flex justify-content-center align-items-center m-2 gap-5",
+        class = paste(
+          "d-flex justify-content-evenly align-items-center",
+          "bg-light-subtle sticky-top border rounded-4",
+          "m-2 gap-5 p-2"
+        ),
         toolbar_args
       )
     ),
