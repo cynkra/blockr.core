@@ -1,0 +1,56 @@
+#' CSV parser block constructor
+#'
+#' Following a file block, such as the upload block, this can parse the file.
+#'
+#' @param sep,quote Forwarded to [utils::read.table()]
+#' @param ... Forwarded to [new_block()]
+#'
+#' @export
+new_csv_block <- function(sep = ",", quote = "\"", ...) {
+  new_parser_block(
+    function(id, file) {
+      moduleServer(
+        id,
+        function(input, output, session) {
+
+          sp <- reactiveVal(sep)
+          qo <- reactiveVal(quote)
+
+          observeEvent(input$sep, sp(input$sep))
+          observeEvent(input$quote, qo(input$quote))
+
+          list(
+            expr = reactive(
+              bquote(
+                utils::read.table(file, header = TRUE, sep = .(sp),
+                                  quote = .(qo), dec = ".", fill = TRUE,
+                                  comment.char = ""),
+                list(sp = sp(), qo = qo())
+              )
+            ),
+            state = list(sep = sp, quote = qo)
+          )
+        }
+      )
+    },
+    function(id) {
+      tagList(
+        textInput(
+          inputId = NS(id, "sep"),
+          label = "Field separator",
+          value = sep
+        ),
+        textInput(
+          inputId = NS(id, "quote"),
+          label = "Quoting characters",
+          value = quote
+        )
+      )
+    },
+    dat_val = function(file) {
+      stopifnot(file.exists(file))
+    },
+    class = "csv_block",
+    ...
+  )
+}
