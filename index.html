@@ -79,25 +79,19 @@
 <p>or for a block that requires input, by additionally passing static data such as</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span></span>
-<span>  <span class="fu">blockr.dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/blockr.dplyr/man/new_join_block.html" class="external-link">new_join_block</a></span><span class="op">(</span>by <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span>,</span>
-<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="va"><a href="https://dplyr.tidyverse.org/reference/band_members.html" class="external-link">band_members</a></span>, y <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="va"><a href="https://dplyr.tidyverse.org/reference/band_members.html" class="external-link">band_instruments</a></span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="reference/new_merge_block.html">new_merge_block</a></span><span class="op">(</span>by <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/BOD.html" class="external-link">BOD</a></span>, y <span class="op">=</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/ChickWeight.html" class="external-link">ChickWeight</a></span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>If previewing multiple connected block is desired, a board can be created and passed to <code><a href="reference/serve.html">serve()</a></code>, e.g.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="reference/new_board.html">new_board</a></span><span class="op">(</span></span>
 <span>    blocks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>      d <span class="op">=</span> <span class="fu">blockr.dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/blockr.dplyr/man/new_join_block.html" class="external-link">new_join_block</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>      a <span class="op">=</span> <span class="fu"><a href="reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>      c <span class="op">=</span> <span class="fu">blockr.dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/blockr.dplyr/man/new_select_block.html" class="external-link">new_select_block</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>      e <span class="op">=</span> <span class="fu">blockr.dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/blockr.dplyr/man/new_select_block.html" class="external-link">new_select_block</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>      b <span class="op">=</span> <span class="fu"><a href="reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>      b <span class="op">=</span> <span class="fu"><a href="reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>      c <span class="op">=</span> <span class="fu"><a href="reference/new_rbind_block.html">new_rbind_block</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    links <span class="op">=</span> <span class="fu"><a href="reference/new_link.html">links</a></span><span class="op">(</span></span>
-<span>      from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"c"</span>, <span class="st">"b"</span>, <span class="st">"d"</span><span class="op">)</span>,</span>
-<span>      to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"d"</span>, <span class="st">"c"</span>, <span class="st">"e"</span><span class="op">)</span>,</span>
-<span>      input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">""</span>, <span class="st">""</span><span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
+<span>    links <span class="op">=</span> <span class="fu"><a href="reference/new_link.html">links</a></span><span class="op">(</span>from <span class="op">=</span> <span class="st">"a"</span>, to <span class="op">=</span> <span class="st">"c"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
