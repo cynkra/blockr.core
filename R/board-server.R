@@ -141,6 +141,14 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         )
       }
 
+      gen_code <- get_plugin("generate_code", plugins)
+
+      if (not_null(gen_code)) {
+        check_gen_code_val(
+          do.call(gen_code, c(list("generate_code", rv), dot_args))
+        )
+      }
+
       for (callback in callbacks) {
 
         res <- do.call(callback, c(list(rv), dot_args))
@@ -302,7 +310,8 @@ validate_plugins <- function(plugins) {
 
   unknown <- setdiff(
     names(plugins),
-    c("preseve_board", "manage_blocks", "manage_links", "notify_user")
+    c("preseve_board", "manage_blocks", "manage_links", "notify_user",
+      "generate_code")
   )
 
   if (length(unknown)) {

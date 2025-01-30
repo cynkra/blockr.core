@@ -1,0 +1,35 @@
+test_that("generate code", {
+
+  board <- new_board(
+    blocks = c(
+      a = new_dataset_block("BOD"),
+      b = new_dataset_block("BOD"),
+      c = new_merge_block(by = "Time")
+    ),
+    links = links(
+      from = c("a", "b"),
+      to = c("c", "c"),
+      input = c("x", "y")
+    )
+  )
+
+  testServer(
+    get_s3_method("board_server", board),
+    {
+      code_gen <- session$makeScope("generate_code")
+      code_gen$setInputs(code = 1)
+
+      session$flushReact()
+
+      res <- code_gen$output$code
+
+      expect_type(res, "character")
+      expect_length(res, 1L)
+    },
+    args = list(x = board, plugins = list(generate_code = gen_code_server))
+  )
+})
+
+test_that("dummy add/rm block ui test", {
+  expect_s3_class(gen_code_ui("gen", new_board()), "shiny.tag.list")
+})

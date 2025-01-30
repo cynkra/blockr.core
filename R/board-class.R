@@ -170,7 +170,8 @@ serve.board <- function(x, ...) {
       list(
         preseve_board = ser_deser_ui,
         manage_blocks = add_rm_block_ui,
-        manage_links = add_rm_link_ui
+        manage_links = add_rm_link_ui,
+        generate_code = gen_code_ui
       )
     )
   )
@@ -181,7 +182,8 @@ serve.board <- function(x, ...) {
         preseve_board = ser_deser_server,
         manage_blocks = add_rm_block_server,
         manage_links = add_rm_link_server,
-        notify_user = block_notification_server
+        notify_user = block_notification_server,
+        generate_code = gen_code_server
       )
     )
   }

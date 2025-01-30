@@ -170,3 +170,11 @@ dot_args_names <- function(x) {
 dot_args_to_list <- function(x) {
   set_names(reactiveValuesToList(x), dot_args_names(x))
 }
+
+substitute_expr <- function(expr, env) {
+  do.call(substitute, list(expr = expr, env = env))
+}
+
+assignment <- function(name, value) {
+  bquote(.(nme) <- .(val), list(nme = as.name(name), val = value))
+}

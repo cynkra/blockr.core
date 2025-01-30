@@ -246,11 +246,6 @@ block_eval <- function(x, expr, data, ...) {
 #' @rdname block_server
 #' @export
 block_eval.block <- function(x, expr, data, ...) {
-
-  if (is.na(block_arity(x)) && is_empty(names(data))) {
-    names(data) <- paste0("...", seq_along(data))
-  }
-
   eval(expr, data)
 }
 

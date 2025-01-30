@@ -22,13 +22,15 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
   add_rm_block <- get_plugin("manage_blocks", plugins)
   add_rm_link <- get_plugin("manage_links", plugins)
   block_notifications <- get_plugin("notify_user", plugins)
+  gen_code <- get_plugin("generate_code", plugins)
 
   ns <- NS(id)
 
   toolbar_args <- list(
     if (length(ser_deser)) ser_deser(ns("preseve_board"), x),
     if (length(add_rm_block)) add_rm_block(ns("manage_blocks"), x),
-    if (length(add_rm_link)) add_rm_link(ns("manage_links"), x)
+    if (length(add_rm_link)) add_rm_link(ns("manage_links"), x),
+    if (length(gen_code)) gen_code(ns("generate_code"), x)
   )
 
   toolbar_args <- do.call(tagList, toolbar_args)
