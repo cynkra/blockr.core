@@ -41,7 +41,10 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
   tagList(
     do.call(
       div,
-      c(class = "d-flex align-items-center m-2 gap-5", toolbar_args)
+      c(
+        class = "d-flex justify-content-center align-items-center m-2 gap-5",
+        toolbar_args
+      )
     ),
     do.call(div, block_notifications),
     do.call(div, c(id = paste0(id, "_blocks"), block_ui(id, x)))

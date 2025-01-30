@@ -16,7 +16,6 @@ add_rm_block_server <- function(id, rv, ...) {
   moduleServer(
     id,
     function(input, output, session) {
-
       res <- reactiveValues(add = NULL, rm = NULL)
 
       observeEvent(
@@ -60,8 +59,8 @@ add_rm_block_ui <- function(id, board) {
     ),
     actionButton(
       NS(id, "add_block"),
-      "Add block",
-      icon = icon("plus"),
+      "Add",
+      icon = icon("circle-plus"),
       class = "btn-success"
     ),
     selectInput(
@@ -71,15 +70,14 @@ add_rm_block_ui <- function(id, board) {
     ),
     actionButton(
       NS(id, "rm_block"),
-      "Remove block",
-      icon = icon("minus"),
+      "Remove",
+      icon = icon("circle-minus"),
       class = "btn-danger"
     )
   )
 }
 
 check_add_rm_block_val <- function(val, rv) {
-
   observeEvent(
     TRUE,
     {
@@ -88,8 +86,10 @@ check_add_rm_block_val <- function(val, rv) {
       }
 
       if (!setequal(names(val), c("add", "rm"))) {
-        stop("Expecting the `add_rm_block` return value to contain ",
-             "components `add` and `rm`.")
+        stop(
+          "Expecting the `add_rm_block` return value to contain ",
+          "components `add` and `rm`."
+        )
       }
     },
     once = TRUE
@@ -99,8 +99,10 @@ check_add_rm_block_val <- function(val, rv) {
     val$add,
     {
       if (!is_blocks(val$add)) {
-        stop("Expecting the `add` component of the `add_rm_block` return ",
-             "value to be `NULL` or a `blocks` object.")
+        stop(
+          "Expecting the `add` component of the `add_rm_block` return ",
+          "value to be `NULL` or a `blocks` object."
+        )
       }
     },
     once = TRUE
@@ -120,8 +122,10 @@ check_add_rm_block_val <- function(val, rv) {
     val$rm,
     {
       if (!is.character(val$rm)) {
-        stop("Expecting the `rm` component of the `add_rm_block` return ",
-             "value to be `NULL` or a character vector.")
+        stop(
+          "Expecting the `rm` component of the `add_rm_block` return ",
+          "value to be `NULL` or a character vector."
+        )
       }
     },
     once = TRUE

@@ -15,7 +15,6 @@ ser_deser_server <- function(id, rv, ...) {
   moduleServer(
     id,
     function(input, output, session) {
-
       output$serialize <- downloadHandler(
         board_filename(rv),
         write_board_to_disk(rv)
@@ -42,7 +41,6 @@ ser_deser_ui <- function(id, board) {
     downloadButton(
       NS(id, "serialize"),
       "Save",
-      class = "mx-2"
     ),
     fileInput(
       NS(id, "restore"),
@@ -54,15 +52,16 @@ ser_deser_ui <- function(id, board) {
 board_filename <- function(rv) {
   function() {
     paste0(
-      rv$board_id, "_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), ".json"
+      rv$board_id,
+      "_",
+      format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+      ".json"
     )
   }
 }
 
 write_board_to_disk <- function(rv) {
-
   function(con) {
-
     blocks <- lapply(
       lst_xtr(rv$blocks, "server", "state"),
       lapply,
@@ -78,7 +77,6 @@ write_board_to_disk <- function(rv) {
 }
 
 check_ser_deser_val <- function(val) {
-
   observeEvent(
     TRUE,
     {
@@ -93,8 +91,10 @@ check_ser_deser_val <- function(val) {
     val(),
     {
       if (!is_board(val())) {
-        stop("Expecting the `ser_deser` return value to evaluate to a ",
-             "`board` object.")
+        stop(
+          "Expecting the `ser_deser` return value to evaluate to a ",
+          "`board` object."
+        )
       }
 
       validate_board(val())
