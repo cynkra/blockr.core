@@ -116,7 +116,7 @@ block_server.block <- function(id, x, data = list(), ...) {
 
           allow_empty <- block_allow_empty_state(x)
 
-          if (isTRUE(allow_empty)) {
+          if (isTRUE(allow_empty) || !length(exp$state)) {
             return(TRUE)
           }
 

@@ -3,9 +3,11 @@
 %   R/plot-block.R, R/transform-block.R
 \name{block_ui}
 \alias{block_ui}
+\alias{block_ui.block}
 \alias{expr_ui}
 \alias{expr_ui.block}
 \alias{block_output}
+\alias{block_output.block}
 \alias{block_ui.board}
 \alias{block_output.data_block}
 \alias{block_ui.data_block}
@@ -17,11 +19,15 @@
 \usage{
 block_ui(id, x, ...)
 
+\method{block_ui}{block}(id, x, ...)
+
 expr_ui(id, x, ...)
 
 \method{expr_ui}{block}(id, x, ...)
 
 block_output(x, result)
+
+\method{block_output}{block}(x, result)
 
 \method{block_ui}{board}(id, x, blocks = NULL, ...)
 

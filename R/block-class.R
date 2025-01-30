@@ -374,7 +374,7 @@ validate_data_inputs <- function(x, data) {
 #' @param id Block ID
 #' @rdname serve
 #' @export
-serve.block <- function(x, data, id = "block", ...) {
+serve.block <- function(x, data = list(), id = "block", ...) {
 
   ui <- bslib::page_fluid(block_ui(id, x))
 

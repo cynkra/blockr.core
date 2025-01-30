@@ -13,6 +13,12 @@ block_ui <- function(id, x, ...) {
 
 #' @rdname block_ui
 #' @export
+block_ui.block <- function(id, x, ...) {
+  expr_ui(id, x, ...)
+}
+
+#' @rdname block_ui
+#' @export
 expr_ui <- function(id, x, ...) {
   UseMethod("expr_ui", x)
 }
@@ -35,4 +41,10 @@ expr_ui.block <- function(id, x, ...) {
 #' @export
 block_output <- function(x, result) {
   UseMethod("block_output")
+}
+
+#' @rdname block_ui
+#' @export
+block_output.block <- function(x, result) {
+  NULL
 }

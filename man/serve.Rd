@@ -7,7 +7,7 @@
 \alias{serve}
 \title{Serve object}
 \usage{
-\method{serve}{block}(x, data, id = "block", ...)
+\method{serve}{block}(x, data = list(), id = "block", ...)
 
 \method{serve}{data_block}(x, ...)
 
