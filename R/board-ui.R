@@ -15,7 +15,6 @@ board_ui <- function(id, x, ...) {
 #' @rdname board_ui
 #' @export
 board_ui.board <- function(id, x, plugins = list(), ...) {
-
   validate_plugins(plugins)
 
   ser_deser <- get_plugin("preseve_board", plugins)
@@ -42,7 +41,17 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
   }
 
   tagList(
-    do.call(div, c(class = "d-flex justify-content-center", toolbar_args)),
+    do.call(
+      div,
+      c(
+        class = paste(
+          "d-flex justify-content-evenly align-items-center",
+          "bg-light-subtle sticky-top border rounded-4",
+          "m-2 gap-5 p-2"
+        ),
+        toolbar_args
+      )
+    ),
     do.call(div, block_notifications),
     do.call(div, c(id = paste0(id, "_blocks"), block_ui(id, x)))
   )
@@ -52,9 +61,7 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
 #' @rdname block_ui
 #' @export
 block_ui.board <- function(id, x, blocks = NULL, ...) {
-
   block_card <- function(x, id, ns) {
-
     div(
       class = "card shadow-sm p-2 mb-2 border",
       id = paste0(id, "_block"),
@@ -94,7 +101,6 @@ insert_block_ui <- function(id, x, blocks = NULL, ...) {
 #' @rdname board_ui
 #' @export
 insert_block_ui.board <- function(id, x, blocks = NULL, ...) {
-
   stopifnot(is_string(id))
 
   insertUI(
@@ -114,9 +120,7 @@ remove_block_ui <- function(id, x, blocks = NULL, ...) {
 #' @rdname board_ui
 #' @export
 remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
-
   if (is.null(blocks)) {
-
     stopifnot(is_string(id))
 
     removeUI(
@@ -124,9 +128,7 @@ remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
       multiple = TRUE,
       immediate = TRUE
     )
-
   } else {
-
     stopifnot(is.character(blocks), all(blocks %in% board_block_ids(x)))
 
     for (block in blocks) {
