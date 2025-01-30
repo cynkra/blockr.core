@@ -52,11 +52,11 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         once = TRUE
       )
 
-      ser_deser <- get_plugin("preseve_board", plugins)
+      ser_deser <- get_plugin("preserve_board", plugins)
 
       if (not_null(ser_deser)) {
         board_refresh <- check_ser_deser_val(
-          do.call(ser_deser, c(list("preseve_board", rv), dot_args))
+          do.call(ser_deser, c(list("preserve_board", rv), dot_args))
         )
 
         observeEvent(
@@ -310,7 +310,7 @@ validate_plugins <- function(plugins) {
 
   unknown <- setdiff(
     names(plugins),
-    c("preseve_board", "manage_blocks", "manage_links", "notify_user",
+    c("preserve_board", "manage_blocks", "manage_links", "notify_user",
       "generate_code")
   )
 

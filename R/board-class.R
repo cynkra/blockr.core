@@ -168,7 +168,7 @@ serve.board <- function(x, ...) {
   ui <- bslib::page_fluid(
     board_ui(id, x,
       list(
-        preseve_board = ser_deser_ui,
+        preserve_board = ser_deser_ui,
         manage_blocks = add_rm_block_ui,
         manage_links = add_rm_link_ui,
         generate_code = gen_code_ui
@@ -179,7 +179,7 @@ serve.board <- function(x, ...) {
   server <- function(input, output, session) {
     board_server(id, x,
       list(
-        preseve_board = ser_deser_server,
+        preserve_board = ser_deser_server,
         manage_blocks = add_rm_block_server,
         manage_links = add_rm_link_server,
         notify_user = block_notification_server,

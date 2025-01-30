@@ -73,7 +73,7 @@ test_that("board server", {
         board_server(
           "board",
           board,
-          list(preseve_board = plugin_a, manage_blocks = plugin_b),
+          list(preserve_board = plugin_a, manage_blocks = plugin_b),
           parent = parent
         )
       }

@@ -17,7 +17,7 @@ board_ui <- function(id, x, ...) {
 board_ui.board <- function(id, x, plugins = list(), ...) {
   validate_plugins(plugins)
 
-  ser_deser <- get_plugin("preseve_board", plugins)
+  ser_deser <- get_plugin("preserve_board", plugins)
   add_rm_block <- get_plugin("manage_blocks", plugins)
   add_rm_link <- get_plugin("manage_links", plugins)
   block_notifications <- get_plugin("notify_user", plugins)
@@ -26,7 +26,7 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
   ns <- NS(id)
 
   toolbar_args <- list(
-    if (length(ser_deser)) ser_deser(ns("preseve_board"), x),
+    if (length(ser_deser)) ser_deser(ns("preserve_board"), x),
     if (length(add_rm_block)) add_rm_block(ns("manage_blocks"), x),
     if (length(add_rm_link)) add_rm_link(ns("manage_links"), x),
     if (length(gen_code)) gen_code(ns("generate_code"), x)
