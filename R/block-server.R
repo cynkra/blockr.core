@@ -161,6 +161,7 @@ block_server.block <- function(id, x, data = list(), ...) {
         {
           req(rv$state_set)
           lapply(exp$state, reval_if)
+          try(exp$expr(), silent = TRUE)
 
           res <- dat()
 
