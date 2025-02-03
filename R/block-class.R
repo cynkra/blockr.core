@@ -102,22 +102,41 @@ new_block <- function(server, ui, class, ctor, ctor_pkg, dat_valid = NULL,
 validate_block_server <- function(server) {
 
   if (!is.function(server)) {
-    stop("A block server component is expected to be a function.")
+    abort(
+      "A block server component is expected to be a function.",
+      class = "block_server_function_invalid"
+    )
   }
 
   args <- names(formals(server))
 
   if (!identical(args[1L], "id")) {
-    stop(
-      "A block server function is expected to have an argument `id` in ",
-      "first poistion."
+    abort(
+      paste(
+        "A block server function is expected to have an argument `id` in",
+        "first poistion."
+      ),
+      class = "block_server_arg_id_invalid"
     )
   }
 
   if ("..." %in% args) {
-    stop(
-      "Variadic blocks are supported not by passing arguments as `...` ",
-      "but using a special argument `...args`."
+    abort(
+      paste(
+        "Variadic blocks are supported not by passing arguments as `...`",
+        "but using a special argument `...args`."
+      ),
+      class = "block_server_dots_invalid"
+    )
+  }
+
+  if (any(grepl("^[1-9][0-9]*$", args))) {
+    abort(
+      paste(
+        "Integer-valued argument names are reserved as poistional arguments",
+        "in `...args.`"
+      ),
+      class = "block_server_args_invalid"
     )
   }
 
@@ -127,11 +146,17 @@ validate_block_server <- function(server) {
 validate_block_ui <- function(ui) {
 
   if (!is.function(ui)) {
-    stop("A block UI component is expected to be a function.")
+    abort(
+      "A block UI component is expected to be a function.",
+      class = "block_ui_function_invalid"
+    )
   }
 
   if (!identical(names(formals(ui)), "id")) {
-    stop("A block UI function is expected to have a single argument `id`.")
+    abort(
+      "A block UI function is expected to have a single argument `id`.",
+      class = "block_ui_arg_id_invalid"
+    )
   }
 
   invisible(ui)
@@ -142,20 +167,31 @@ validate_data_validator <- function(validator, server) {
   server_args <- setdiff(names(formals(server)), "id")
 
   if (!length(server_args) && not_null(validator)) {
-    stop("A nullary server function cannot accopmany a data input validator.")
+    abort(
+      "A nullary server function cannot accopmany a data input validator.",
+      class = "block_validator_nullary_invalid"
+    )
   }
 
   if (not_null(validator)) {
 
     if (!is.function(validator)) {
-      stop("Data input validator is expected to be a function.")
+      abort(
+        "Data input validator is expected to be a function.",
+        class = "block_validator_function_invalid"
+      )
     }
 
     val_args <- names(formals(validator))
 
     if (!identical(server_args, val_args)) {
-      stop("Block `", class[1L], "` has server args ", paste_enum(server_args),
-           " which does not match validator args ", paste_enum(val_args), ".")
+      abort(
+        paste0(
+          "Server args ", paste_enum(server_args), " do not match validator ",
+          "args ", paste_enum(val_args), "."
+        ),
+        class = "block_validator_args_invalid"
+      )
     }
   }
 
@@ -165,15 +201,38 @@ validate_data_validator <- function(validator, server) {
 validate_block <- function(x, ui_eval = FALSE) {
 
   if (!is_block(x)) {
-    stop("Expecting blocks to inherit from \"block\".")
+    abort(
+      "Expecting blocks to inherit from \"block\".",
+      class = "block_class_invalid"
+    )
   }
 
   if (class(x)[1L] == "block") {
-    stop("Expecting blocks to have at least one sub-class.")
+    abort(
+      "Expecting blocks to have at least one sub-class.",
+      class = "block_class_invalid"
+    )
   }
 
   if (!is.list(x)) {
-    stop("Expecting blocks to behave list-like.")
+    abort(
+      "Expecting blocks to behave list-like.",
+      class = "block_list_like_invalid"
+    )
+  }
+
+  if (!is.function(try(block_ctor(x), silent = TRUE))) {
+    abort(
+      "Cannot reconstruct blocks without constructors.",
+      class = "block_no_ctor"
+    )
+  }
+
+  if (!is_string(block_name(x))) {
+    abort(
+      "Expecting a string-valued block name.",
+      class = "block_name_invalid"
+    )
   }
 
   srv <- block_expr_server(x)
@@ -187,17 +246,14 @@ validate_block <- function(x, ui_eval = FALSE) {
     ui <- expr_ui("block", x)
 
     if (!inherits(ui, "shiny.tag", "shiny.tag.list", agg = any)) {
-      stop("A block UI function is expected to return a shiny UI object, ",
-           "i.e. either a `shiny.tag` or a `shiny.tag.list`.")
+      abort(
+        paste(
+          "A block UI function is expected to return a shiny UI object,",
+          "i.e. either a `shiny.tag` or a `shiny.tag.list`."
+        ),
+        class = "block_ui_eval_invalid"
+      )
     }
-  }
-
-  if (!is.function(block_ctor(x))) {
-    stop("Cannot reconstruct blocks without constructors.")
-  }
-
-  if (!is_string(block_name(x))) {
-    stop("Expecting a string-valued block name.")
   }
 
   x

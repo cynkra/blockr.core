@@ -24,6 +24,112 @@ test_that("block constructor", {
     new_identity_block(),
     c("identity_block", "transform_block", "block")
   )
+
+  expect_error(
+    validate_block_server("abc"),
+    class = "block_server_function_invalid"
+  )
+
+  expect_error(
+    validate_block_server(function() {}),
+    class = "block_server_arg_id_invalid"
+  )
+
+  expect_error(
+    validate_block_server(function(id, ...) {}),
+    class = "block_server_dots_invalid"
+  )
+
+  expect_error(
+    validate_block_server(function(id, `1`) {}),
+    class = "block_server_args_invalid"
+  )
+
+  expect_identical(
+    validate_block_server(function(id) {}),
+    function(id) {}
+  )
+
+  expect_error(
+    validate_block_ui("abc"),
+    class = "block_ui_function_invalid"
+  )
+
+  expect_error(
+    validate_block_ui(function() {}),
+    class = "block_ui_arg_id_invalid"
+  )
+
+  expect_error(
+    validate_block_ui(function(abc) {}),
+    class = "block_ui_arg_id_invalid"
+  )
+
+  expect_error(
+    validate_data_validator(function(x) {}, function() {}),
+    class = "block_validator_nullary_invalid"
+  )
+
+  expect_error(
+    validate_data_validator("abc", function(id, x) {}),
+    class = "block_validator_function_invalid"
+  )
+
+  expect_silent(
+    validate_data_validator(NULL, function(id, x) {})
+  )
+
+  expect_error(
+    validate_data_validator(function(y) {}, function(id, x) {}),
+    class = "block_validator_args_invalid"
+  )
+
+  expect_error(
+    validate_block("abc"),
+    class = "block_class_invalid"
+  )
+
+  expect_error(
+    validate_block(structure("abc", class = "block")),
+    class = "block_class_invalid"
+  )
+
+  expect_error(
+    validate_block(structure("abc", class = c("some_block", "block"))),
+    class = "block_list_like_invalid"
+  )
+
+  expect_error(
+    validate_block(
+      structure(list(), ctor = "abc", class = c("some_block", "block"))
+    ),
+    class = "block_no_ctor"
+  )
+
+  expect_error(
+    validate_block(
+      structure(list(), ctor = function() {}, name = 1,
+                class = c("some_block", "block"))
+    ),
+    class = "block_name_invalid"
+  )
+
+  expect_error(
+    validate_block(
+      structure(
+        list(
+          expr_server = function(id) {},
+          expr_ui = function(id) {},
+          dat_valid = NULL
+        ),
+        ctor = function() {},
+        name = "1",
+        class = c("some_block", "block")
+      ),
+      ui_eval = TRUE
+    ),
+    class = "block_ui_eval_invalid"
+  )
 })
 
 test_that("block class", {
