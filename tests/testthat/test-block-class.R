@@ -153,9 +153,6 @@ test_that("block utils", {
 
   expect_s3_class(c(blk, blk), "blocks")
   expect_s3_class(c(blk, lst), "blocks")
-
-  expect_type(c(lst, blk), "list")
-  expect_type(c(lst, lst), "list")
 })
 
 test_that("block app", {

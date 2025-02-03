@@ -28,11 +28,17 @@ new_link <- function(from = "", to = "", input = "", ...,
 validate_link <- function(x) {
 
   if (!is_link(x)) {
-    stop("Expecting a link to inherit from \"link\".")
+    abort(
+      "Expecting a link to inherit from \"link\".",
+      class = "link_class_invalid"
+    )
   }
 
   if (!is.list(x)) {
-    stop("Expecting a link to be represented by a list.")
+    abort(
+      "Expecting a link to be represented by a list.",
+      class = "link_list_like_invalid"
+    )
   }
 
   if (all_zero_len(x)) {
@@ -42,19 +48,37 @@ validate_link <- function(x) {
   fields <- c("from", "to", "input")
 
   if (!all(fields %in% names(x))) {
-    stop("Expecting a link to contain attributes ", paste_enum(fields), ".")
+    abort(
+      paste0(
+        "Expecting a link to contain attributes ", paste_enum(fields), "."
+      ),
+      class = "link_components_missing"
+    )
   }
 
   if (!all(lgl_ply(x[fields], is_string))) {
-    stop("Expecting link attributes ", paste_enum(fields), " to be strings.")
+    abort(
+      paste0(
+        "Expecting link attributes ", paste_enum(fields), " to be strings."
+      ),
+      class = "link_components_invalid"
+    )
   }
 
   if (anyNA(x[fields])) {
-    stop("Missing values for ", paste_enum(fields), " are not allowed.")
+    abort(
+      paste0(
+        "Missing values for ", paste_enum(fields), " are not allowed."
+      ),
+      class = "link_components_invalid"
+    )
   }
 
   if (x[["from"]] == x[["to"]] && x[["to"]] != "") {
-    stop("Self-referencing links are not allowed.")
+    abort(
+      "Self-referencing links are not allowed.",
+      class = "link_self_referencing"
+    )
   }
 
   x
@@ -164,44 +188,3 @@ print.link <- function(x, ...) {
 c.link <- function(...) {
   as_links(lapply(list(...), as_link))
 }
-
-#' @export
-vec_restore.link <- function(x, to, ...) {
-  validate_link(NextMethod())
-}
-
-#' @export
-vec_ptype2.link.link <- function(x, y, ...) x
-
-#' @export
-vec_ptype2.character.link <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.link.character <- function(x, y, ...) x
-
-#' @export
-vec_ptype2.list.link <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.link.list <- function(x, y, ...) x
-
-#' @export
-vec_cast.link.link <- function(x, to, ...) x
-
-#' @export
-vec_cast.link.character <- function(x, to, ...) as_link(x)
-
-#' @export
-vec_cast.character.link <- function(x, to, ...) as.character(x)
-
-#' @export
-vec_cast.link.list <- function(x, to, ...) as_link(x)
-
-#' @export
-vec_cast.list.link <- function(x, to, ...) as.list(x)
-
-#' @export
-vec_cast.link.data.frame <- function(x, to, ...) as_link(x)
-
-#' @export
-vec_cast.data.frame.link <- function(x, to, ...) as.data.frame(x)
