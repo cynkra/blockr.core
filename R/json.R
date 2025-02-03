@@ -22,7 +22,7 @@ blockr_ser.block <- function(x, state = NULL, ...) {
 #' @export
 blockr_ser.blocks <- function(x, blocks = NULL, ...) {
 
-  if (is.null(blocks)) {
+  if (!length(blocks)) {
 
     res <- lapply(x, blockr_ser)
 
