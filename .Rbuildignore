@@ -2,3 +2,4 @@
 ^README\.(Rmd|html)$
 ^\.github$
 ^\.lintr$
+_\.new\.png$

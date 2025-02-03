@@ -2,14 +2,11 @@
 % Please edit documentation in R/block-class.R, R/board-class.R, R/utils-misc.R
 \name{serve.block}
 \alias{serve.block}
-\alias{serve.data_block}
 \alias{serve.board}
 \alias{serve}
 \title{Serve object}
 \usage{
 \method{serve}{block}(x, data = list(), id = "block", ...)
-
-\method{serve}{data_block}(x, ...)
 
 \method{serve}{board}(x, ...)
 

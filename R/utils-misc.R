@@ -170,3 +170,13 @@ dot_args_names <- function(x) {
 dot_args_to_list <- function(x) {
   set_names(reactiveValuesToList(x), dot_args_names(x))
 }
+
+# https://github.com/rstudio/shiny/issues/3768
+safely_export <- function(r) {
+  r_quo <- rlang::enquo(r)
+  rlang::inject({
+    reactive({
+      tryCatch(!!r_quo, error = function(e) e)
+    })
+  })
+}

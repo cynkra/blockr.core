@@ -34,5 +34,6 @@ Suggests:
     testthat (>= 3.0.0),
     memuse,
     withr,
-    grDevices
+    grDevices,
+    shinytest2
 Config/testthat/edition: 3

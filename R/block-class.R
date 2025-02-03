@@ -435,16 +435,17 @@ serve.block <- function(x, data = list(), id = "block", ...) {
   ui <- bslib::page_fluid(block_ui(id, x))
 
   server <- function(input, output, session) {
-    block_server(id, x, lapply(data, reactiveVal))
+
+    res <- block_server(id, x, lapply(data, reactiveVal))
+
+    exportTestValues(
+      result = safely_export(res$result())()
+    )
+
+    invisible()
   }
 
   shinyApp(ui, server)
-}
-
-#' @rdname serve
-#' @export
-serve.data_block <- function(x, ...) {
-  NextMethod(data = list())
 }
 
 #' @rdname new_block

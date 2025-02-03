@@ -145,3 +145,38 @@ test_that("block class", {
 
   expect_snapshot(print(x))
 })
+
+test_that("block app", {
+
+  skip_on_cran()
+
+  app_path <- system.file(
+    "examples", "block", "app.R",
+    package = "blockr.core"
+  )
+
+  app <- shinytest2::AppDriver$new(
+    app_path,
+    name = "block",
+    seed = 42
+  )
+
+  app$expect_values(export = TRUE, screenshot_args = FALSE)
+
+  app$set_inputs(`block-expr-by` = "Time")
+  app$expect_values(export = TRUE, screenshot_args = FALSE)
+
+  app$set_inputs(`block-expr-type` = "all.x")
+  app$expect_values(export = TRUE, screenshot_args = FALSE)
+
+  app$set_inputs(`block-expr-type` = c("all.x", "all.y"))
+  app$expect_values(export = TRUE, screenshot_args = FALSE)
+
+  app$set_inputs(`block-expr-type` = "all.y")
+  app$expect_values(export = TRUE, screenshot_args = FALSE)
+
+  app$set_inputs(`block-expr-type` = character(0))
+  app$expect_values(export = TRUE, screenshot_args = FALSE)
+
+  app$stop()
+})
