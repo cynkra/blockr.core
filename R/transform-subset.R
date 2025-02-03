@@ -37,12 +37,14 @@ new_subset_block <- function(subset = "", select = "", ...) {
         textInput(
           inputId = NS(id, "subset"),
           label = "Subset",
-          value = subset
+          value = subset,
+          placeholder = "Enter a row subsetting expression."
         ),
         textInput(
           inputId = NS(id, "select"),
           label = "Select",
-          value = select
+          value = select,
+          placeholder = "Enter a column selection expression."
         ),
         actionButton(
           inputId = NS(id, "eval"),
