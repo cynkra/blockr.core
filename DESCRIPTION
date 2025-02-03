@@ -32,9 +32,7 @@ Imports:
     rlang
 Suggests:
     testthat (>= 3.0.0),
-    blockr.dplyr,
     memuse,
     withr,
     grDevices
-Remotes: cynkra/blockr.dplyr
 Config/testthat/edition: 3

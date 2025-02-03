@@ -4,10 +4,10 @@ test_that("block constructor", {
 
   board <- new_board(
     list(
-      d = blockr.dplyr::new_join_block(),
+      d = new_merge_block(),
       a = new_dataset_block(),
-      c = blockr.dplyr::new_select_block(),
-      e = blockr.dplyr::new_select_block(),
+      c = new_subset_block(),
+      e = new_subset_block(),
       b = new_dataset_block()
     ),
     data.frame(
@@ -25,7 +25,7 @@ test_that("block constructor", {
     new_board(
       list(
         a = new_dataset_block(),
-        b = blockr.dplyr::new_select_block()
+        b = new_subset_block()
       ),
       new_link("a", "b", "foo")
     ),
@@ -36,7 +36,7 @@ test_that("block constructor", {
     new_board(
       list(
         a = new_dataset_block(),
-        b = blockr.dplyr::new_select_block()
+        b = new_subset_block()
       ),
       data.frame(from = "a", to = "b", input = "foo")
     ),

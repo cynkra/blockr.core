@@ -56,11 +56,11 @@ If previewing multiple connected block is desired, a board can be created and pa
 serve(
   new_board(
     blocks = c(
-      a = new_dataset_block(),
-      b = new_dataset_block(),
-      c = new_rbind_block()
+      a = new_dataset_block("BOD"),
+      b = new_dataset_block("ChickWeight"),
+      c = new_merge_block("Time")
     ),
-    links = links(from = "a", to = "c")
+    links = links(from = c("a", "b"), to = c("c", "c"), input = c("x", "y"))
   )
 )
 ```
@@ -73,7 +73,7 @@ The constructor return value should be a call to `new_block()` (or if applicable
 
 ### Block `server`
 
-- A signature with as many arguments as data inputs is expected: zero for a data block, one for a transform block such as a select block, two for a join block and `...` for an `rbind` block (excluding the required first argument `id`).
+- A signature with as many arguments as data inputs is expected: zero for a data block, one for a transform block such as a select block, two for a join block and the special argument `...args` for variadic blocks, such as an `rbind` block (all, excluding the required first argument `id`).
 - The first argument `id` should be passed to the `shiny::moduleServer()` call.
 - As return value a call to `shiny::moduleServer()` is expected, containing a `module` function that in turn returns a list with entries `expr` and `state`.
 - The block expression is a quoted reactive value that contains user-supplied components and is updated whenever user values change. Data names should match between expressio and the top-level function arguments.
@@ -180,10 +180,10 @@ The block can then be manipulated via UI as
 serve(new_dataset_block("iris"))
 ```
 
-Another example is a `dplyr::select()` block, such as the one offered by the blockr.dplyr extension package:
+Another example is a `utils::head()` block, such as the one offered as `new_head_block()`:
 
 ```{r}
-new_select_block <- function(columns = character(), ...) {
+new_head_block <- function(n = 6L, ...) {
 
   new_transform_block(
     function(id, data) {
@@ -191,67 +191,67 @@ new_select_block <- function(columns = character(), ...) {
         id,
         function(input, output, session) {
 
-          sels <- reactiveVal(columns)
-          cols <- reactive(colnames(data()))
+          n_rows <- reactiveVal(n)
 
-          observe(
-            {
-              sels(intersect(input$columns, cols()))
+          observeEvent(input$n, n_rows(input$n))
 
-              updateSelectInput(
-                session,
-                inputId = "columns",
-                choices = cols(),
-                selected = sels()
-              )
-            }
+          observeEvent(
+            nrow(data()),
+            updateNumericInput(
+              inputId = "n",
+              value = n_rows(),
+              min = 1L,
+              max = nrow(data())
+            )
           )
 
           list(
             expr = reactive(
-              bquote(
-                dplyr::select(data, ..(cols)),
-                list(cols = lapply(sels(), as.name)),
-                splice = TRUE
-              )
+              bquote(utils::head(data, n = .(n)), list(n = n_rows()))
             ),
             state = list(
-              columns = reactive(sels()),
-              choices = reactive(cols())
+              n = n_rows
             )
           )
         }
       )
     },
     function(id) {
-      selectInput(
-        inputId = NS(id, "columns"),
-        label = "Columns",
-        choices = list(),
-        multiple = TRUE
+      tagList(
+        numericInput(
+          inputId = NS(id, "n"),
+          label = "Number of rows",
+          value = n,
+          min = 1L
+        )
       )
     },
-    class = "select_block",
+    dat_val = function(data) {
+      stopifnot(is.data.frame(data) || is.matrix(data))
+    },
+    class = "head_block",
     ...
   )
 }
 ```
 
-Here, the state return value contains entries `columns` (required by the constructor) and `choices`, which is not an argument of the constructor, but an argument of the UI function. The value for `choices` can be inferred by the server function but is not available when first drawing the UI. Consequently the signature of the UI function requires a default value (for the initial UI rendering) and the server function contains a call to `shiny::updateSelectInput()` to populate the selec choices as soon as the corresponding value is available. As the UI function can be used to re-draw the UI from scratch, `choices` also is required to be included in `state` for correctly re-drawing the block UI.
+Here, the state return value is a list of length 1, containing the current value for the only constructor argument. The current value for `n` is represented by a `shiny::reactiveVal()`, `n_rows()`, which is initialized with the values `n` in the constructor scope and updated on every change to `input$n`. Furthermore the `max` value for the `shiny::numericInput()` field is updated on every change to the number of data rows.
 
-An app containing such a select block can be spun up as
+A final `block` constructor argument of note might be `dat_val`, which is an optional function that can be passed which signals to the framework, if data passed to a block, can actually be processed by the block.
+
+An app containing such a head block can be spun up as
 
 ```{r, eval = FALSE}
-serve(new_select_block(c("mpg", "cyl")), list(data = mtcars))
+serve(new_head_block(n = 10L), list(data = mtcars))
 ```
 
-For an example with multiple data inputs, refer to `blockr.dplyr::new_join_block()`, which can be explored in a standalone app as
+For an example with multiple data inputs, refer to examples such as `new_merge_block()`. Such a binary block (with arguments `x` and `y`) can be explored in a standalone app (with nonsensical inputs) as
 
 ```{r, eval = FALSE}
 serve(
-  blockr.dplyr::new_join_block(by = "name"),
-  data = list(x = dplyr::band_members, y = dplyr::band_instruments)
+  new_merge_block(by = "Time"),
+  data = list(x = datasets::BOD, y = datasets::ChickWeight)
 )
 ```
 
-The `data` argument to `serve()` expects a list with names components that match the server function signature, i.e. `data` for `blockr.core::new_select_block()` and `x`, `y` for `blockr.dplyr::new_join_block()`. These names can be chosen freely by the block implementer.
+The `data` argument to `serve()` expects a list with names components that match the server function signature, i.e. `data` for `new_head_block()` and `x`, `y` for `new_merge_block()`. Such names can be chosen freely by the block implementer (with the exception of integer-valued names, such as `` `1` ``, `` `2` ``, etc. which are reserved as positional arguments in `...args`).

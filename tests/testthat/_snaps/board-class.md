@@ -7,13 +7,14 @@
       
       Blocks[5]:
       
-      <join_block<transform_block<block>>>
-      Name: "Join block"
+      <merge_block<transform_block<block>>>
+      Name: "Merge block"
       Data inputs: "x" and "y"
       Initial block state:
-       $ type: chr "left_join"
-       $ by  : chr(0)
-      Constructor: blockr.dplyr::new_join_block()
+       $ by   : chr(0)
+       $ all_x: logi FALSE
+       $ all_y: logi FALSE
+      Constructor: blockr.core::new_merge_block()
       
       <dataset_block<data_block<block>>>
       Name: "Dataset block"
@@ -23,19 +24,21 @@
        $ package: chr "datasets"
       Constructor: blockr.core::new_dataset_block()
       
-      <select_block<transform_block<block>>>
-      Name: "Select block"
+      <subset_block<transform_block<block>>>
+      Name: "Subset block"
       Data inputs: "data"
       Initial block state:
-       $ columns: chr(0)
-      Constructor: blockr.dplyr::new_select_block()
+       $ subset: chr ""
+       $ select: chr ""
+      Constructor: blockr.core::new_subset_block()
       
-      <select_block<transform_block<block>>>
-      Name: "Select block"
+      <subset_block<transform_block<block>>>
+      Name: "Subset block"
       Data inputs: "data"
       Initial block state:
-       $ columns: chr(0)
-      Constructor: blockr.dplyr::new_select_block()
+       $ subset: chr ""
+       $ select: chr ""
+      Constructor: blockr.core::new_subset_block()
       
       <dataset_block<data_block<block>>>
       Name: "Dataset block"

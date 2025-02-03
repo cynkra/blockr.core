@@ -71,8 +71,8 @@ list_blocks <- function() {
 
 #' @rdname register_block
 #' @export
-unregister_block <- function(uid) {
-  rm(uid, envir = block_registry, inherits = FALSE)
+unregister_blocks <- function(uid = list_blocks()) {
+  rm(list = uid, envir = block_registry, inherits = FALSE)
 }
 
 #' @param ... Forwarded to `register_block()`
@@ -118,7 +118,22 @@ create_block <- function(id, ...) {
   ctor(..., ctor = attr(ctor, "ctor_name"), ctor_pkg = attr(ctor, "package"))
 }
 
-register_core_blocks <- function() {
+register_core_blocks <- function(which = get_option("blocks", "all")) {
+
+  blocks <- paste0(
+    c("dataset", "subset", "merge", "rbind", "scatter", "upload", "csv",
+      "static", "head"),
+    "_block"
+  )
+
+  if (identical(which, "all")) {
+    which <- blocks
+  } else {
+    stopifnot(all(which %in% blocks), anyDuplicated(which) == 0L)
+  }
+
+  blocks <- match(which, blocks)
+
   register_blocks(
     c(
       "new_dataset_block",
@@ -130,7 +145,7 @@ register_core_blocks <- function() {
       "new_csv_block",
       "new_static_block",
       "new_head_block"
-    ),
+    )[blocks],
     name = c(
       "dataset block",
       "subset block",
@@ -141,7 +156,7 @@ register_core_blocks <- function() {
       "csv parser block",
       "static data block",
       "head/tail block"
-    ),
+    )[blocks],
     description = c(
       "Choose a dataset from a package",
       "Row and column subsetting",
@@ -152,7 +167,7 @@ register_core_blocks <- function() {
       "Read CSV file",
       "Static data",
       "Data head/tail"
-    ),
+    )[blocks],
     category = c(
       "data",
       "transform",
@@ -163,7 +178,7 @@ register_core_blocks <- function() {
       "parse",
       "data",
       "transform"
-    ),
+    )[blocks],
     package = utils::packageName(),
     overwrite = TRUE
   )

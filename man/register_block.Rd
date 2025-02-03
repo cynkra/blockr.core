@@ -3,7 +3,7 @@
 \name{register_block}
 \alias{register_block}
 \alias{list_blocks}
-\alias{unregister_block}
+\alias{unregister_blocks}
 \alias{register_blocks}
 \alias{available_blocks}
 \alias{create_block}
@@ -22,7 +22,7 @@ register_block(
 
 list_blocks()
 
-unregister_block(uid)
+unregister_blocks(uid = list_blocks())
 
 register_blocks(...)
 
