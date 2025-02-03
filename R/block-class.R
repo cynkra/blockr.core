@@ -339,29 +339,6 @@ c.block <- function(...) {
   as_blocks(lapply(list(...), as_block))
 }
 
-#' @export
-vec_restore.block <- function(x, to, ...) {
-  validate_block(NextMethod())
-}
-
-#' @export
-vec_ptype2.block.block <- function(x, y, ...) x
-
-#' @export
-vec_ptype2.list.block <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.block.list <- function(x, y, ...) x
-
-#' @export
-vec_cast.block.block <- function(x, to, ...) x
-
-#' @export
-vec_cast.block.list <- function(x, to, ...) as_block(x)
-
-#' @export
-vec_cast.list.block <- function(x, to, ...) as.list(x)
-
 #' @rdname new_block
 #' @export
 block_name <- function(x) {

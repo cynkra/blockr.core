@@ -146,6 +146,18 @@ test_that("block class", {
   expect_snapshot(print(x))
 })
 
+test_that("block utils", {
+
+  blk <- new_dataset_block()
+  lst <- as.list(blk)
+
+  expect_s3_class(c(blk, blk), "blocks")
+  expect_s3_class(c(blk, lst), "blocks")
+
+  expect_type(c(lst, blk), "list")
+  expect_type(c(lst, lst), "list")
+})
+
 test_that("block app", {
 
   skip_on_cran()
