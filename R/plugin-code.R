@@ -15,22 +15,41 @@ gen_code_server <- function(id, rv, ...) {
     id,
     function(input, output, session) {
 
+      code <- reactive(
+        generate_code(rv)
+      )
+
       observeEvent(
-        input$code,
+        input$code_mod,
         {
-          output$code <- renderPrint(HTML(generate_code(rv)))
+          output$code_out <- renderPrint(HTML(code()))
 
           showModal(
             modalDialog(
               title = "Generated code",
               div(
                 class = "text-decoration-none",
-                verbatimTextOutput(session$ns("code"))
+                actionButton(
+                  session$ns("copy_code"),
+                  class = "btn-sm btn-info position-absolute top-0 end-0",
+                  icon("clipboard")
+                ),
+                verbatimTextOutput(session$ns("code_out"))
               ),
               easyClose = TRUE,
               footer = NULL,
               size = "l"
             )
+          )
+        }
+      )
+
+      observeEvent(
+        input$copy_code,
+        {
+          session$sendCustomMessage(
+            "blockr-copy-code",
+            list(code = code())
           )
         }
       )
@@ -46,10 +65,29 @@ gen_code_server <- function(id, rv, ...) {
 gen_code_ui <- function(id, board) {
   tagList(
     actionButton(
-      NS(id, "code"),
+      NS(id, "code_mod"),
       "Show code",
       icon = icon("code")
     )
+  )
+}
+
+copy_to_clipboard <- function() {
+
+  deps <- htmltools::htmlDependency(
+    "copy-to-clipboard",
+    pkg_version(),
+    src = pkg_file("assets", "js"),
+    script = "copyToClipboard.js"
+  )
+
+  tagList(
+    actionButton(
+      session$ns("copy_code"),
+      class = "btn-sm btn-info position-absolute top-0 end-0",
+      icon("code")
+    ),
+    deps
   )
 }
 

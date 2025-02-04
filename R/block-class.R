@@ -49,7 +49,7 @@ new_block <- function(server, ui, class, ctor, ctor_pkg, dat_valid = NULL,
     } else {
 
       if (missing(ctor_pkg)) {
-        ctor_pkg <- utils::packageName(environment(fun))
+        ctor_pkg <- pkg_name(environment(fun))
       }
 
       if (not_null(ctor_pkg)) {
@@ -330,7 +330,7 @@ as.list.block <- function(x, state = NULL, ...) {
     payload = state,
     constructor = attr(x, "ctor"),
     package = pkg,
-    version = as.character(utils::packageVersion(pkg))
+    version = as.character(pkg_version(pkg))
   )
 }
 

@@ -159,10 +159,7 @@ test_that("block app", {
 
   skip_on_cran()
 
-  app_path <- system.file(
-    "examples", "block", "app.R",
-    package = "blockr.core"
-  )
+  app_path <- pkg_file("examples", "block", "app.R")
 
   app <- shinytest2::AppDriver$new(
     app_path,

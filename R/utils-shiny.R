@@ -28,8 +28,8 @@ slow_text_input <- function(..., debounce = 1000) {
 
   binding <- htmltools::htmlDependency(
     "slow-text-binding",
-    utils::packageVersion(utils::packageName()),
-    src = system.file("assets/js", package = "blockr.core"),
+    pkg_version(),
+    src = pkg_file("assets", "js"),
     script = "slowTextInputBinding.js"
   )
 

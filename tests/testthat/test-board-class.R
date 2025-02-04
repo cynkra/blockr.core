@@ -48,10 +48,7 @@ test_that("board app", {
 
   skip_on_cran()
 
-  app_path <- system.file(
-    "examples", "board", "app.R",
-    package = "blockr.core"
-  )
+  app_path <- pkg_file("examples", "board", "app.R")
 
   app <- shinytest2::AppDriver$new(
     app_path,
