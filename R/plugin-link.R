@@ -146,7 +146,8 @@ add_rm_link_ui <- function(id, board) {
       NS(id, "links_mod"),
       "Edit links",
       icon = icon("table")
-    )
+    ),
+    slow_text_input_binding()
   )
 }
 

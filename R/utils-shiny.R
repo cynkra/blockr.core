@@ -23,15 +23,7 @@
 #'   shinyApp(ui, server)
 #' }
 slow_text_input <- function(..., debounce = 1000) {
-
   stopifnot(is_count(debounce))
-
-  binding <- htmltools::htmlDependency(
-    "slow-text-binding",
-    utils::packageVersion(utils::packageName()),
-    src = system.file("assets/js", package = "blockr.core"),
-    script = "slowTextInputBinding.js"
-  )
 
   tagList(
     htmltools::tagQuery(
@@ -39,6 +31,18 @@ slow_text_input <- function(..., debounce = 1000) {
     )$find(".shiny-input-text")$removeClass("shiny-input-text")$addClass(
       "shiny-slow-text"
     )$addAttrs("data-debounce" = debounce)$allTags(),
-    binding
+    slow_text_input_binding()
+  )
+}
+
+#' Custom binding slow text input
+#'
+#' @keywords internal
+slow_text_input_binding <- function() {
+  htmltools::htmlDependency(
+    "slow-text-binding",
+    utils::packageVersion(utils::packageName()),
+    src = system.file("assets/js", package = "blockr.core"),
+    script = "slowTextInputBinding.js"
   )
 }
