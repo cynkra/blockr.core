@@ -20,7 +20,7 @@ add_rm_link_server <- function(id, rv, ...) {
     function(input, output, session) {
 
       observeEvent(
-        input$links,
+        input$links_mod,
         showModal(links_modal(session$ns))
       )
 
@@ -39,10 +39,10 @@ add_rm_link_server <- function(id, rv, ...) {
         }
       )
 
-      output$links <- DT::renderDT(
+      output$links_dt <- DT::renderDT(
         {
           DT::datatable(
-            dt_board_link(upd$curr, session$ns, rv),
+            dt_board_link(isolate(upd$curr), session$ns, rv),
             options = list(
               pageLength = 5,
               preDrawCallback = DT::JS(
@@ -61,10 +61,18 @@ add_rm_link_server <- function(id, rv, ...) {
         server = TRUE
       )
 
+      proxy <- DT::dataTableProxy("links_dt")
+
       observeEvent(
         names(upd$curr),
         {
           ids <- names(upd$curr)
+
+          DT::replaceData(
+            proxy,
+            dt_board_link(upd$curr, session$ns, rv),
+            rownames = FALSE
+          )
 
           upd <- create_dt_observers(setdiff(ids, names(upd$obs)), input, upd,
                                      board_blocks(rv$board), session)
@@ -135,7 +143,7 @@ add_rm_link_server <- function(id, rv, ...) {
 add_rm_link_ui <- function(id, board) {
   tagList(
     actionButton(
-      NS(id, "links"),
+      NS(id, "links_mod"),
       "Edit links",
       icon = icon("table")
     )
@@ -364,7 +372,7 @@ destroy_dt_observers <- function(ids, update) {
 links_modal <- function(ns) {
   modalDialog(
     title = "Board links",
-    DT::dataTableOutput(ns("links")),
+    DT::dataTableOutput(ns("links_dt")),
     footer = tagList(
       actionButton(ns("add_link"), "Add row", icon = icon("plus")),
       actionButton(ns("rm_link"), "Remove selected", icon = icon("minus")),

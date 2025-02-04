@@ -64,7 +64,7 @@ test_that("board app", {
   app$set_inputs(`my_board-manage_blocks-block_id` = "a")
   app$click("my_board-manage_blocks-confirm_add")
 
-  app$wait_for_idle(duration = 100)
+  app$wait_for_idle(duration = 500)
 
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
@@ -73,7 +73,7 @@ test_that("board app", {
   app$set_inputs(`my_board-manage_blocks-block_id` = "b")
   app$click("my_board-manage_blocks-confirm_add")
 
-  app$wait_for_idle(duration = 100)
+  app$wait_for_idle(duration = 500)
 
   app$set_inputs(`my_board-b-expr-dataset` = "ChickWeight")
 
@@ -84,7 +84,7 @@ test_that("board app", {
   app$set_inputs(`my_board-manage_blocks-block_id` = "c")
   app$click("my_board-manage_blocks-confirm_add")
 
-  app$wait_for_idle(duration = 100)
+  app$wait_for_idle(duration = 500)
 
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
@@ -102,7 +102,7 @@ test_that("board app", {
   app$set_inputs(`my_board-manage_links-tcvubwfzjheaqgd_to` = "c")
   app$set_inputs(`my_board-manage_links-tcvubwfzjheaqgd_input` = "y")
 
-  app$wait_for_idle(duration = 100)
+  app$wait_for_idle(duration = 500)
 
   app$click("my_board-manage_links-modify_links")
 
