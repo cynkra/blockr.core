@@ -159,11 +159,10 @@ is_acyclic.board <- function(x) {
   is_acyclic(as.matrix(x))
 }
 
+#' @param id Board namespace ID
 #' @rdname serve
 #' @export
-serve.board <- function(x, ...) {
-
-  id <- rand_names()
+serve.board <- function(x, id = rand_names(), ...) {
 
   ui <- bslib::page_fluid(
     board_ui(id, x,
@@ -177,7 +176,7 @@ serve.board <- function(x, ...) {
   )
 
   server <- function(input, output, session) {
-    board_server(id, x,
+    res <- board_server(id, x,
       list(
         preserve_board = ser_deser_server,
         manage_blocks = add_rm_block_server,
@@ -186,6 +185,18 @@ serve.board <- function(x, ...) {
         generate_code = gen_code_server
       )
     )
+
+    exportTestValues(
+      result = lapply(
+        lapply(
+          lapply(lst_xtr(res$blocks, "server", "result"), safely_export),
+          reval
+        ),
+        reval
+      )
+    )
+
+    invisible()
   }
 
   shinyApp(ui, server)

@@ -86,9 +86,19 @@ add_rm_link_server <- function(id, rv, ...) {
           list(upd$curr[row], col, coal(upd$edit$val, ""))
         )
 
-        upd$curr[row] <- new
+        if (col == "id") {
+          upd$curr[row] <- NULL
+          upd$curr <- c(upd$curr, new)
+        } else {
+          upd$curr[row] <- new
+        }
 
-        if (row %in% names(upd$add)) {
+        exst <- row %in% names(upd$add)
+
+        if (exst && col == "id") {
+          upd$add[row] <- NULL
+          upd$add <- c(upd$add, new)
+        } else if (exst) {
           upd$add[row] <- new
         } else {
           upd$add <- c(upd$add, new)
@@ -246,6 +256,11 @@ dt_board_link <- function(lnk, ns, rv) {
   )
 
   data.frame(
+    ID = chr_mply(
+      dt_text,
+      lapply(paste0(lnk$id, "_id"), ns),
+      lnk$id
+    ),
     From = chr_mply(
       dt_selectize,
       lapply(paste0(lnk$id, "_from"), ns),
@@ -268,6 +283,12 @@ dt_board_link <- function(lnk, ns, rv) {
   )
 }
 
+dt_text <- function(id, val) {
+  as.character(
+    textInput(inputId = id, label = "", value = val, width = "150px")
+  )
+}
+
 dt_selectize <- function(id, val, choices, create = FALSE) {
 
   if (isTRUE(create)) {
@@ -277,7 +298,7 @@ dt_selectize <- function(id, val, choices, create = FALSE) {
   }
 
   res <- selectizeInput(id, label = "", choices = c("", choices),
-                        selected = val, options = opts)
+                        selected = val, options = opts, width = "150px")
 
   as.character(res)
 }
@@ -290,7 +311,7 @@ create_dt_observers <- function(ids, input, update, blks, sess) {
 
 create_dt_observers_for_id <- function(id, input, update, blks, sess) {
 
-  obs <- set_names(nm = c("from", "to", "input"))
+  obs <- set_names(nm = c("id", "from", "to", "input"))
 
   lapply(obs, create_dt_observer, id, input, update, blks, sess)
 }
@@ -305,7 +326,12 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
     input[[inp]],
     {
       new <- input[[inp]]
-      cur <- upd$curr[[row]][[col]]
+
+      if (col == "id") {
+        cur <- row
+      } else {
+        cur <- upd$curr[[row]][[col]]
+      }
 
       if (new == cur || new == "") {
         return()
@@ -404,7 +430,7 @@ links_modal <- function(ns) {
       actionButton(ns("cancel_links"), "Cancel", class = "btn-danger"),
       actionButton(ns("modify_links"), "OK", class = "btn-success")
     ),
-    size = "xl"
+    size = "l"
   )
 }
 

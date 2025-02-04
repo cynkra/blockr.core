@@ -6,7 +6,11 @@ test_that("add/rm blocks", {
       expect_null(res$add)
       expect_null(res$rm)
 
-      session$setInputs(registry_select = "dataset_block", add_block = 1)
+      session$setInputs(
+        registry_select = "dataset_block",
+        block_id = "a",
+        confirm_add = 1
+      )
 
       expect_s3_class(res$add, "blocks")
       expect_length(res$add, 1L)
@@ -29,7 +33,7 @@ test_that("add/rm blocks", {
       expect_null(res$add)
       expect_null(res$rm)
 
-      session$setInputs(block_select = "a", rm_block = 1)
+      session$setInputs(block_select = "a", confirm_rm = 1)
 
       expect_type(res$rm, "character")
       expect_length(res$rm, 1L)

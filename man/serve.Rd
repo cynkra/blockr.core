@@ -8,7 +8,7 @@
 \usage{
 \method{serve}{block}(x, data = list(), id = "block", ...)
 
-\method{serve}{board}(x, ...)
+\method{serve}{board}(x, id = rand_names(), ...)
 
 serve(x, ...)
 }
@@ -17,7 +17,7 @@ serve(x, ...)
 
 \item{data}{Data inputs}
 
-\item{id}{Block ID}
+\item{id}{Board namespace ID}
 
 \item{...}{Generic consistency}
 }

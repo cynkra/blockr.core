@@ -16,29 +16,106 @@ add_rm_block_server <- function(id, rv, ...) {
   moduleServer(
     id,
     function(input, output, session) {
+
       res <- reactiveValues(add = NULL, rm = NULL)
 
       observeEvent(
         input$add_block,
+        add_block_modal(session$ns)
+      )
+
+      observeEvent(
+        input$confirm_add,
         {
-          req(input$registry_select)
-          res$add <- as_blocks(create_block(input$registry_select))
+          sel <- input$registry_select
+          bid <- input$block_id
+
+          if (nchar(bid) == 0L || !is_string(bid)) {
+
+            showNotification(
+              "Please choose a valid block ID.",
+              type = "warning"
+            )
+
+            return()
+          }
+
+          if (bid %in% board_block_ids(rv$board)) {
+
+            showNotification(
+              "Please choose a unique block ID.",
+              type = "warning"
+            )
+
+            return()
+          }
+
+          if (!is_string(sel) || !sel %in% list_blocks()) {
+
+            showNotification(
+              "Please choose a valid block type.",
+              type = "warning"
+            )
+
+            return()
+          }
+
+          res$add <- as_blocks(
+            set_names(list(create_block(sel)), bid)
+          )
+
+          removeModal()
         }
       )
 
-      observe(
-        updateSelectInput(
-          session,
-          inputId = "block_select",
-          choices = board_block_ids(rv$board)
-        )
+      observeEvent(
+        input$cancel_add,
+        {
+          res$add <- NULL
+          removeModal()
+        }
       )
 
       observeEvent(
         input$rm_block,
+        rm_block_modal(session$ns, rv$board)
+      )
+
+      observeEvent(
+        input$confirm_rm,
         {
-          req(input$block_select)
-          res$rm <- input$block_select
+          sel <- input$block_select
+
+          if (!length(sel)) {
+
+            showNotification(
+              "Please choose at least one block.",
+              type = "warning"
+            )
+
+            return()
+          }
+
+          if (!all(sel %in% board_block_ids(rv$board))) {
+
+            showNotification(
+              "Please choose valid block IDs.",
+              type = "warning"
+            )
+
+            return()
+          }
+
+          res$rm <- sel
+          removeModal()
+        }
+      )
+
+      observeEvent(
+        input$cancel_rm,
+        {
+          res$rm <- NULL
+          removeModal()
         }
       )
 
@@ -52,27 +129,60 @@ add_rm_block_server <- function(id, rv, ...) {
 #' @export
 add_rm_block_ui <- function(id, board) {
   tagList(
-    selectInput(
-      NS(id, "registry_select"),
-      "Select block from registry",
-      choices = c("", list_blocks())
-    ),
     actionButton(
       NS(id, "add_block"),
-      "Add",
+      "Add block",
       icon = icon("circle-plus"),
       class = "btn-success"
     ),
-    selectInput(
-      NS(id, "block_select"),
-      "Select block from board",
-      choices = c("", board_block_ids(board))
-    ),
     actionButton(
       NS(id, "rm_block"),
-      "Remove",
+      "Remove block",
       icon = icon("circle-minus"),
       class = "btn-danger"
+    )
+  )
+}
+
+add_block_modal <- function(ns) {
+  showModal(
+    modalDialog(
+      title = "Add block",
+      div(
+        selectInput(
+          ns("registry_select"),
+          "Select block from registry",
+          choices = list_blocks()
+        ),
+        textInput(
+          inputId = ns("block_id"),
+          label = "Block ID",
+          value = rand_names(),
+          placeholder = "Enter a block ID."
+        )
+      ),
+      footer = tagList(
+        actionButton(ns("cancel_add"), "Cancel", class = "btn-danger"),
+        actionButton(ns("confirm_add"), "OK", class = "btn-success")
+      )
+    )
+  )
+}
+
+rm_block_modal <- function(ns, board) {
+  showModal(
+    modalDialog(
+      title = "Remove blocks",
+      selectInput(
+        ns("block_select"),
+        "Select block(s) from board",
+        choices = board_block_ids(board),
+        multiple = TRUE
+      ),
+      footer = tagList(
+        actionButton(ns("cancel_rm"), "Cancel", class = "btn-danger"),
+        actionButton(ns("confirm_rm"), "OK", class = "btn-success")
+      )
     )
   )
 }
