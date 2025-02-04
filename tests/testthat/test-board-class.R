@@ -88,7 +88,7 @@ test_that("board app", {
 
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
-  app$click("my_board-manage_links-links")
+  app$click("my_board-manage_links-links_mod")
 
   app$click("my_board-manage_links-add_link")
   app$wait_for_value(input = "my_board-manage_links-edbxrcxwquzrffb_id")
