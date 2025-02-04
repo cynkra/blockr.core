@@ -29,7 +29,8 @@ Imports:
     jsonlite,
     vctrs,
     generics,
-    rlang
+    rlang,
+    htmltools
 Suggests:
     testthat (>= 3.0.0),
     memuse,
