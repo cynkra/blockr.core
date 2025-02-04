@@ -72,88 +72,13 @@ add_rm_link_server <- function(id, rv, ...) {
         }
       )
 
-      observeEvent(upd$edit, {
+      edit_link_observer(upd, rv)
 
-        row <- upd$edit$row
-        col <- upd$edit$col
+      add_link_observer(input, rv, upd)
 
-        if (!row %in% upd$rm && row %in% board_link_ids(rv$board)) {
-          upd$rm <- c(upd$rm, row)
-        }
+      rm_link_observer(input, rv, upd)
 
-        new <- do.call(
-          `$<-`,
-          list(upd$curr[row], col, coal(upd$edit$val, ""))
-        )
-
-        if (col == "id") {
-          upd$curr[row] <- NULL
-          upd$curr <- c(upd$curr, new)
-        } else {
-          upd$curr[row] <- new
-        }
-
-        exst <- row %in% names(upd$add)
-
-        if (exst && col == "id") {
-          upd$add[row] <- NULL
-          upd$add <- c(upd$add, new)
-        } else if (exst) {
-          upd$add[row] <- new
-        } else {
-          upd$add <- c(upd$add, new)
-        }
-      })
-
-      observeEvent(input$add_link, {
-
-        total <- sum(block_arity(rv$board))
-
-        if (is.na(total) || length(upd$curr) < total) {
-
-          upd$curr <- c(
-            upd$curr,
-            new_link(from = "", to = "", input = "")
-          )
-
-          upd$add <- c(upd$add, upd$curr[length(upd$curr)])
-
-        } else {
-
-          showNotification(
-            "No new links can be added. Remove a row first.",
-            type = "warning"
-          )
-        }
-      })
-
-      observeEvent(input$rm_link, {
-
-        sel <- input$links_rows_selected
-
-        if (length(sel)) {
-
-          ids <- names(upd$curr[sel])
-
-          upd$rm <- c(upd$rm, ids[ids %in% board_link_ids(rv$board)])
-
-          upd$add <- upd$add[setdiff(names(upd$add), ids)]
-          upd$curr <- upd$curr[setdiff(names(upd$curr), ids)]
-
-        } else {
-
-          showNotification("No row selected", type = "warning")
-        }
-      })
-
-      observeEvent(input$cancel_links, {
-
-        removeModal()
-
-        upd$add <- links()
-        upd$rm <- character()
-        upd$curr <- board_links(rv$board)
-      })
+      cancel_link_observer(session, input, rv, upd)
 
       res <- reactiveVal(
         list(add = NULL, rm = NULL)
@@ -337,7 +262,19 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
         return()
       }
 
-      if (col == "from") {
+      if (col == "id") {
+
+        if (new %in% names(upd$curr)) {
+
+          showNotification(
+            "Please choose a unique link ID.",
+            type = "warning"
+          )
+
+          return()
+        }
+
+      } else if (col == "from") {
 
         to_avail <- int_ply(blks, block_arity, use_names = TRUE)
 
@@ -357,9 +294,8 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
           choices = c("", setdiff(to_avail, new)),
           selected = upd$curr[[row]][["to"]]
         )
-      }
 
-      if (col == "to") {
+      } else if (col == "to") {
 
         ids <- names(blks)
 
@@ -400,6 +336,10 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
             options = opt
           )
         }
+
+      } else if (col != "input") {
+
+        stop("Unexpected input: column ", col)
       }
 
       upd$edit <- list(row = row, col = col, val = new)
@@ -411,7 +351,7 @@ create_dt_observer <- function(col, row, input, upd, blks, sess) {
 destroy_dt_observers <- function(ids, update) {
 
   for (row in ids) {
-    for (col in c("from", "to", "input")) {
+    for (col in c("id", "from", "to", "input")) {
       update$obs[[row]][[col]]$destroy()
     }
     update$obs[[row]] <- NULL
@@ -432,6 +372,101 @@ links_modal <- function(ns) {
     ),
     size = "l"
   )
+}
+
+edit_link_observer <- function(upd, rv) {
+
+  observeEvent(upd$edit, {
+
+    row <- upd$edit$row
+    col <- upd$edit$col
+
+    if (!row %in% upd$rm && row %in% board_link_ids(rv$board)) {
+      upd$rm <- c(upd$rm, row)
+    }
+
+    new <- do.call(
+      `$<-`,
+      list(upd$curr[row], col, coal(upd$edit$val, ""))
+    )
+
+    if (col == "id") {
+      upd$curr[row] <- NULL
+      upd$curr <- c(upd$curr, new)
+    } else {
+      upd$curr[row] <- new
+    }
+
+    exst <- row %in% names(upd$add)
+
+    if (exst && col == "id") {
+      upd$add[row] <- NULL
+      upd$add <- c(upd$add, new)
+    } else if (exst) {
+      upd$add[row] <- new
+    } else {
+      upd$add <- c(upd$add, new)
+    }
+  })
+}
+
+add_link_observer <- function(input, rv, upd) {
+
+  observeEvent(input$add_link, {
+
+    total <- sum(block_arity(rv$board))
+
+    if (is.na(total) || length(upd$curr) < total) {
+
+      upd$curr <- c(
+        upd$curr,
+        new_link(from = "", to = "", input = "")
+      )
+
+      upd$add <- c(upd$add, upd$curr[length(upd$curr)])
+
+    } else {
+
+      showNotification(
+        "No new links can be added. Remove a row first.",
+        type = "warning"
+      )
+    }
+  })
+}
+
+rm_link_observer <- function(input, rv, upd) {
+
+  observeEvent(input$rm_link, {
+
+    sel <- input$links_rows_selected
+
+    if (length(sel)) {
+
+      ids <- names(upd$curr[sel])
+
+      upd$rm <- c(upd$rm, ids[ids %in% board_link_ids(rv$board)])
+
+      upd$add <- upd$add[setdiff(names(upd$add), ids)]
+      upd$curr <- upd$curr[setdiff(names(upd$curr), ids)]
+
+    } else {
+
+      showNotification("No row selected", type = "warning")
+    }
+  })
+}
+
+cancel_link_observer <- function(session, input, rv, upd) {
+
+  observeEvent(input$cancel_links, {
+
+    removeModal(session)
+
+    upd$add <- links()
+    upd$rm <- character()
+    upd$curr <- board_links(rv$board)
+  })
 }
 
 check_add_rm_link_val <- function(val, rv) {
