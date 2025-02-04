@@ -29,11 +29,7 @@ gen_code_server <- function(id, rv, ...) {
               title = "Generated code",
               div(
                 class = "text-decoration-none",
-                actionButton(
-                  session$ns("copy_code"),
-                  class = "btn-sm btn-info position-absolute top-0 end-0",
-                  icon("clipboard")
-                ),
+                copy_to_clipboard(session),
                 verbatimTextOutput(session$ns("code_out"))
               ),
               easyClose = TRUE,
@@ -72,7 +68,7 @@ gen_code_ui <- function(id, board) {
   )
 }
 
-copy_to_clipboard <- function() {
+copy_to_clipboard <- function(session) {
 
   deps <- htmltools::htmlDependency(
     "copy-to-clipboard",

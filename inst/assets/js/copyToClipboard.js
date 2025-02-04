@@ -11,7 +11,7 @@ window.Shiny.addCustomMessageHandler("blockr-copy-code", (msg) => {
     });
     return;
   }
-  copyText(msg.code.map((code) => code.trim()).join("\n\t"));
+  copyText(msg.code.trim());
   window.Shiny.notifications.show({
     html: "<span>Code copied to clipboard</span>",
     type: "message",
