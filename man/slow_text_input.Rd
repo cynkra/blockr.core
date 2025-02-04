@@ -4,28 +4,10 @@
 \alias{slow_text_input}
 \title{Custom shiny textInput}
 \usage{
-slow_text_input(
-  inputId,
-  label,
-  value = "",
-  width = NULL,
-  placeholder = NULL,
-  debounce = 2000
-)
+slow_text_input(..., debounce = 1000)
 }
 \arguments{
-\item{inputId}{The \code{input} slot that will be used to access the value.}
-
-\item{label}{Display label for the control, or \code{NULL} for no label.}
-
-\item{value}{Initial value.}
-
-\item{width}{The width of the input, e.g. \code{'400px'}, or \code{'100\%'};
-see \code{\link[shiny:validateCssUnit]{validateCssUnit()}}.}
-
-\item{placeholder}{A character string giving the user a hint as to what can
-be entered into the control. Internet Explorer 8 and 9 do not support this
-option.}
+\item{...}{Forwarded to \code{\link[shiny:textInput]{shiny::textInput()}}}
 
 \item{debounce}{Debounce delay in ms.}
 }
@@ -35,19 +17,19 @@ Defaults to 2000ms.
 }
 \examples{
 if (interactive()) {
- library(shiny)
- library(bslib)
+  library(shiny)
+  library(bslib)
+  ui <- page_fluid(
+    blockr.core:::slow_text_input("ee", "ee", "aaa", debounce = 5000)
+  )
 
- ui <- page_fluid(
-   slow_text_input("ee", "ee", "aaa")
- )
+  server <- function(input, output, session) {
+    observeEvent(input$ee, {
+      showNotification(input$ee)
+    })
+  }
 
- server <- function(input, output, session) {
-   observeEvent(input$ee, {
-     showNotification(input$ee)
-   })
- }
-
- shinyApp(ui, server)
+  shinyApp(ui, server)
 }
 }
+\keyword{internal}

@@ -210,7 +210,8 @@ dt_board_link <- function(lnk, ns, rv) {
 
 dt_text <- function(id, val) {
   as.character(
-    textInput(inputId = id, label = "", value = val, width = "150px")
+    slow_text_input(inputId = id, label = "", value = val, width = "150px",
+                    debounce = 5000)
   )
 }
 

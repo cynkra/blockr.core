@@ -60,7 +60,10 @@ serve(
       b = new_dataset_block("ChickWeight"),
       c = new_merge_block("Time")
     ),
-    links = links(from = c("a", "b"), to = c("c", "c"), input = c("x", "y"))
+    links = c(
+      ac = new_link("a", "c", "x"),
+      bc = new_link("b", "c", "y")
+    )
   )
 )
 ```
