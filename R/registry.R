@@ -19,7 +19,7 @@ register_block <- function(ctor, name, description, classes = NULL, uid = NULL,
                            overwrite = FALSE) {
 
   if (is.function(ctor)) {
-    package <- utils::packageName(environment(ctor))
+    package <- pkg_name(environment(ctor))
   }
 
   ctor_name <- NULL
@@ -179,7 +179,7 @@ register_core_blocks <- function(which = get_option("blocks", "all")) {
       "data",
       "transform"
     )[blocks],
-    package = utils::packageName(),
+    package = pkg_name(),
     overwrite = TRUE
   )
 }

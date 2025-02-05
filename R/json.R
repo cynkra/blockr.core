@@ -49,7 +49,7 @@ blockr_ser.board <- function(x, blocks = NULL, ...) {
     object = class(x),
     blocks = blockr_ser(board_blocks(x), blocks),
     links = lapply(board_links(x), blockr_ser),
-    version = as.character(utils::packageVersion(utils::packageName()))
+    version = as.character(pkg_version())
   )
 }
 
