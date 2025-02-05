@@ -1,21 +1,14 @@
 function copyText(text) {
-  return new Promise((resolve, reject) => {
-    if (typeof navigator !== "undefined" && typeof navigator.clipboard !== "undefined" && navigator.permissions !== "undefined") {
-      const type = "text/plain";
-      const blob = new Blob([text], { type });
-      const data = [new ClipboardItem({ [type]: blob })];
-      navigator.permissions.query({name: "clipboard-write"}).then((perm) => {
-        if (perm.state === "granted" || perm.state === "prompt") {
-          navigator.clipboard.write(data).then(resolve, reject).catch(reject);
-        }
-        else {
-          reject(new Error("Permission to copy not granted."));
-        }
-      });
-    } else {
-      reject(new Error("Copying not supported by this browser."));
-    }
-  });
+  if (typeof ClipboardItem && navigator.clipboard.write) {
+    const data = new ClipboardItem({
+      "text/plain": new Promise(async (resolve) => {
+        resolve(new Blob([text], { type: "text/plain" }))
+      })
+    })
+    navigator.clipboard.write([data]);
+  } else {
+    navigator.clipboard.writeText(text);
+  }
 }
 
 window.Shiny.addCustomMessageHandler("blockr-copy-code", (msg) => {
@@ -29,7 +22,7 @@ window.Shiny.addCustomMessageHandler("blockr-copy-code", (msg) => {
   }
 
   try {
-    await copyText(msg.code.trim());
+    copyText(msg.code.trim());
     window.Shiny.notifications.show({
       html: "<span>Code successfully copied to clipboard.</span>",
       type: "message",
