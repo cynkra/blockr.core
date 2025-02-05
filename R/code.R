@@ -11,7 +11,9 @@ generate_code <- function(rv) {
     }
   )
 
-  exprs <- Map(with_expr, exprs, arg_map[names(exprs)])
+  ordering <- topo_sort(as.matrix(rv$board))
+
+  exprs <- Map(with_expr, exprs[ordering], arg_map[ordering])
 
   exprs <- map(assignment, names(exprs), exprs)
   exprs <- lapply(exprs, deparse)
