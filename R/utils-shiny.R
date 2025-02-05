@@ -6,33 +6,23 @@
 #' @param ... Forwarded to [shiny::textInput()]
 #' @param debounce Debounce delay in ms.
 #' @keywords internal
-#' @examples
-#' if (interactive()) {
-#'   library(shiny)
-#'   library(bslib)
-#'   ui <- page_fluid(
-#'     blockr.core:::slow_text_input("ee", "ee", "aaa", debounce = 5000)
-#'   )
-#'
-#'   server <- function(input, output, session) {
-#'     observeEvent(input$ee, {
-#'       showNotification(input$ee)
-#'     })
-#'   }
-#'
-#'   shinyApp(ui, server)
-#' }
 slow_text_input <- function(..., debounce = 1000) {
+
   stopifnot(is_count(debounce))
 
-  tagList(
-    htmltools::tagQuery(
-      textInput(...)
-    )$find(".shiny-input-text")$removeClass("shiny-input-text")$addClass(
-      "shiny-slow-text"
-    )$addAttrs("data-debounce" = debounce)$allTags(),
-    slow_text_input_binding()
-  )
+  res <- htmltools::tagQuery(
+    textInput(...)
+  )$find(
+    ".shiny-input-text"
+  )$removeClass(
+    "shiny-input-text"
+  )$addClass(
+    "shiny-slow-text"
+  )$addAttrs(
+    "data-debounce" = debounce
+  )$allTags()
+
+  tagList(res, slow_text_input_binding())
 }
 
 #' Custom binding slow text input

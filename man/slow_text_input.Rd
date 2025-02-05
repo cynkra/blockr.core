@@ -15,21 +15,4 @@ slow_text_input(..., debounce = 1000)
 A shiny textInput where one can set the debounce rate.
 Defaults to 2000ms.
 }
-\examples{
-if (interactive()) {
-  library(shiny)
-  library(bslib)
-  ui <- page_fluid(
-    blockr.core:::slow_text_input("ee", "ee", "aaa", debounce = 5000)
-  )
-
-  server <- function(input, output, session) {
-    observeEvent(input$ee, {
-      showNotification(input$ee)
-    })
-  }
-
-  shinyApp(ui, server)
-}
-}
 \keyword{internal}
