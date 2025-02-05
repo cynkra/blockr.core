@@ -28,7 +28,7 @@ gen_code_server <- function(id, rv, ...) {
             modalDialog(
               title = "Generated code",
               div(
-                class = "text-decoration-none",
+                class = "text-decoration-none position-relative",
                 copy_to_clipboard(session),
                 verbatimTextOutput(session$ns("code_out"))
               ),
@@ -80,8 +80,11 @@ copy_to_clipboard <- function(session) {
   tagList(
     actionButton(
       session$ns("copy_code"),
-      class = "btn-sm btn-info position-absolute top-0 end-0",
-      icon("code")
+      class = paste(
+        "btn", "btn-outline-secondary", "btn-sm", "position-absolute",
+        "top-0", "end-0", "m-2"
+      ),
+      icon("clipboard", c("fa-solid", "fa-2x"))
     ),
     deps
   )

@@ -22,7 +22,7 @@ window.Shiny.addCustomMessageHandler("blockr-copy-code", (msg) => {
 
   if (!msg.code) {
     window.Shiny.notifications.show({
-      html: "<span>Failed to copy code to clipboard</span>",
+      html: "<span>No code found to copy.</span>",
       type: "error",
     });
     return;
@@ -31,12 +31,12 @@ window.Shiny.addCustomMessageHandler("blockr-copy-code", (msg) => {
   try {
     await copyText(msg.code.trim());
     window.Shiny.notifications.show({
-      html: "<span>Code copied to clipboard</span>",
+      html: "<span>Code successfully copied to clipboard.</span>",
       type: "message",
     });
   } catch (error) {
     window.Shiny.notifications.show({
-      html: error.message,
+      html: "<span>" + error.message + "</span>",
       type: "error"
     });
   }
