@@ -146,7 +146,8 @@ add_rm_link_ui <- function(id, board) {
       NS(id, "links_mod"),
       "Edit links",
       icon = icon("table")
-    )
+    ),
+    slow_text_input_binding()
   )
 }
 
@@ -218,8 +219,7 @@ dt_board_link <- function(lnk, ns, rv) {
 
 dt_text <- function(id, val) {
   as.character(
-    slow_text_input(inputId = id, label = "", value = val, width = "150px",
-                    debounce = 5000)
+    slow_text_input(inputId = id, label = "", value = val, width = "150px")
   )
 }
 
