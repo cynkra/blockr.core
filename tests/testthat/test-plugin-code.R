@@ -17,11 +17,11 @@ test_that("generate code", {
     get_s3_method("board_server", board),
     {
       code_gen <- session$makeScope("generate_code")
-      code_gen$setInputs(code = 1)
+      code_gen$setInputs(code_mod = 1)
 
       session$flushReact()
 
-      res <- code_gen$output$code
+      res <- code_gen$output$code_out
 
       expect_type(res, "character")
       expect_length(res, 1L)

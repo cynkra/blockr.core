@@ -1,36 +1,24 @@
-function copyText(text) {
-  if (typeof ClipboardItem && navigator.clipboard.write) {
-    const data = new ClipboardItem({
-      "text/plain": new Promise(async (resolve) => {
-        resolve(new Blob([text], { type: "text/plain" }))
-      })
-    })
-    navigator.clipboard.write([data]);
-  } else {
-    navigator.clipboard.writeText(text);
-  }
-}
+function copyCode(id) {
 
-window.Shiny.addCustomMessageHandler("blockr-copy-code", (msg) => {
+  var range = document.createRange();
+  range.selectNode(document.getElementById(id));
 
-  if (!msg.code) {
-    window.Shiny.notifications.show({
-      html: "<span>No code found to copy.</span>",
-      type: "error",
-    });
-    return;
-  }
+  window.getSelection().removeAllRanges();
+  window.getSelection().addRange(range);
 
   try {
-    copyText(msg.code.trim());
+    var successful = document.execCommand("copy");
+    var msg = successful ? "successful" : "unsuccessful";
     window.Shiny.notifications.show({
-      html: "<span>Code successfully copied to clipboard.</span>",
-      type: "message",
+      html: "<span>Copying code command was " + msg + ".</span>",
+      type: successful ? "message" : "error"
     });
   } catch (error) {
     window.Shiny.notifications.show({
       html: "<span>" + error.message + "</span>",
       type: "error"
     });
+  } finally {
+    window.getSelection().removeAllRanges();
   }
-});
+}

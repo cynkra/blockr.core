@@ -24,28 +24,20 @@ gen_code_server <- function(id, rv, ...) {
         {
           output$code_out <- renderPrint(HTML(code()))
 
+          id <- "code_out"
+
           showModal(
             modalDialog(
               title = "Generated code",
               div(
                 class = "text-decoration-none position-relative",
-                copy_to_clipboard(session),
-                verbatimTextOutput(session$ns("code_out"))
+                copy_to_clipboard(session, id),
+                verbatimTextOutput(session$ns(id))
               ),
               easyClose = TRUE,
               footer = NULL,
               size = "l"
             )
-          )
-        }
-      )
-
-      observeEvent(
-        input$copy_code,
-        {
-          session$sendCustomMessage(
-            "blockr-copy-code",
-            list(code = code())
           )
         }
       )
@@ -68,7 +60,7 @@ gen_code_ui <- function(id, board) {
   )
 }
 
-copy_to_clipboard <- function(session) {
+copy_to_clipboard <- function(session, id) {
 
   deps <- htmltools::htmlDependency(
     "copy-to-clipboard",
@@ -80,11 +72,13 @@ copy_to_clipboard <- function(session) {
   tagList(
     actionButton(
       session$ns("copy_code"),
+      "",
       class = paste(
         "btn", "btn-outline-secondary", "btn-sm", "position-absolute",
         "top-0", "end-0", "m-2"
       ),
-      icon("clipboard", c("fa-solid", "fa-2x"))
+      icon = icon("copy", c("fa-solid", "fa-2x")),
+      onclick = paste0("copyCode(\"", session$ns(id), "\");")
     ),
     deps
   )
