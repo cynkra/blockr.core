@@ -31,7 +31,7 @@ gen_code_server <- function(id, rv, ...) {
               title = "Generated code",
               div(
                 class = "text-decoration-none position-relative",
-                copy_to_clipboard(session, id),
+                if (nchar(code())) copy_to_clipboard(session, id),
                 verbatimTextOutput(session$ns(id))
               ),
               easyClose = TRUE,
