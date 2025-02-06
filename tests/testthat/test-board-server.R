@@ -108,6 +108,31 @@ test_that("board server", {
   )
 
   testServer(
+    get_s3_method("board_server", empty),
+    {
+      session$flushReact()
+      rv$abc <- 1L
+    },
+    args = list(
+      x = empty,
+      plugins = list(
+        preserve_board = function(id, rv) {
+          moduleServer(
+            id,
+            function(input, output, session) {
+              observeEvent(
+                rv$abc,
+                expect_identical(rv$abc, 1L)
+              )
+              reactiveVal()
+            }
+          )
+        }
+      )
+    )
+  )
+
+  testServer(
     function(id, board, plugin) {
       moduleServer(
         id,
@@ -126,7 +151,11 @@ test_that("board server", {
             observeEvent(
               TRUE,
               {
-                expect_error(rv$abc <- 1)
+                expect_error(
+                  {
+                    rv$abc <- 1
+                  }
+                )
               },
               once = TRUE
             )
