@@ -34,7 +34,8 @@ new_merge_block <- function(by = character(), all_x = FALSE, all_y = FALSE,
               allx("all.x" %in% input$type)
               ally("all.y" %in% input$type)
             },
-            ignoreNULL = FALSE
+            ignoreNULL = FALSE,
+            ignoreInit = TRUE
           )
 
           cols <- reactive(by_choices(x(), y()))
