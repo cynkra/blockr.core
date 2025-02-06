@@ -202,8 +202,8 @@ check_add_rm_block_val <- function(val, rv) {
         abort(
           paste(
             "Expecting the `manage_blocks` return value to contain",
-            "components `add` and `rm`.")
-          ,
+            "components `add` and `rm`."
+          ),
           class = "manage_blocks_return_invalid"
         )
       }
