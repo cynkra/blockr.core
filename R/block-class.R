@@ -409,11 +409,15 @@ validate_data_inputs <- function(x, data) {
 #' @export
 serve.block <- function(x, data = list(), id = "block", ...) {
 
+  init_data <- function(x, is_variadic) {
+    if (is_variadic) do.call(reactiveValues, x) else reactiveVal(x)
+  }
+
   ui <- bslib::page_fluid(block_ui(id, x))
 
   server <- function(input, output, session) {
 
-    res <- block_server(id, x, lapply(data, reactiveVal))
+    res <- block_server(id, x, Map(init_data, data, names(data) == "...args"))
 
     exportTestValues(
       result = safely_export(res$result())()
