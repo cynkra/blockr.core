@@ -192,13 +192,19 @@ check_add_rm_block_val <- function(val, rv) {
     TRUE,
     {
       if (!is.reactivevalues(val)) {
-        stop("Expecting `add_rm_block` to return a `reactivevalues` object.")
+        abort(
+          "Expecting `manage_blocks` to return a `reactivevalues` object.",
+          class = "manage_blocks_return_invalid"
+        )
       }
 
       if (!setequal(names(val), c("add", "rm"))) {
-        stop(
-          "Expecting the `add_rm_block` return value to contain ",
-          "components `add` and `rm`."
+        abort(
+          paste(
+            "Expecting the `manage_blocks` return value to contain",
+            "components `add` and `rm`.")
+          ,
+          class = "manage_blocks_return_invalid"
         )
       }
     },
@@ -209,20 +215,27 @@ check_add_rm_block_val <- function(val, rv) {
     val$add,
     {
       if (!is_blocks(val$add)) {
-        stop(
-          "Expecting the `add` component of the `add_rm_block` return ",
-          "value to be `NULL` or a `blocks` object."
+        abort(
+          paste(
+            "Expecting the `add` component of the `manage_blocks` return",
+            "value to be `NULL` or a `blocks` object."
+          ),
+          class = "manage_blocks_return_invalid"
         )
       }
     },
-    once = TRUE
+    once = TRUE,
+    priority = 2
   )
 
   observeEvent(
     val$add,
     {
       if (any(names(val$add) %in% board_block_ids(rv$board))) {
-        stop("Expecting the newly added block to have a unique ID.")
+        abort(
+          "Expecting the newly added block to have a unique ID.",
+          class = "manage_blocks_return_invalid"
+        )
       }
     },
     priority = 1
@@ -232,20 +245,27 @@ check_add_rm_block_val <- function(val, rv) {
     val$rm,
     {
       if (!is.character(val$rm)) {
-        stop(
-          "Expecting the `rm` component of the `add_rm_block` return ",
-          "value to be `NULL` or a character vector."
+        abort(
+          paste(
+            "Expecting the `rm` component of the `manage_blocks` return",
+            "value to be `NULL` or a character vector."
+          ),
+          class = "manage_blocks_return_invalid"
         )
       }
     },
-    once = TRUE
+    once = TRUE,
+    priority = 2
   )
 
   observeEvent(
     val$rm,
     {
       if (all(!val$rm %in% board_block_ids(rv$board))) {
-        stop("Expecting the removed block to be specified by a known ID.")
+        abort(
+          "Expecting the removed block to be specified by a known ID.",
+          class = "manage_blocks_return_invalid"
+        )
       }
     },
     priority = 1

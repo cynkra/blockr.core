@@ -107,5 +107,13 @@ test_that("board app", {
 
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
+  app$click("my_board-manage_blocks-rm_block")
+  app$set_inputs(`my_board-manage_blocks-block_select` = "a")
+  app$click("my_board-manage_blocks-confirm_rm")
+
+  app$wait_for_idle(duration = 500)
+
+  app$expect_values(export = TRUE, screenshot_args = FALSE)
+
   app$stop()
 })

@@ -144,7 +144,7 @@ test_that("add/rm links", {
   )
 })
 
-test_that("add/rm links retun validation", {
+test_that("add/rm links return validation", {
 
   with_mock_session(
     {
