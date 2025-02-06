@@ -54,3 +54,30 @@ test_that("add/rm blocks", {
     args = list(rv = reactiveValues(blocks = list()))
   )
 })
+
+test_that("notify_user return validation", {
+
+  with_mock_session(
+    {
+      check_block_notifications_val(list(a = 1))
+      sink_msg(
+        expect_warning(
+          session$flushReact(),
+          "Expecting `notify_user` to return a reactive value"
+        )
+      )
+    }
+  )
+
+  with_mock_session(
+    {
+      check_block_notifications_val(reactiveVal(1))
+      sink_msg(
+        expect_warning(
+          session$flushReact(),
+          "Expecting the `notify_user` return value to evaluate to a list"
+        )
+      )
+    }
+  )
+})

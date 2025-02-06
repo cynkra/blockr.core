@@ -174,7 +174,10 @@ test_that("add/rm links return validation", {
       val(list(add = NULL, rm = "bc"))
 
       sink_msg(
-        expect_warning(session$flushReact(), "Error in observe")
+        expect_warning(
+          session$flushReact(),
+          "Expecting all link IDs to be removed to be known"
+        )
       )
     }
   )
@@ -183,7 +186,10 @@ test_that("add/rm links return validation", {
     {
       check_add_rm_link_val(list(), list())
       sink_msg(
-        expect_warning(session$flushReact(), "Error in observe")
+        expect_warning(
+          session$flushReact(),
+          "Expecting `manage_links` to return a reactive value"
+        )
       )
     }
   )
@@ -192,7 +198,13 @@ test_that("add/rm links return validation", {
     {
       check_add_rm_link_val(reactiveVal(1), list())
       sink_msg(
-        expect_warning(session$flushReact(), "Error in observe")
+        expect_warning(
+          session$flushReact(),
+          paste(
+            "Expecting the `manage_links` return value to evaluate to a list",
+            "with components `add` and `rm`"
+          )
+        )
       )
     }
   )
@@ -201,7 +213,13 @@ test_that("add/rm links return validation", {
     {
       check_add_rm_link_val(reactiveVal(list(add = 1, rm = NULL)), list())
       sink_msg(
-        expect_warning(session$flushReact(), "Error in observe")
+        expect_warning(
+          session$flushReact(),
+          paste(
+            "Expecting the `add` component of the `manage_links` return",
+            "value to be `NULL` or a `links` object"
+          )
+        )
       )
     }
   )
@@ -231,16 +249,28 @@ test_that("add/rm links return validation", {
     {
       check_add_rm_link_val(reactiveVal(list(add = NULL, rm = 1)), list())
       sink_msg(
-        expect_warning(session$flushReact(), "Error in observe")
+        expect_warning(
+          session$flushReact(),
+          paste(
+            "Expecting the `rm` component of the `manage_links` return",
+            "value to be a character vector"
+          )
+        )
       )
     }
   )
 
   with_mock_session(
     {
-      check_add_rm_link_val(reactiveVal(list(add = NULL, rm = 1)), list())
+      check_add_rm_link_val(
+        reactiveVal(list(add = NULL, rm = "a")),
+        list(board = new_board())
+      )
       sink_msg(
-        expect_warning(session$flushReact(), "Error in observe")
+        expect_warning(
+          session$flushReact(),
+          "Expecting all link IDs to be removed to be known"
+        )
       )
     }
   )

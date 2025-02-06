@@ -96,8 +96,10 @@ check_block_notifications_val <- function(val) {
     TRUE,
     {
       if (!is.reactive(val)) {
-        stop("Expecting a `block_notifications` server to return a reactive ",
-             "value.")
+        abort(
+          "Expecting `notify_user` to return a reactive value.",
+          class = "notify_user_return_invalid"
+        )
       }
     },
     once = TRUE
@@ -107,8 +109,10 @@ check_block_notifications_val <- function(val) {
     val(),
     {
       if (!is.list(val())) {
-        stop("Expecting the `block_notifications` return value to evaluate ",
-             "to a list.")
+        abort(
+          "Expecting the `notify_user` return value to evaluate to a list.",
+          class = "notify_user_return_invalid"
+        )
       }
     },
     once = TRUE

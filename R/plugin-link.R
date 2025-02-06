@@ -485,8 +485,8 @@ check_add_rm_link_val <- function(val, rv) {
     {
       if (!is.reactive(val)) {
         abort(
-          "Expecting `add_rm_link` to return a reactive value.",
-          class = ""
+          "Expecting `manage_links` to return a reactive value.",
+          class = "manage_links_return_invalid"
         )
       }
     },
@@ -498,8 +498,13 @@ check_add_rm_link_val <- function(val, rv) {
     val(),
     {
       if (!is.list(val()) || !setequal(names(val()), c("add", "rm"))) {
-        stop("Expecting the `add_rm_link` return value to evaluate to a list ",
-             "with components `add` and `rm`.")
+        abort(
+          paste(
+            "Expecting the `manage_links` return value to evaluate to a list",
+            "with components `add` and `rm`."
+          ),
+          class = "manage_links_return_invalid"
+        )
       }
     },
     once = TRUE,
@@ -510,8 +515,13 @@ check_add_rm_link_val <- function(val, rv) {
     val()$add,
     {
       if (!is_links(val()$add)) {
-        stop("Expecting the `add` component of the `add_rm_link` return ",
-             "value to be `NULL` or a `links` object.")
+        abort(
+          paste(
+            "Expecting the `add` component of the `manage_links` return",
+            "value to be `NULL` or a `links` object."
+          ),
+          class = "manage_links_return_invalid"
+        )
       }
     },
     once = TRUE,
@@ -528,19 +538,27 @@ check_add_rm_link_val <- function(val, rv) {
     val()$rm,
     {
       if (!is.character(val()$rm)) {
-        stop("Expecting the `rm` component of the `add_rm_link` return ",
-             "value to be a character vector.")
+        abort(
+          paste(
+            "Expecting the `rm` component of the `manage_links` return",
+            "value to be a character vector."
+          ),
+          class = "manage_links_return_invalid"
+        )
       }
     },
     once = TRUE,
-    priority = 1
+    priority = 2
   )
 
   observeEvent(
     val()$rm,
     {
       if (!all(val()$rm %in% board_link_ids(rv$board))) {
-        stop("Expecting all link IDs to be removed to be known.")
+        abort(
+          "Expecting all link IDs to be removed to be known.",
+          class = "manage_links_return_invalid"
+        )
       }
     },
     priority = 1
