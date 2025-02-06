@@ -403,14 +403,18 @@ validate_data_inputs <- function(x, data) {
   NULL
 }
 
-#' @param data Data inputs
 #' @param id Block ID
+#' @param data Data inputs
 #' @rdname serve
 #' @export
-serve.block <- function(x, data = list(), id = "block", ...) {
+serve.block <- function(x, id = "block", ..., data = list()) {
 
   init_data <- function(x, is_variadic) {
     if (is_variadic) do.call(reactiveValues, x) else reactiveVal(x)
+  }
+
+  if (...length() && !length(data)) {
+    data <- list(...)
   }
 
   ui <- bslib::page_fluid(block_ui(id, x))
