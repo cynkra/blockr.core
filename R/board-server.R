@@ -52,11 +52,13 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         once = TRUE
       )
 
+      rv_ro <- make_read_only(rv)
+
       ser_deser <- get_plugin("preserve_board", plugins)
 
       if (not_null(ser_deser)) {
         board_refresh <- check_ser_deser_val(
-          do.call(ser_deser, c(list("preserve_board", rv), dot_args))
+          do.call(ser_deser, c(list("preserve_board", rv_ro), dot_args))
         )
 
         observeEvent(
@@ -77,7 +79,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
 
       if (not_null(add_rm_block)) {
         blocks <- check_add_rm_block_val(
-          do.call(add_rm_block, c(list("manage_blocks", rv), dot_args)),
+          do.call(add_rm_block, c(list("manage_blocks", rv_ro), dot_args)),
           rv
         )
 
@@ -108,7 +110,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
 
       if (not_null(add_rm_link)) {
         links <- check_add_rm_link_val(
-          do.call(add_rm_link, c(list("manage_links", rv), dot_args)),
+          do.call(add_rm_link, c(list("manage_links", rv_ro), dot_args)),
           rv
         )
 
@@ -136,7 +138,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         rv$msgs <- check_block_notifications_val(
           do.call(
             block_notification_server,
-            c(list("notify_user", rv), dot_args)
+            c(list("notify_user", rv_ro), dot_args)
           )
         )
       }
@@ -145,13 +147,13 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
 
       if (not_null(gen_code)) {
         check_gen_code_val(
-          do.call(gen_code, c(list("generate_code", rv), dot_args))
+          do.call(gen_code, c(list("generate_code", rv_ro), dot_args))
         )
       }
 
       for (callback in callbacks) {
 
-        res <- do.call(callback, c(list(rv), dot_args))
+        res <- do.call(callback, c(list(rv_ro), dot_args))
 
         if (!is.null(res)) {
           warning(
@@ -161,7 +163,10 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         }
       }
 
-      rv
+      c(
+        list(rv_ro),
+        dot_args
+      )
     }
   )
 }

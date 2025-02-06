@@ -36,3 +36,14 @@ slow_text_input_binding <- function() {
     script = "slowTextInputBinding.js"
   )
 }
+
+make_read_only <- function(x) {
+
+  stopifnot(is.reactivevalues(x))
+
+  res <- unclass(x)
+  res[["readonly"]] <- TRUE
+  class(res) <- class(x)
+
+  res
+}
