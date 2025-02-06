@@ -417,6 +417,16 @@ serve.block <- function(x, id = "block", ..., data = list()) {
     data <- list(...)
   }
 
+  dot_args <- !names(data) %in% block_inputs(x)
+
+  if (!is.na(block_arity(x)) && any(dot_args)) {
+    stop("Unexpected arguments.")
+  }
+
+  if (any(dot_args)) {
+    data <- c(data[!dot_args], list(...args = data[dot_args]))
+  }
+
   ui <- bslib::page_fluid(block_ui(id, x))
 
   server <- function(input, output, session) {
