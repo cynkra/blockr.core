@@ -13,7 +13,7 @@ generate_code <- function(rv) {
 
   ordering <- topo_sort(as.matrix(rv$board))
 
-  exprs <- Map(with_expr, exprs[ordering], arg_map[ordering])
+  exprs <- Map(wrap_expr, exprs[ordering], arg_map[ordering])
 
   exprs <- map(assignment, names(exprs), exprs)
   exprs <- lapply(exprs, deparse)
@@ -22,8 +22,7 @@ generate_code <- function(rv) {
   paste0(exprs, collapse = "\n\n")
 }
 
-with_expr <- function(expr, env) {
-
+wrap_expr <- function(expr, env) {
   if (length(env)) {
     call("with", env, expr)
   } else {

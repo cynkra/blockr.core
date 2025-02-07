@@ -180,3 +180,22 @@ safely_export <- function(r) {
     })
   })
 }
+
+exprs_to_lang <- function(exprs) {
+
+  if (rlang::is_syntactic_literal(exprs)) {
+    return(exprs)
+  }
+
+  if (is.expression(exprs)) {
+    exprs <- as.list(exprs)
+  }
+
+  if (is.list(exprs)) {
+    exprs <- as.call(c(quote(`{`), exprs))
+  }
+
+  stopifnot(typeof(exprs) == "language")
+
+  exprs
+}

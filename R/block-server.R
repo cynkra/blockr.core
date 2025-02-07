@@ -81,6 +81,10 @@ block_server.block <- function(id, x, data = list(), ...) {
         x
       )
 
+      lang <- reactive(
+        exprs_to_lang(exp$expr())
+      )
+
       dat <- reactive(
         {
           res <- lapply(data[names(data) != "...args"], reval)
@@ -183,7 +187,7 @@ block_server.block <- function(id, x, data = list(), ...) {
         {
           req(rv$state_set)
           lapply(exp$state, reval_if)
-          try(exp$expr(), silent = TRUE)
+          try(lang(), silent = TRUE)
 
           res <- dat()
 
@@ -205,7 +209,7 @@ block_server.block <- function(id, x, data = list(), ...) {
           out <- tryCatch(
             withCallingHandlers(
               {
-                block_eval(x, exp$expr(), dat_eval())
+                block_eval(x, lang(), dat_eval())
               },
               message = function(m) {
                 rv$eval_cond$message <- c(rv$eval_cond$message, cond_msg(m))
@@ -233,7 +237,7 @@ block_server.block <- function(id, x, data = list(), ...) {
 
       list(
         result = res,
-        expr = exp$expr,
+        expr = lang,
         state = exp$state,
         cond = reactive(
           list(
