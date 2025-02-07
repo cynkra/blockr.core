@@ -427,17 +427,6 @@ serve.block <- function(x, id = "block", ..., data = list()) {
     data <- c(data[!dot_args], list(...args = data[dot_args]))
   }
 
-  if ("...args" %in% names(data)) {
-
-    arg_names <- names(data[["...args"]])
-    pos_args <- grepl("[1-9][0-9]*", arg_names)
-
-    pos <- which(pos_args)
-    ind <- c(pos[order(as.integer(arg_names[pos]))], which(!pos_args))
-
-    data[["...args"]] <- data[["...args"]][ind]
-  }
-
   ui <- bslib::page_fluid(block_ui(id, x))
 
   server <- function(input, output, session) {

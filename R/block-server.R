@@ -52,6 +52,28 @@ block_server.block <- function(id, x, data = list(), ...) {
         eval_cond = empty_cond
       )
 
+      if ("...args" %in% names(data)) {
+
+        observeEvent(
+          names(data[["...args"]]),
+          {
+            arg_names <- names(data[["...args"]])
+            pos_args <- grepl("[1-9][0-9]*", arg_names)
+
+            if (any(pos_args)) {
+
+              ind <- which(pos_args)
+              ind <- c(
+                ind[order(as.integer(arg_names[ind]))],
+                which(!pos_args)
+              )
+
+              reorder_rv(data[["...args"]], arg_names[ind])
+            }
+          }
+        )
+      }
+
       res <- reactiveVal()
 
       exp <- check_expr_val(
