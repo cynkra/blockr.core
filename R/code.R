@@ -25,10 +25,10 @@ generate_code <- function(rv) {
 with_expr <- function(expr, env) {
 
   if (length(env)) {
-    expr <- call("with", env, expr)
+    call("with", env, expr)
+  } else {
+    call("local", expr)
   }
-
-  expr
 }
 
 assignment <- function(name, value) {
