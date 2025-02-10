@@ -34,24 +34,20 @@ links <- function(...) {
   )
 }
 
-list_to_list_of_links <- function(x) {
-
-  harmonize_list <- function(x) {
-
-    if (is_link(x)) {
-      return(list(x))
-    }
-
-    if (is_links(x)) {
-      return(as.list(x))
-    }
-
-    if (is.list(x) && all(lgl_ply(x, is_link))) {
-      return(x)
-    }
-
+harmonize_list_of_links <- function(x) {
+  if (is_link(x)) {
+    list(x)
+  } else if (is_links(x)) {
+    as.list(x)
+  } else if (is.list(x) && all(lgl_ply(x, is_link))) {
+    x
+  } else {
     list(as_link(x))
   }
+}
+
+
+list_to_list_of_links <- function(x) {
 
   if (length(x) == 1L && is.character(x[[1L]])) {
     x <- list(as.list(x))
@@ -77,10 +73,12 @@ list_to_list_of_links <- function(x) {
       names(res) <- NULL
     }
 
-    return(res)
-  }
+    res
 
-  unlist(lapply(x, harmonize_list), recursive = FALSE)
+  } else {
+
+    unlist(lapply(x, harmonize_list_of_links), recursive = FALSE)
+  }
 }
 
 #' @rdname new_link
