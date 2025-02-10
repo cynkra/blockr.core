@@ -19,24 +19,8 @@ block_server.block <- function(id, x, data = list(), ...) {
     id,
     function(input, output, session) {
 
-      cond_msg <- local(
-        {
-          id <- 1L
-
-          function(cnd) {
-
-            id <<- id + 1L
-
-            if (inherits(cnd, "condition")) {
-              cnd <- conditionMessage(cnd)
-            }
-
-            list(
-              structure(cnd, id = int_to_chr(id), class = "block_cnd")
-            )
-          }
-        }
-      )
+      onStop(function() set_globals(NULL))
+      set_globals(0L)
 
       empty_cond <- list(
         error = character(),
@@ -117,14 +101,20 @@ block_server.block <- function(id, x, data = list(), ...) {
                   TRUE
                 },
                 message = function(m) {
-                  rv$data_cond$message <- c(rv$data_cond$message, cond_msg(m))
+                  rv$data_cond$message <- c(
+                    rv$data_cond$message,
+                    new_condition(m)
+                  )
                 },
                 warning = function(w) {
-                  rv$data_cond$warning <- c(rv$data_cond$warning, cond_msg(w))
+                  rv$data_cond$warning <- c(
+                    rv$data_cond$warning,
+                    new_condition(w)
+                  )
                 }
               ),
               error = function(e) {
-                rv$data_cond$error <- cond_msg(e)
+                rv$data_cond$error <- new_condition(e)
                 NULL
               }
             )
@@ -173,7 +163,7 @@ block_server.block <- function(id, x, data = list(), ...) {
           rv$state_set <- NULL
 
           if (!all(ok)) {
-            rv$state_cond$error <- cond_msg(
+            rv$state_cond$error <- new_condition(
               paste0("State values ", paste_enum(names(ok)[!ok]), " are ",
                      "not yet initialized.")
             )
@@ -212,14 +202,20 @@ block_server.block <- function(id, x, data = list(), ...) {
                 block_eval(x, lang(), dat_eval())
               },
               message = function(m) {
-                rv$eval_cond$message <- c(rv$eval_cond$message, cond_msg(m))
+                rv$eval_cond$message <- c(
+                  rv$eval_cond$message,
+                  new_condition(m)
+                )
               },
               warning = function(w) {
-                rv$eval_cond$warning <- c(rv$eval_cond$warning, cond_msg(w))
+                rv$eval_cond$warning <- c(
+                  rv$eval_cond$warning,
+                  new_condition(w)
+                )
               }
             ),
             error = function(e) {
-              rv$eval_cond$error <- cond_msg(e)
+              rv$eval_cond$error <- new_condition(e)
               NULL
             }
           )
@@ -274,6 +270,20 @@ block_eval <- function(x, expr, data, ...) {
 #' @export
 block_eval.block <- function(x, expr, data, ...) {
   eval(expr, data)
+}
+
+new_condition <- function(x, ...) {
+
+  id <- get_globals(...) + 1L
+  set_globals(id, ...)
+
+  if (inherits(x, "condition")) {
+    x <- conditionMessage(x)
+  }
+
+  list(
+    structure(x, id = id, class = "block_cnd")
+  )
 }
 
 check_expr_val <- function(val, x) {

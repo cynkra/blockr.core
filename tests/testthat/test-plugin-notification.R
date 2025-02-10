@@ -14,7 +14,7 @@ test_that("add/rm blocks", {
                 data = list(),
                 state = list(),
                 eval = list(
-                  error = list(structure("some error", id = "abc")),
+                  error = list(structure("some error", id = 1)),
                   warning = character(),
                   message = character()
                 )
@@ -28,7 +28,7 @@ test_that("add/rm blocks", {
         session$returned(),
         list(
           a = list(
-            eval = list(error = list(structure("some error", id = "abc")))
+            eval = list(error = list(structure("some error", id = 1)))
           )
         )
       )
@@ -37,7 +37,7 @@ test_that("add/rm blocks", {
 
       expect_identical(
         get_globals(session = session),
-        list(a = "a_abc")
+        list(a = session$ns(1))
       )
 
       rv$blocks <- list()

@@ -65,7 +65,8 @@ block_notification_server <- function(id, rv, ...) {
   )
 }
 
-create_block_notifications <- function(notf, blk) {
+create_block_notifications <- function(notf, blk,
+                                       session = getDefaultReactiveDomain()) {
 
   cur <- c()
 
@@ -73,7 +74,7 @@ create_block_notifications <- function(notf, blk) {
     for (cnd in names(notf[[blk]][[typ]])) {
       for (msg in notf[[blk]][[typ]][[cnd]]) {
 
-        id <- paste0(blk, "_", attr(msg, "id"))
+        id <- session_to_id(attr(msg, "id"), session)
 
         showNotification(
           paste0("Block ", blk, ": ", msg),

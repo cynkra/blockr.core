@@ -4,20 +4,19 @@ blockr_globals_env <- list2env(
   )
 )
 
-get_globals <- function(name = NULL, session = getDefaultReactiveDomain()) {
+get_globals <- function(...) {
 
   get0(
-    sess_to_name(session, name),
+    session_to_id(...),
     envir = blockr_globals_env,
     inherits = FALSE
   )
 }
 
-set_globals <- function(value, name = NULL,
-                        session = getDefaultReactiveDomain()) {
+set_globals <- function(value, ...) {
 
   assign(
-    sess_to_name(session, name),
+    session_to_id(...),
     value,
     envir = blockr_globals_env,
     inherits = FALSE
@@ -26,11 +25,11 @@ set_globals <- function(value, name = NULL,
   invisible()
 }
 
-sess_to_name <- function(sess, nme) {
+session_to_id <- function(name = NULL, session = getDefaultReactiveDomain()) {
 
-  if (is.null(sess)) {
-    return(nme)
+  if (is.null(session)) {
+    return(name)
   }
 
-  sess$ns(nme)
+  session$ns(name)
 }
