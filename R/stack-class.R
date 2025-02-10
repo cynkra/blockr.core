@@ -16,7 +16,7 @@ new_stack <- function(blocks, id = rand_names(), name = NULL, ...,
     blocks <- names(blocks)
   }
 
-  stack_counter <- get_globals("stack_counter")
+  stack_counter <- get_globals("stack_counter", session = NULL)
 
   if (is.null(name)) {
     name <- paste0("Stack ", stack_counter)
@@ -26,7 +26,7 @@ new_stack <- function(blocks, id = rand_names(), name = NULL, ...,
     new_vctr(blocks, id = id, name = name, ..., class = c(class, "stack"))
   )
 
-  set_globals("stack_counter", stack_counter + 1L)
+  set_globals(stack_counter + 1L, "stack_counter", session = NULL)
 
   res
 }

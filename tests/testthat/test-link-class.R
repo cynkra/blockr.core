@@ -47,12 +47,3 @@ test_that("link class", {
   expect_s3_class(c(lnk, lst), "links")
   expect_s3_class(c(lnk, chr), "links")
 })
-
-serve(
-  new_rbind_block(),
-  data = list(
-    x = data.frame(a = 1),
-    y = data.frame(a = 2)
-  )
-)
-

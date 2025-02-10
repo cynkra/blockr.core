@@ -4,7 +4,7 @@ test_that("add/rm blocks", {
     block_notification_server,
     {
       expect_null(session$returned())
-      expect_identical(get_globals("notification_ids"), list())
+      expect_identical(get_globals(session = session), list())
 
       rv$blocks <- list(
         a = list(
@@ -36,7 +36,7 @@ test_that("add/rm blocks", {
       session$flushReact()
 
       expect_identical(
-        get_globals("notification_ids"),
+        get_globals(session = session),
         list(a = "a_abc")
       )
 
@@ -47,7 +47,7 @@ test_that("add/rm blocks", {
       session$flushReact()
 
       expect_identical(
-        get_globals("notification_ids"),
+        get_globals(session = session),
         list(a = NULL)[0]
       )
     },

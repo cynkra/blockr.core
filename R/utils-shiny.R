@@ -47,4 +47,4 @@ reorder_rv <- function(x, new) {
   internals$.nameOrder <- new
 
   invisible(x)
- }
+}
