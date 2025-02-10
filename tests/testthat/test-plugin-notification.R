@@ -1,4 +1,6 @@
-test_that("add/rm blocks", {
+test_that("notify_user", {
+
+  reset_gobals_env()
 
   testServer(
     block_notification_server,

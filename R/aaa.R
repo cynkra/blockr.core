@@ -1,8 +1,24 @@
-blockr_globals_env <- list2env(
-  list(
-    stack_counter = 1L
+blockr_globals_env <- new.env()
+
+reset_gobals_env <- function(stack_counter = 1L) {
+
+  rm(list = ls(envir = blockr_globals_env), envir = blockr_globals_env)
+
+  vals <- list(
+    stack_counter = stack_counter
   )
-)
+
+  Map(
+    assign,
+    names(vals),
+    vals,
+    MoreArgs = list(envir = blockr_globals_env, inherits = FALSE)
+  )
+
+  invisible()
+}
+
+reset_gobals_env()
 
 get_globals <- function(...) {
 
