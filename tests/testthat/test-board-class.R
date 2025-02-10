@@ -46,6 +46,22 @@ test_that("block constructor", {
 
 test_that("board app", {
 
+  links_input_ids <- function(curr = character()) {
+
+    res <- grep(
+      "my_board-manage_links-[a-z]{15}_id",
+      names(app$get_values(input = TRUE)[["input"]]),
+      value = TRUE
+    )
+
+    setdiff(sub("id$", "", res), curr)
+  }
+
+  set_input <- function(val, name, app) {
+    do.call(app$set_inputs, set_names(list(val), name))
+    invisible()
+  }
+
   skip_on_cran()
 
   app_path <- pkg_file("examples", "board", "app.R")
@@ -61,7 +77,7 @@ test_that("board app", {
   app$set_inputs(`my_board-manage_blocks-block_id` = "a")
   app$click("my_board-manage_blocks-confirm_add")
 
-  app$wait_for_idle(duration = 500)
+  app$wait_for_idle()
 
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
@@ -70,7 +86,7 @@ test_that("board app", {
   app$set_inputs(`my_board-manage_blocks-block_id` = "b")
   app$click("my_board-manage_blocks-confirm_add")
 
-  app$wait_for_idle(duration = 500)
+  app$wait_for_idle()
 
   app$set_inputs(`my_board-b-expr-dataset` = "ChickWeight")
 
@@ -81,25 +97,35 @@ test_that("board app", {
   app$set_inputs(`my_board-manage_blocks-block_id` = "c")
   app$click("my_board-manage_blocks-confirm_add")
 
-  app$wait_for_idle(duration = 500)
+  app$wait_for_idle()
 
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
   app$click("my_board-manage_links-links_mod")
 
   app$click("my_board-manage_links-add_link")
-  app$wait_for_value(input = "my_board-manage_links-edbxrcxwquzrffb_id")
-  app$set_inputs(`my_board-manage_links-edbxrcxwquzrffb_from` = "a")
-  app$set_inputs(`my_board-manage_links-edbxrcxwquzrffb_to` = "c")
-  app$set_inputs(`my_board-manage_links-edbxrcxwquzrffb_input` = "x")
+  app$wait_for_idle()
+  inp <- links_input_ids()
+
+  Map(
+    set_input,
+    list("a", "c", "x"),
+    paste0(inp, c("from", "to", "input")),
+    MoreArgs = list(app = app)
+  )
 
   app$click("my_board-manage_links-add_link")
-  app$wait_for_value(input = "my_board-manage_links-tcvubwfzjheaqgd_id")
-  app$set_inputs(`my_board-manage_links-tcvubwfzjheaqgd_from` = "b")
-  app$set_inputs(`my_board-manage_links-tcvubwfzjheaqgd_to` = "c")
-  app$set_inputs(`my_board-manage_links-tcvubwfzjheaqgd_input` = "y")
+  app$wait_for_idle()
+  inp <- links_input_ids(inp)
 
-  app$wait_for_idle(duration = 500)
+  Map(
+    set_input,
+    list("b", "c", "y"),
+    paste0(inp, c("from", "to", "input")),
+    MoreArgs = list(app = app)
+  )
+
+  app$wait_for_idle()
 
   app$click("my_board-manage_links-modify_links")
 
@@ -111,7 +137,7 @@ test_that("board app", {
   app$set_inputs(`my_board-manage_blocks-block_select` = "a")
   app$click("my_board-manage_blocks-confirm_rm")
 
-  app$wait_for_idle(duration = 500)
+  app$wait_for_idle()
 
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
