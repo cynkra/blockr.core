@@ -22,41 +22,15 @@ block_server.block <- function(id, x, data = list(), ...) {
       onStop(function() set_globals(NULL))
       set_globals(0L)
 
-      empty_cond <- list(
-        error = character(),
-        warning = character(),
-        message = character()
-      )
-
       rv <- reactiveValues(
         data_valid = if (block_has_data_validator(x)) NULL else TRUE,
-        data_cond = empty_cond,
+        data_cond = empty_block_condition,
         state_set = NULL,
-        state_cond = empty_cond,
-        eval_cond = empty_cond
+        state_cond = empty_block_condition,
+        eval_cond = empty_block_condition
       )
 
-      if ("...args" %in% names(data)) {
-
-        observeEvent(
-          names(data[["...args"]]),
-          {
-            arg_names <- names(data[["...args"]])
-            pos_args <- grepl("[1-9][0-9]*", arg_names)
-
-            if (any(pos_args)) {
-
-              ind <- which(pos_args)
-              ind <- c(
-                ind[order(as.integer(arg_names[ind]))],
-                which(!pos_args)
-              )
-
-              reorder_rv(data[["...args"]], arg_names[ind])
-            }
-          }
-        )
-      }
+      reorder_dots_observer(data)
 
       res <- reactiveVal()
 
@@ -82,154 +56,10 @@ block_server.block <- function(id, x, data = list(), ...) {
         }
       )
 
-      if (block_has_data_validator(x)) {
-
-        observeEvent(
-          dat(),
-          {
-            log_debug("performing input validation for block ", id)
-
-            res(NULL)
-
-            rv$data_cond <- empty_cond
-            rv$state_set <- NULL
-
-            rv$data_valid <- tryCatch(
-              withCallingHandlers(
-                {
-                  validate_data_inputs(x, dat())
-                  TRUE
-                },
-                message = function(m) {
-                  rv$data_cond$message <- c(
-                    rv$data_cond$message,
-                    new_condition(m)
-                  )
-                },
-                warning = function(w) {
-                  rv$data_cond$warning <- c(
-                    rv$data_cond$warning,
-                    new_condition(w)
-                  )
-                }
-              ),
-              error = function(e) {
-                rv$data_cond$error <- new_condition(e)
-                NULL
-              }
-            )
-          }
-        )
-      }
-
-      state_check <- reactive(
-        {
-          dat()
-
-          if (!isTruthy(rv$data_valid)) {
-            return(NULL)
-          }
-
-          allow_empty <- block_allow_empty_state(x)
-
-          if (isTRUE(allow_empty) || !length(exp$state)) {
-            return(TRUE)
-          }
-
-          if (isFALSE(allow_empty)) {
-            check <- TRUE
-          } else {
-            check <- setdiff(names(exp$state), allow_empty)
-          }
-
-          lgl_ply(
-            lapply(exp$state[check], reval_if),
-            Negate(is_empty),
-            use_names = TRUE
-          )
-        }
-      )
-
-      observeEvent(
-        state_check(),
-        {
-          log_debug("checking returned state values of block ", id)
-
-          res(NULL)
-
-          ok <- state_check()
-
-          rv$state_cond <- empty_cond
-          rv$state_set <- NULL
-
-          if (!all(ok)) {
-            rv$state_cond$error <- new_condition(
-              paste0("State values ", paste_enum(names(ok)[!ok]), " are ",
-                     "not yet initialized.")
-            )
-          } else {
-            rv$state_set <- TRUE
-          }
-        }
-      )
-
-      dat_eval <- reactive(
-        {
-          req(rv$state_set)
-          lapply(exp$state, reval_if)
-          try(lang(), silent = TRUE)
-
-          res <- dat()
-
-          if ("...args" %in% names(res)) {
-            res <- c(res[names(res) != "...args"], res[["...args"]])
-          }
-
-          res
-        }
-      )
-
-      observeEvent(
-        dat_eval(),
-        {
-          log_debug("evaluating block ", id)
-
-          rv$eval_cond <- empty_cond
-
-          out <- tryCatch(
-            withCallingHandlers(
-              {
-                block_eval(x, lang(), dat_eval())
-              },
-              message = function(m) {
-                rv$eval_cond$message <- c(
-                  rv$eval_cond$message,
-                  new_condition(m)
-                )
-              },
-              warning = function(w) {
-                rv$eval_cond$warning <- c(
-                  rv$eval_cond$warning,
-                  new_condition(w)
-                )
-              }
-            ),
-            error = function(e) {
-              rv$eval_cond$error <- new_condition(e)
-              NULL
-            }
-          )
-
-          res(out)
-        }
-      )
-
-      observeEvent(
-        res(),
-        {
-          output$result <- block_output(x, res())
-        }
-      )
+      validate_block_observer(id, x, dat, res, rv)
+      state_check_observer(id, x, dat, res, exp, rv)
+      data_eval_observer(id, x, dat, res, exp, lang, rv)
+      output_result_observer(x, res, output)
 
       list(
         result = res,
@@ -272,6 +102,31 @@ block_eval.block <- function(x, expr, data, ...) {
   eval(expr, data)
 }
 
+reorder_dots_observer <- function(data) {
+
+  if ("...args" %in% names(data)) {
+
+    observeEvent(
+      names(data[["...args"]]),
+      {
+        arg_names <- names(data[["...args"]])
+        pos_args <- grepl("[1-9][0-9]*", arg_names)
+
+        if (any(pos_args)) {
+
+          ind <- which(pos_args)
+          ind <- c(
+            ind[order(as.integer(arg_names[ind]))],
+            which(!pos_args)
+          )
+
+          reorder_rv(data[["...args"]], arg_names[ind])
+        }
+      }
+    )
+  }
+}
+
 new_condition <- function(x, ...) {
 
   id <- get_globals(...) + 1L
@@ -283,6 +138,172 @@ new_condition <- function(x, ...) {
 
   list(
     structure(x, id = id, class = "block_cnd")
+  )
+}
+
+empty_block_condition <- list(
+  error = character(),
+  warning = character(),
+  message = character()
+)
+
+validate_block_observer <- function(id, x, dat, res, rv) {
+
+  if (block_has_data_validator(x)) {
+    observeEvent(
+      dat(),
+      {
+        log_debug("performing input validation for block ", id)
+
+        res(NULL)
+
+        rv$data_cond <- empty_block_condition
+        rv$state_set <- NULL
+
+        rv$data_valid <- tryCatch(
+          withCallingHandlers(
+            {
+              validate_data_inputs(x, dat())
+              TRUE
+            },
+            message = function(m) {
+              rv$data_cond$message <- c(
+                rv$data_cond$message,
+                new_condition(m)
+              )
+            },
+            warning = function(w) {
+              rv$data_cond$warning <- c(
+                rv$data_cond$warning,
+                new_condition(w)
+              )
+            }
+          ),
+          error = function(e) {
+            rv$data_cond$error <- new_condition(e)
+            NULL
+          }
+        )
+      }
+    )
+  }
+}
+
+state_check_observer <- function(id, x, dat, res, exp, rv) {
+
+  state_check <- reactive(
+    {
+      dat()
+
+      if (!isTruthy(rv$data_valid)) {
+        return(NULL)
+      }
+
+      allow_empty <- block_allow_empty_state(x)
+
+      if (isTRUE(allow_empty) || !length(exp$state)) {
+        return(TRUE)
+      }
+
+      if (isFALSE(allow_empty)) {
+        check <- TRUE
+      } else {
+        check <- setdiff(names(exp$state), allow_empty)
+      }
+
+      lgl_ply(
+        lapply(exp$state[check], reval_if),
+        Negate(is_empty),
+        use_names = TRUE
+      )
+    }
+  )
+
+  observeEvent(
+    state_check(),
+    {
+      log_debug("checking returned state values of block ", id)
+
+      res(NULL)
+
+      ok <- state_check()
+
+      rv$state_cond <- empty_block_condition
+      rv$state_set <- NULL
+
+      if (!all(ok)) {
+        rv$state_cond$error <- new_condition(
+          paste0("State values ", paste_enum(names(ok)[!ok]), " are ",
+                 "not yet initialized.")
+        )
+      } else {
+        rv$state_set <- TRUE
+      }
+    }
+  )
+}
+
+data_eval_observer <- function(id, x, dat, res, exp, lang, rv) {
+
+  dat_eval <- reactive(
+    {
+      req(rv$state_set)
+      lapply(exp$state, reval_if)
+      try(lang(), silent = TRUE)
+
+      res <- dat()
+
+      if ("...args" %in% names(res)) {
+        res <- c(res[names(res) != "...args"], res[["...args"]])
+      }
+
+      res
+    }
+  )
+
+  observeEvent(
+    dat_eval(),
+    {
+      log_debug("evaluating block ", id)
+
+      rv$eval_cond <- empty_block_condition
+
+      out <- tryCatch(
+        withCallingHandlers(
+          {
+            block_eval(x, lang(), dat_eval())
+          },
+          message = function(m) {
+            rv$eval_cond$message <- c(
+              rv$eval_cond$message,
+              new_condition(m)
+            )
+          },
+          warning = function(w) {
+            rv$eval_cond$warning <- c(
+              rv$eval_cond$warning,
+              new_condition(w)
+            )
+          }
+        ),
+        error = function(e) {
+          rv$eval_cond$error <- new_condition(e)
+          NULL
+        }
+      )
+
+      res(out)
+    }
+  )
+}
+
+output_result_observer <- function(x, res, output) {
+
+  observeEvent(
+    res(),
+    {
+      output$result <- block_output(x, res())
+    }
   )
 }
 
