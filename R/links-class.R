@@ -36,11 +36,28 @@ links <- function(...) {
 
 list_to_list_of_links <- function(x) {
 
+  harmonize_list <- function(x) {
+
+    if (is_link(x)) {
+      return(list(x))
+    }
+
+    if (is_links(x)) {
+      return(as.list(x))
+    }
+
+    if (is.list(x) && all(lgl_ply(x, is_link))) {
+      return(x)
+    }
+
+    list(as_link(x))
+  }
+
   if (length(x) == 1L && is.character(x[[1L]])) {
     x <- list(as.list(x))
   }
 
-  if (any(lgl_ply(x, is.atomic))) {
+  if (length(x) && all(lgl_ply(x, is.atomic))) {
 
     stopifnot(
       all(length(x[[1L]]) == lengths(x[-1L]))
@@ -63,7 +80,7 @@ list_to_list_of_links <- function(x) {
     return(res)
   }
 
-  lapply(x, as_link)
+  unlist(lapply(x, harmonize_list), recursive = FALSE)
 }
 
 #' @rdname new_link
@@ -143,12 +160,7 @@ vec_cast.links.link <- function(x, to, ...) as_links(x)
 
 #' @export
 c.links <- function(...) {
-
-  args <- lapply(list(...), as_links)
-
-  validate_links(
-    do.call(vec_c, c(args, list(.ptype = args[[1L]])))
-  )
+  as_links(list_to_list_of_links(list(...)))
 }
 
 #' @export
@@ -183,9 +195,12 @@ c.links <- function(...) {
   new_ids <- names(value)
 
   if (!setequal(new_ids, trg_ids)) {
-    stop(
-      "Replacing IDs ", paste_enum(trg_ids), " with ", paste_enum(new_ids),
-      " is not allowed."
+    abort(
+      paste(
+        "Replacing IDs", paste_enum(trg_ids), "with", paste_enum(new_ids),
+        "is not allowed."
+      ),
+      class = "links_assignment_name_invalid"
     )
   }
 

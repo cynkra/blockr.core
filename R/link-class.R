@@ -124,7 +124,7 @@ as_link.data.frame <- function(x) {
 
 #' @export
 as.character.link <- function(x, ...) {
-  as.character(as.list(x))
+  do.call(c, as.list(x))
 }
 
 #' @export
@@ -186,5 +186,5 @@ print.link <- function(x, ...) {
 
 #' @export
 c.link <- function(...) {
-  as_links(lapply(list(...), as_link))
+  as_links(list_to_list_of_links(list(...)))
 }
