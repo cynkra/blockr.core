@@ -99,33 +99,6 @@ vec_restore.blocks <- function(x, to, ...) {
   validate_blocks(NextMethod())
 }
 
-#' @export
-vec_ptype2.blocks.blocks <- function(x, y, ...) x
-
-#' @export
-vec_ptype2.list.blocks <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.blocks.list <- function(x, y, ...) x
-
-#' @export
-vec_ptype2.block.blocks <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.blocks.block <- function(x, y, ...) x
-
-#' @export
-vec_cast.blocks.blocks <- function(x, to, ...) x
-
-#' @export
-vec_cast.blocks.list <- function(x, to, ...) as_blocks(x)
-
-#' @export
-vec_cast.list.blocks <- function(x, to, ...) as.list(x)
-
-#' @export
-vec_cast.blocks.block <- function(x, to, ...) as_blocks(x)
-
 harmonize_list_of_blocks <- function(x) {
   if (is_block(x)) {
     list(x)
@@ -179,6 +152,15 @@ c.blocks <- function(...) {
   }
 
   blocks_assign(x, i, value[trg_ids])
+}
+
+#' @export
+`[[<-.blocks` <- function(x, i, ..., value) {
+
+  i <- vec_as_location2(i, length(x), names(x))
+  val <- set_names(list(as_block(value)), x$id[i])
+
+  blocks_assign(x, i, as_blocks(val))
 }
 
 blocks_slice <- function(...) {
