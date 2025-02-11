@@ -174,21 +174,33 @@ blocks_assign <- function(...) {
 validate_blocks <- function(x) {
 
   if (!is_blocks(x)) {
-    stop("Expecting blocks to inherit from \"blocks\".")
+    abort(
+      "Expecting blocks to inherit from \"blocks\".",
+      class = "blocks_class_invalid"
+    )
   }
 
   if (!is.list(x) || !all(lgl_ply(x, is_block))) {
-    stop("Expecting the board to contain a set of blocks.")
+    abort(
+      "Expecting the board to contain a set of blocks.",
+      class = "blocks_contains_invalid"
+    )
   }
 
   ids <- names(x)
 
   if (length(ids) != length(x) || any(is.na(ids) | !nchar(ids))) {
-    stop("Block IDs are required to be nonempty strings.")
+    abort(
+      "Block IDs are required to be nonempty strings.",
+      class = "blocks_names_invalid"
+    )
   }
 
   if (anyDuplicated(ids) != 0) {
-    stop("Block IDs are required to be unique.")
+    abort(
+      "Block IDs are required to be unique.",
+      class = "blocks_names_invalid"
+    )
   }
 
   x

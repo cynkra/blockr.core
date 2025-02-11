@@ -80,4 +80,39 @@ test_that("blocks utils", {
   expect_named(abc["c"], "c")
 
   expect_s3_class(abc[["c"]], "block")
+
+  expect_error(
+    validate_blocks("a"),
+    class = "blocks_class_invalid"
+  )
+
+  expect_error(
+    validate_blocks(
+      structure(
+        1,
+        class = c("blocks", "vctrs_vctr", "list")
+      )
+    ),
+    class = "blocks_contains_invalid"
+  )
+
+  expect_error(
+    validate_blocks(
+      structure(
+        list(a),
+        class = c("blocks", "vctrs_vctr", "list")
+      )
+    ),
+    class = "blocks_names_invalid"
+  )
+
+  expect_error(
+    validate_blocks(
+      structure(
+        list(a = a, a = b),
+        class = c("blocks", "vctrs_vctr", "list")
+      )
+    ),
+    class = "blocks_names_invalid"
+  )
 })
