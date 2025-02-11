@@ -97,7 +97,10 @@ names.links <- function(x) {
   if (is.null(value)) {
     value <- rep("", length(x))
   } else if (anyDuplicated(value) != 0L) {
-    stop("IDs are required to be unique.")
+    abort(
+      "IDs are required to be unique.",
+      class = "links_names_unique_invalid"
+    )
   }
 
   field(x, "id") <- value
@@ -335,11 +338,14 @@ validate_links <- function(x) {
     )
   }
 
-  for (y in as.list(x)) {
-    validate_link(y)
+  if (!is.list(x)) {
+    abort(
+      "Expecting a board links objects behave list-like.",
+      class = "links_list_like_invalid"
+    )
   }
 
-  fields <- c("id", "to", "input")
+  fields <- c("id", "from", "to", "input")
 
   if (!all(fields %in% fields(x))) {
     abort(
@@ -348,6 +354,10 @@ validate_links <- function(x) {
       ),
       class = "links_fields_invalid"
     )
+  }
+
+  for (y in as.list(x)) {
+    validate_link(y)
   }
 
   if (any_dup(field(x, "id")) != 0L) {
