@@ -21,6 +21,24 @@ test_that("block constructor", {
   expect_s3_class(board, "board")
   expect_snapshot(print(board))
 
+  sorted <- sort(board)
+
+  expect_true(
+    match("a", board_block_ids(sorted)) < match("d", board_block_ids(sorted))
+  )
+
+  expect_true(
+    match("b", board_block_ids(sorted)) < match("d", board_block_ids(sorted))
+  )
+
+  expect_true(
+    match("b", board_block_ids(sorted)) < match("c", board_block_ids(sorted))
+  )
+
+  expect_true(
+    match("c", board_block_ids(sorted)) < match("d", board_block_ids(sorted))
+  )
+
   expect_error(
     new_board(
       list(

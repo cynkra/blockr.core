@@ -79,7 +79,7 @@ block_ui.board <- function(id, x, blocks = NULL, ...) {
   stopifnot(is_string(id))
 
   if (is.null(blocks)) {
-    blocks <- sort(x)
+    blocks <- board_blocks(x)
   } else if (is.character(blocks)) {
     blocks <- board_blocks(x)[blocks]
   }

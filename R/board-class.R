@@ -141,7 +141,9 @@ sort.board <- function(x, decreasing = FALSE, ...) {
     ind <- rev(ind)
   }
 
-  board_blocks(x)[ind]
+  board_blocks(x) <- board_blocks(x)[ind]
+
+  x
 }
 
 #' @export

@@ -182,7 +182,7 @@ setup_blocks <- function(rv) {
   rv$inputs <- list()
   rv$links <- list()
 
-  blks <- sort(rv$board)
+  blks <- board_blocks(rv$board)
 
   for (i in names(blks)) {
     rv <- setup_block(blks[[i]], i, rv)
