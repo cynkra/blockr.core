@@ -59,7 +59,10 @@ validate_board_blocks_links <- function(blocks, links) {
   ids <- names(blocks)
 
   if (!all(links$from %in% ids) || !all(links$to %in% ids)) {
-    stop("Expecting all links to refer to known block IDs.")
+    abort(
+      "Expecting all links to refer to known block IDs.",
+      class = "board_block_link_name_mismatch"
+    )
   }
 
   arity <- int_ply(blocks, block_arity)
@@ -69,10 +72,13 @@ validate_board_blocks_links <- function(blocks, links) {
     fail <- table(factor(links$to, levels = ids[arity == i])) > i
 
     if (any(fail)) {
-      stop(
-        i, "-ary blocks are expected to have at most ", i, " incoming ",
-        "edge(s), which does not hold for block(s) ",
-        paste_enum(names(fail)[fail]), "."
+      abort(
+        paste0(
+          i, "-ary blocks are expected to have at most ", i, " incoming ",
+          "edge(s), which does not hold for block(s) ",
+          paste_enum(names(fail)[fail]), "."
+        ),
+        class = "board_block_link_arity_mismatch"
       )
     }
   }
@@ -84,9 +90,12 @@ validate_board_blocks_links <- function(blocks, links) {
     unknown <- setdiff(links$input[links$to == i], inputs[[i]])
 
     if (length(unknown)) {
-      stop(
-        "Block ", i, " expects inputs ", paste_enum(inputs[[i]]),
-        " but received ", paste_enum(unknown)
+      abort(
+        paste0(
+          "Block ", i, " expects inputs ", paste_enum(inputs[[i]]),
+          " but received ", paste_enum(unknown)
+        ),
+        class = "board_block_link_input_mismatch"
       )
     }
   }
@@ -100,18 +109,25 @@ validate_board_blocks_links <- function(blocks, links) {
 validate_board <- function(x) {
 
   if (!is_board(x)) {
-    stop("Expecting a board object to inherit from \"baord\".")
+    abort(
+      "Expecting a board object to inherit from \"baord\".",
+      class = "board_inheritance_invalid"
+    )
   }
 
   if (!is.list(x)) {
-    stop("Expecting a board object to be list-like.")
+    abort(
+      "Expecting a board object to be list-like.",
+      class = "board_list_like_invalid"
+    )
   }
 
   cmps <- c("blocks", "links")
 
   if (!all(cmps %in% names(x))) {
-    stop(
-      "Expecting a board object to contain components ", paste_enum(cmps), "."
+    abort(
+      "Expecting a board object to contain components ", paste_enum(cmps), ".",
+      class = "board_list_components_invalid"
     )
   }
 
