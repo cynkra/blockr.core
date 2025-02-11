@@ -14,7 +14,7 @@
         $ package: chr "datasets"
        Constructor: blockr.core::new_dataset_block()
       
-      c
+      b
        <subset_block<transform_block<block>>>
        Name: "Subset block"
        Data inputs: "data"

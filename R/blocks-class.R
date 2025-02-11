@@ -62,7 +62,10 @@ as.list.blocks <- function(x, ...) {
   if (is.null(value)) {
     value <- rep("", length(x))
   } else if (anyDuplicated(value) != 0L) {
-    stop("IDs are required to be unique.")
+    abort(
+      "IDs are required to be unique.",
+      class = "blocks_names_unique_invalid"
+    )
   }
 
   attr(x, "names") <- value
@@ -123,16 +126,27 @@ vec_cast.list.blocks <- function(x, to, ...) as.list(x)
 #' @export
 vec_cast.blocks.block <- function(x, to, ...) as_blocks(x)
 
+harmonize_list_of_blocks <- function(x) {
+  if (is_block(x)) {
+    list(x)
+  } else if (is_blocks(x)) {
+    as.list(x)
+  } else if (is.list(x) && all(lgl_ply(x, is_block))) {
+    x
+  } else {
+    list(as_block(x))
+  }
+}
+
 #' @export
 c.blocks <- function(...) {
 
-  args <- lapply(list(...), as_blocks)
-  args <- lapply(args, as.list)
-  args <- do.call(c, args)
-
-  validate_blocks(
-    do.call(c, args)
+  res <- unlist(
+    lapply(list(...), harmonize_list_of_blocks),
+    recursive = FALSE
   )
+
+  as_blocks(res)
 }
 
 #' @export
@@ -155,9 +169,12 @@ c.blocks <- function(...) {
   new_ids <- names(value)
 
   if (!setequal(new_ids, trg_ids)) {
-    stop(
-      "Replacing IDs ", paste_enum(trg_ids), " with ", paste_enum(new_ids),
-      " is not allowed."
+    abort(
+      paste0(
+        "Replacing IDs ", paste_enum(trg_ids), " with ", paste_enum(new_ids),
+        " is not allowed."
+      ),
+      class = "blocks_assignment_name_invalid"
     )
   }
 
