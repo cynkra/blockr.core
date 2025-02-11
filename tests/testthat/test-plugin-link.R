@@ -73,11 +73,11 @@ test_that("add/rm links", {
       expect_named(upd$obs, "ac")
       expect_type(upd$obs, "list")
 
-      expect_length(upd$obs[["ac"]], 4L)
-      expect_named(upd$obs[["ac"]], c("id", "from", "to", "input"))
+      expect_length(upd$obs[["ac"]], 3L)
+      expect_named(upd$obs[["ac"]], c("from", "to", "input"))
       expect_type(upd$obs[["ac"]], "list")
 
-      for (i in c("id", "from", "to", "input")) {
+      for (i in c("from", "to", "input")) {
         expect_s3_class(upd$obs[["ac"]][[i]], "Observer")
       }
 
@@ -125,7 +125,7 @@ test_that("add/rm links", {
 
       expect_identical(upd$rm, character())
 
-      session$setInputs(links_rows_selected = 1, rm_link = 1)
+      session$setInputs(links_dt_rows_selected = 1, rm_link = 1)
 
       expect_identical(upd$rm, "aa")
 

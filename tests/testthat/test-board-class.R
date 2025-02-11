@@ -46,22 +46,6 @@ test_that("block constructor", {
 
 test_that("board app", {
 
-  links_input_ids <- function(curr = character()) {
-
-    res <- grep(
-      "my_board-manage_links-[a-z]{15}_id",
-      names(app$get_values(input = TRUE)[["input"]]),
-      value = TRUE
-    )
-
-    setdiff(sub("id$", "", res), curr)
-  }
-
-  set_input <- function(val, name, app) {
-    do.call(app$set_inputs, set_names(list(val), name))
-    invisible()
-  }
-
   skip_on_cran()
 
   app_path <- pkg_file("examples", "board", "app.R")
@@ -103,27 +87,25 @@ test_that("board app", {
 
   app$click("my_board-manage_links-links_mod")
 
+  app$set_inputs(`my_board-manage_links-new_link_id` = "ac")
   app$click("my_board-manage_links-add_link")
+
   app$wait_for_idle()
-  inp <- links_input_ids()
 
-  Map(
-    set_input,
-    list("a", "c", "x"),
-    paste0(inp, c("from", "to", "input")),
-    MoreArgs = list(app = app)
-  )
+  app$set_inputs(`my_board-manage_links-ac_from` = "a")
+  app$set_inputs(`my_board-manage_links-ac_to` = "c")
+  app$set_inputs(`my_board-manage_links-ac_input` = "x")
 
+  app$wait_for_idle()
+
+  app$set_inputs(`my_board-manage_links-new_link_id` = "bc")
   app$click("my_board-manage_links-add_link")
-  app$wait_for_idle()
-  inp <- links_input_ids(inp)
 
-  Map(
-    set_input,
-    list("b", "c", "y"),
-    paste0(inp, c("from", "to", "input")),
-    MoreArgs = list(app = app)
-  )
+  app$wait_for_idle()
+
+  app$set_inputs(`my_board-manage_links-bc_from` = "b")
+  app$set_inputs(`my_board-manage_links-bc_to` = "c")
+  app$set_inputs(`my_board-manage_links-bc_input` = "y")
 
   app$wait_for_idle()
 

@@ -46,7 +46,6 @@ harmonize_list_of_links <- function(x) {
   }
 }
 
-
 list_to_list_of_links <- function(x) {
 
   if (length(x) == 1L && is.character(x[[1L]])) {
