@@ -16,13 +16,15 @@ block_notification_server <- function(id, rv, ...) {
     id,
     function(input, output, session) {
 
-      onStop(function() set_globals(list()))
+      onStop(
+        function() set_globals(list(), session = session)
+      )
 
-      if (length(get_globals())) {
+      if (length(get_globals(session = session))) {
         warning("Existing notification IDs will be purged.")
       }
 
-      set_globals(list())
+      set_globals(list(), session = session)
 
       cnd <- reactive(
         lst_xtr_reval(rv$blocks, "server", "cond")
@@ -32,7 +34,7 @@ block_notification_server <- function(id, rv, ...) {
         cnd(),
         {
           notf <- cnd()
-          ids <- get_globals()
+          ids <- get_globals(session = session)
 
           for (blk in setdiff(names(ids), names(notf))) {
 
@@ -41,7 +43,7 @@ block_notification_server <- function(id, rv, ...) {
             }
 
             ids[[blk]] <- NULL
-            set_globals(ids)
+            set_globals(ids, session = session)
           }
 
           for (blk in names(notf)) {
@@ -53,7 +55,7 @@ block_notification_server <- function(id, rv, ...) {
             }
 
             ids[[blk]] <- cur
-            set_globals(ids)
+            set_globals(ids, session = session)
           }
         }
       )

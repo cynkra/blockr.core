@@ -19,8 +19,11 @@ block_server.block <- function(id, x, data = list(), ...) {
     id,
     function(input, output, session) {
 
-      onStop(function() set_globals(NULL))
-      set_globals(0L)
+      onStop(
+        function() set_globals(NULL, session = session)
+      )
+
+      set_globals(0L, session = session)
 
       rv <- reactiveValues(
         data_valid = if (block_has_data_validator(x)) NULL else TRUE,
@@ -30,7 +33,7 @@ block_server.block <- function(id, x, data = list(), ...) {
         eval_cond = empty_block_condition
       )
 
-      reorder_dots_observer(data)
+      reorder_dots_observer(data, session)
 
       res <- reactiveVal()
 
@@ -56,10 +59,10 @@ block_server.block <- function(id, x, data = list(), ...) {
         }
       )
 
-      validate_block_observer(id, x, dat, res, rv)
-      state_check_observer(id, x, dat, res, exp, rv)
-      data_eval_observer(id, x, dat, res, exp, lang, rv)
-      output_result_observer(x, res, output)
+      validate_block_observer(id, x, dat, res, rv, session)
+      state_check_observer(id, x, dat, res, exp, rv, session)
+      data_eval_observer(id, x, dat, res, exp, lang, rv, session)
+      output_result_observer(x, res, output, session)
 
       list(
         result = res,
@@ -102,7 +105,7 @@ block_eval.block <- function(x, expr, data, ...) {
   eval(expr, data)
 }
 
-reorder_dots_observer <- function(data) {
+reorder_dots_observer <- function(data, sess) {
 
   if ("...args" %in% names(data)) {
 
@@ -122,7 +125,8 @@ reorder_dots_observer <- function(data) {
 
           reorder_rv(data[["...args"]], arg_names[ind])
         }
-      }
+      },
+      domain = sess
     )
   }
 }
@@ -147,7 +151,7 @@ empty_block_condition <- list(
   message = character()
 )
 
-validate_block_observer <- function(id, x, dat, res, rv) {
+validate_block_observer <- function(id, x, dat, res, rv, sess) {
 
   if (block_has_data_validator(x)) {
     observeEvent(
@@ -169,27 +173,28 @@ validate_block_observer <- function(id, x, dat, res, rv) {
             message = function(m) {
               rv$data_cond$message <- c(
                 rv$data_cond$message,
-                new_condition(m)
+                new_condition(m, session = sess)
               )
             },
             warning = function(w) {
               rv$data_cond$warning <- c(
                 rv$data_cond$warning,
-                new_condition(w)
+                new_condition(w, session = sess)
               )
             }
           ),
           error = function(e) {
-            rv$data_cond$error <- new_condition(e)
+            rv$data_cond$error <- new_condition(e, session = sess)
             NULL
           }
         )
-      }
+      },
+      domain = sess
     )
   }
 }
 
-state_check_observer <- function(id, x, dat, res, exp, rv) {
+state_check_observer <- function(id, x, dat, res, exp, rv, sess) {
 
   state_check <- reactive(
     {
@@ -216,7 +221,8 @@ state_check_observer <- function(id, x, dat, res, exp, rv) {
         Negate(is_empty),
         use_names = TRUE
       )
-    }
+    },
+    domain = sess
   )
 
   observeEvent(
@@ -234,16 +240,18 @@ state_check_observer <- function(id, x, dat, res, exp, rv) {
       if (!all(ok)) {
         rv$state_cond$error <- new_condition(
           paste0("State values ", paste_enum(names(ok)[!ok]), " are ",
-                 "not yet initialized.")
+                 "not yet initialized."),
+          session = sess
         )
       } else {
         rv$state_set <- TRUE
       }
-    }
+    },
+    domain = sess
   )
 }
 
-data_eval_observer <- function(id, x, dat, res, exp, lang, rv) {
+data_eval_observer <- function(id, x, dat, res, exp, lang, rv, sess) {
 
   dat_eval <- reactive(
     {
@@ -258,7 +266,8 @@ data_eval_observer <- function(id, x, dat, res, exp, lang, rv) {
       }
 
       res
-    }
+    },
+    domain = sess
   )
 
   observeEvent(
@@ -276,34 +285,36 @@ data_eval_observer <- function(id, x, dat, res, exp, lang, rv) {
           message = function(m) {
             rv$eval_cond$message <- c(
               rv$eval_cond$message,
-              new_condition(m)
+              new_condition(m, session = sess)
             )
           },
           warning = function(w) {
             rv$eval_cond$warning <- c(
               rv$eval_cond$warning,
-              new_condition(w)
+              new_condition(w, session = sess)
             )
           }
         ),
         error = function(e) {
-          rv$eval_cond$error <- new_condition(e)
+          rv$eval_cond$error <- new_condition(e, session = sess)
           NULL
         }
       )
 
       res(out)
-    }
+    },
+    domain = sess
   )
 }
 
-output_result_observer <- function(x, res, output) {
+output_result_observer <- function(x, res, output, sess) {
 
   observeEvent(
     res(),
     {
       output$result <- block_output(x, res())
-    }
+    },
+    domain = sess
   )
 }
 
