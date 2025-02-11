@@ -120,45 +120,6 @@ vec_restore.links <- function(x, to, ...) {
 }
 
 #' @export
-vec_ptype2.links.links <- function(x, y, ...) x
-
-#' @export
-vec_ptype2.list.links <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.links.list <- function(x, y, ...) x
-
-#' @export
-vec_ptype2.data.frame.links <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.links.data.frame <- function(x, y, ...) x
-
-#' @export
-vec_ptype2.link.links <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.links.link <- function(x, y, ...) x
-
-#' @export
-vec_cast.links.links <- function(x, to, ...) x
-
-#' @export
-vec_cast.links.list <- function(x, to, ...) as_links(x)
-
-#' @export
-vec_cast.list.links <- function(x, to, ...) as.list(x)
-
-#' @export
-vec_cast.links.data.frame <- function(x, to, ...) as_links(x)
-
-#' @export
-vec_cast.data.frame.links <- function(x, to, ...) as.data.frame(x)
-
-#' @export
-vec_cast.links.link <- function(x, to, ...) as_links(x)
-
-#' @export
 c.links <- function(...) {
   as_links(list_to_list_of_links(list(...)))
 }
@@ -204,7 +165,7 @@ c.links <- function(...) {
     )
   }
 
-  links_assign(x, i, value[trg_ids])
+  links_assign(x, i, as_links(value[trg_ids]))
 }
 
 #' @export
@@ -223,7 +184,7 @@ c.links <- function(...) {
   i <- vec_as_location2(i, length(x), names(x))
   val <- set_names(list(as_link(value)), x$id[i])
 
-  links_assign(x, i, val)
+  links_assign(x, i, as_links(val))
 }
 
 #' @export
