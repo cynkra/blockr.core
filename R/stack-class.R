@@ -208,3 +208,14 @@ is.element.stack <- function(el, set, ...) {
     class = "stack_subassignment_invalid"
   )
 }
+
+#' @export
+c.stack <- function(...) {
+
+  res <- unlist(
+    lapply(list(...), harmonize_list_of_stacks),
+    recursive = FALSE
+  )
+
+  as_stacks(res)
+}

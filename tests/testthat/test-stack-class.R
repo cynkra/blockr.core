@@ -79,4 +79,10 @@ test_that("stack class", {
     x[[1]] <- "c",
     class = "stack_subassignment_invalid"
   )
+
+  stks <- c(x, letters[6:8])
+
+  expect_s3_class(stks, "stacks")
+  expect_true(is_stacks(stks))
+  expect_length(stks, 2)
 })
