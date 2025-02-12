@@ -44,7 +44,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">new_stack</span><span class="op">(</span><span class="va">blocks</span>, id <span class="op">=</span> <span class="fu"><a href="rand_names.html">rand_names</a></span><span class="op">(</span><span class="op">)</span>, name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">new_stack</span><span class="op">(</span><span class="va">blocks</span>, name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">is_stack</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
@@ -54,7 +54,25 @@
 <span><span class="fu">as_stack</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'character'</span></span>
-<span><span class="fu">as_stack</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">as_stack</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'list'</span></span>
+<span><span class="fu">as_stack</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">stacks</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">is_stacks</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">as_stacks</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'stacks'</span></span>
+<span><span class="fu">as_stacks</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'list'</span></span>
+<span><span class="fu">as_stacks</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'stack'</span></span>
+<span><span class="fu">as_stacks</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -63,10 +81,6 @@
 
 <dl><dt id="arg-blocks">blocks<a class="anchor" aria-label="anchor" href="#arg-blocks"></a></dt>
 <dd><p>Set of blocks</p></dd>
-
-
-<dt id="arg-id">id<a class="anchor" aria-label="anchor" href="#arg-id"></a></dt>
-<dd><p>Unique stack ID</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
