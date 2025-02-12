@@ -3,6 +3,10 @@
 \name{new_stack}
 \alias{new_stack}
 \alias{is_stack}
+\alias{stack_blocks}
+\alias{stack_blocks<-}
+\alias{stack_name}
+\alias{stack_name<-}
 \alias{as_stack}
 \alias{as_stack.stack}
 \alias{as_stack.character}
@@ -16,9 +20,17 @@
 \alias{as_stacks.stack}
 \title{Stacks}
 \usage{
-new_stack(blocks, name = NULL, ..., class = character())
+new_stack(blocks = character(), name = NULL, ..., class = character())
 
 is_stack(x)
+
+stack_blocks(x)
+
+stack_blocks(x) <- value
+
+stack_name(x, name)
+
+stack_name(x) <- value
 
 as_stack(x)
 
@@ -52,6 +64,8 @@ as_stacks(x, ...)
 \item{class}{(Optional) stack sub-class}
 
 \item{x}{Stack object}
+
+\item{value}{Replacement value}
 }
 \description{
 Stacks are sets of blocks.

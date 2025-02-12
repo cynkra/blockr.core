@@ -21,7 +21,7 @@ add_rm_block_server <- function(id, rv, ...) {
 
       observeEvent(
         input$add_block,
-        add_block_modal(session$ns)
+        showModal(add_block_modal(session$ns))
       )
 
       observeEvent(
@@ -145,26 +145,24 @@ add_rm_block_ui <- function(id, board) {
 }
 
 add_block_modal <- function(ns) {
-  showModal(
-    modalDialog(
-      title = "Add block",
-      div(
-        selectInput(
-          ns("registry_select"),
-          "Select block from registry",
-          choices = list_blocks()
-        ),
-        textInput(
-          inputId = ns("block_id"),
-          label = "Block ID",
-          value = rand_names(),
-          placeholder = "Enter a block ID."
-        )
+  modalDialog(
+    title = "Add block",
+    div(
+      selectInput(
+        ns("registry_select"),
+        "Select block from registry",
+        choices = list_blocks()
       ),
-      footer = tagList(
-        actionButton(ns("cancel_add"), "Cancel", class = "btn-danger"),
-        actionButton(ns("confirm_add"), "OK", class = "btn-success")
+      textInput(
+        inputId = ns("block_id"),
+        label = "Block ID",
+        value = rand_names(),
+        placeholder = "Enter a block ID."
       )
+    ),
+    footer = tagList(
+      actionButton(ns("cancel_add"), "Cancel", class = "btn-danger"),
+      actionButton(ns("confirm_add"), "OK", class = "btn-success")
     )
   )
 }

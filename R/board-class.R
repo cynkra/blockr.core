@@ -213,6 +213,7 @@ serve.board <- function(x, id = rand_names(), ...) {
         preserve_board = ser_deser_ui,
         manage_blocks = add_rm_block_ui,
         manage_links = add_rm_link_ui,
+        manage_stacks = add_rm_stack_ui,
         generate_code = gen_code_ui
       )
     )
@@ -224,6 +225,7 @@ serve.board <- function(x, id = rand_names(), ...) {
         preserve_board = ser_deser_server,
         manage_blocks = add_rm_block_server,
         manage_links = add_rm_link_server,
+        manage_stacks = add_rm_stack_server,
         notify_user = block_notification_server,
         generate_code = gen_code_server
       )
@@ -309,24 +311,52 @@ board_stack_ids <- function(x) {
   names(board_stacks(x))
 }
 
-#' @param add Links to add
-#' @param rm Link IDs to remove
+#' @rdname new_board
+#' @export
+available_stack_blocks <- function(x, stacks = board_stacks(x),
+                                   blocks = board_stack_ids(x)) {
+
+  Reduce(setdiff, lapply(stacks, as.character), blocks)
+}
+
+#' @param add Links/stacks to add
+#' @param rm Link/stack IDs to remove
 #' @rdname new_board
 #' @export
 modify_links <- function(x, add = NULL, rm = NULL) {
 
   links <- board_links(x)
 
-  if (is_link(rm)) {
+  if (is_links(rm)) {
     rm <- names(rm)
   }
 
   if (length(rm)) {
     stopifnot(is.character(rm), all(rm %in% names(links)))
-    links <- links[!names(links) %in% rm, ]
+    links <- links[!names(links) %in% rm]
   }
 
   board_links(x) <- c(links, add)
+
+  x
+}
+
+#' @rdname new_board
+#' @export
+modify_stacks <- function(x, add = NULL, rm = NULL) {
+
+  stacks <- board_stacks(x)
+
+  if (is_stacks(rm)) {
+    rm <- names(rm)
+  }
+
+  if (length(rm)) {
+    stopifnot(is.character(rm), all(rm %in% names(stacks)))
+    stacks <- stacks[!names(stacks) %in% rm]
+  }
+
+  board_stacks(x) <- c(stacks, add)
 
   x
 }

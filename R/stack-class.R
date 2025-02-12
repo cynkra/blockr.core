@@ -8,7 +8,8 @@
 #' @param class (Optional) stack sub-class
 #'
 #' @export
-new_stack <- function(blocks, name = NULL, ..., class = character()) {
+new_stack <- function(blocks = character(), name = NULL, ...,
+                      class = character()) {
 
   if (is_blocks(blocks)) {
     blocks <- names(blocks)
@@ -34,6 +35,32 @@ new_stack <- function(blocks, name = NULL, ..., class = character()) {
 #' @export
 is_stack <- function(x) {
   inherits(x, "stack")
+}
+
+#' @rdname new_stack
+#' @export
+stack_blocks <- function(x) {
+  as.character(x)
+}
+
+#' @param value Replacement value
+#' @rdname new_stack
+#' @export
+`stack_blocks<-` <- function(x, value) {
+  vec_restore(new_stack(value), x)
+}
+
+#' @rdname new_stack
+#' @export
+stack_name <- function(x, name) {
+  attr(x, "name")
+}
+
+#' @rdname new_stack
+#' @export
+`stack_name<-` <- function(x, value) {
+  attr(x, "name") <- value
+  x
 }
 
 validate_stack <- function(x) {
@@ -94,13 +121,16 @@ format.stack <- function(x, ...) {
     out <- paste0("<", cl, out, ">")
   }
 
+  if (length(x)) {
+    blks <- paste0("Blocks: ", paste_enum(as.character(x), quotes = "\""))
+  } else {
+    blks <- "No blocks"
+  }
+
   c(
     out,
     paste0("Name: \"", attr(x, "name"), "\""),
-    strwrap(
-      paste0("Blocks: ", paste_enum(as.character(x), quotes = "\"")),
-      exdent = 2
-    )
+    strwrap(blks, exdent = 2)
   )
 }
 

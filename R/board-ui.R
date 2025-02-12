@@ -20,6 +20,7 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
   ser_deser <- get_plugin("preserve_board", plugins)
   add_rm_block <- get_plugin("manage_blocks", plugins)
   add_rm_link <- get_plugin("manage_links", plugins)
+  add_rm_stack <- get_plugin("manage_stacks", plugins)
   block_notifications <- get_plugin("notify_user", plugins)
   gen_code <- get_plugin("generate_code", plugins)
 
@@ -29,6 +30,7 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
     if (length(ser_deser)) ser_deser(ns("preserve_board"), x),
     if (length(add_rm_block)) add_rm_block(ns("manage_blocks"), x),
     if (length(add_rm_link)) add_rm_link(ns("manage_links"), x),
+    if (length(add_rm_stack)) add_rm_stack(ns("manage_stacks"), x),
     if (length(gen_code)) gen_code(ns("generate_code"), x)
   )
 

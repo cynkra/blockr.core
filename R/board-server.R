@@ -76,6 +76,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
       add_rm_block <- get_plugin("manage_blocks", plugins)
 
       if (not_null(add_rm_block)) {
+
         blocks <- check_add_rm_block_val(
           do.call(add_rm_block, c(list("manage_blocks", rv), dot_args)),
           rv
@@ -107,6 +108,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
       add_rm_link <- get_plugin("manage_links", plugins)
 
       if (not_null(add_rm_link)) {
+
         links <- check_add_rm_link_val(
           do.call(add_rm_link, c(list("manage_links", rv), dot_args)),
           rv
@@ -126,13 +128,35 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         )
       }
 
+      add_rm_stack <- get_plugin("manage_stacks", plugins)
+
+      if (not_null(add_rm_stack)) {
+
+        stacks <- check_add_rm_stack_val(
+          do.call(add_rm_stack, c(list("manage_stacks", rv), dot_args)),
+          rv
+        )
+
+        observeEvent(
+          stacks(),
+          {
+            updates <- stacks()
+            rv$board <- modify_stacks(rv$board, updates$add, updates$rm)
+          },
+          ignoreInit = TRUE
+        )
+      }
+
       block_notifications <- get_plugin("notify_user", plugins)
 
       if (is.null(block_notifications)) {
+
         rv$msgs <- reactive(
           filter_all_zero_len(lst_xtr_reval(rv$blocks, "server", "cond"))
         )
+
       } else {
+
         rv$msgs <- check_block_notifications_val(
           do.call(
             block_notification_server,
@@ -144,21 +168,16 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
       gen_code <- get_plugin("generate_code", plugins)
 
       if (not_null(gen_code)) {
+
         check_gen_code_val(
           do.call(gen_code, c(list("generate_code", rv), dot_args))
         )
       }
 
-      for (callback in callbacks) {
+      cb_res <- vector("list", length(callbacks))
 
-        res <- do.call(callback, c(list(rv), dot_args))
-
-        if (!is.null(res)) {
-          warning(
-            "Callbacks are only called for their side-effects and are ",
-            "expected to return `NULL`."
-          )
-        }
+      for (i in seq_along(callbacks)) {
+        cb_res[[i]] <- do.call(callbacks[[i]], c(list(rv), dot_args))
       }
 
       rv
@@ -308,8 +327,8 @@ validate_plugins <- function(plugins) {
 
   unknown <- setdiff(
     names(plugins),
-    c("preserve_board", "manage_blocks", "manage_links", "notify_user",
-      "generate_code")
+    c("preserve_board", "manage_blocks", "manage_links", "manage_stacks",
+      "notify_user", "generate_code")
   )
 
   if (length(unknown)) {

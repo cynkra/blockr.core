@@ -39,27 +39,35 @@ add_rm_link_server <- function(id, rv, ...) {
         }
       )
 
-      output$links_dt <- DT::renderDT(
-        link_dt(isolate(upd$curr), session$ns, rv),
+      output$links_dt <- DT::renderDataTable(
+        link_dt(isolate(upd$curr), session$ns, isolate(rv$board)),
         server = TRUE
       )
 
-      proxy <- DT::dataTableProxy("links_dt")
+      links_proxy <- DT::dataTableProxy("links_dt")
+
+      curr_ids <- reactiveVal(NULL)
 
       observeEvent(
         names(upd$curr),
         {
           ids <- names(upd$curr)
 
+          if (identical(ids, curr_ids())) {
+            return()
+          }
+
+          curr_ids(ids)
+
           DT::replaceData(
-            proxy,
-            dt_board_link(upd$curr, session$ns, rv),
+            links_proxy,
+            dt_board_link(upd$curr, session$ns, rv$board),
             rownames = FALSE
           )
 
-          upd <- create_dt_observers(setdiff(ids, names(upd$obs)), input, upd,
-                                     board_blocks(rv$board), session)
-          upd <- destroy_dt_observers(setdiff(names(upd$obs), ids), upd)
+          upd <- create_dt_link_obs(setdiff(ids, names(upd$obs)), upd, input,
+                                    board_blocks(rv$board), session)
+          upd <- destroy_dt_link_obs(setdiff(names(upd$obs), ids), upd)
         }
       )
 
@@ -128,14 +136,14 @@ add_rm_link_ui <- function(id, board) {
     actionButton(
       NS(id, "links_mod"),
       "Edit links",
-      icon = icon("table")
+      icon = icon("link")
     )
   )
 }
 
-link_dt <- function(dat, ns, rv) {
+link_dt <- function(dat, ns, board) {
   res <- DT::datatable(
-    dt_board_link(dat, ns, rv),
+    dt_board_link(dat, ns, board),
     options = list(
       pageLength = 5,
       preDrawCallback = DT::JS(
@@ -157,9 +165,9 @@ link_dt <- function(dat, ns, rv) {
   DT::formatStyle(res, 1L, `vertical-align` = "middle")
 }
 
-dt_board_link <- function(lnk, ns, rv) {
+dt_board_link <- function(lnk, ns, board) {
 
-  blks <- board_blocks(rv$board)
+  blks <- board_blocks(board)
   arity <- int_ply(blks, block_arity, use_names = TRUE)
 
   from_ids <- rep(list(names(blks)), length(lnk))
@@ -239,113 +247,117 @@ dt_selectize <- function(id, val, choices, create = FALSE) {
   as.character(res)
 }
 
-create_dt_observers <- function(ids, input, update, blks, sess) {
-  update$obs[ids] <- lapply(ids, create_dt_observers_for_id, input, update,
-                            blks, sess)
-  update
-}
+create_dt_link_obs <- function(ids, upd, ...) {
 
-create_dt_observers_for_id <- function(id, input, update, blks, sess) {
+  create_obs <- function(col, row, upd, input, blks, sess) {
 
-  obs <- set_names(nm = c("from", "to", "input"))
+    inp <- paste0(row, "_", col)
 
-  lapply(obs, create_dt_observer, id, input, update, blks, sess)
-}
+    log_debug("creating link DT observer ", inp)
 
-create_dt_observer <- function(col, row, input, upd, blks, sess) {
+    observeEvent(
+      input[[inp]],
+      {
+        new <- input[[inp]]
+        cur <- upd$curr[[row]][[col]]
 
-  inp <- paste0(row, "_", col)
-
-  log_debug("creating link DT observer ", inp)
-
-  observeEvent(
-    input[[inp]],
-    {
-      new <- input[[inp]]
-      cur <- upd$curr[[row]][[col]]
-
-      if (new == cur || new == "") {
-        return()
-      }
-
-      if (col == "from") {
-
-        to_avail <- int_ply(blks, block_arity, use_names = TRUE)
-
-        cnt <- c(table(filter_empty(upd$curr$to)))
-
-        to_avail[names(cnt)] <- int_mply(`-`, to_avail[names(cnt)], cnt)
-        to_avail[is.na(to_avail)] <- 1L
-
-        to_avail <- c(
-          upd$curr[[row]][["to"]],
-          names(to_avail)[to_avail > 0L]
-        )
-
-        updateSelectizeInput(
-          sess,
-          inputId = paste0(row, "_to"),
-          choices = c("", setdiff(to_avail, new)),
-          selected = upd$curr[[row]][["to"]]
-        )
-
-      } else if (col == "to") {
-
-        ids <- names(blks)
-
-        updateSelectizeInput(
-          sess,
-          inputId = paste0(row, "_from"),
-          choices = c("", setdiff(ids, new)),
-          selected = upd$curr[[row]][["from"]]
-        )
-
-        if (identical(new, "")) {
-
-          updateSelectizeInput(
-            sess,
-            inputId = paste0(row, "_input"),
-            choices = list()
-          )
-
-        } else {
-
-          blk <- blks[[which(ids == new)]]
-          ary <- block_arity(blk)
-          hit <- upd$curr$to == new
-
-          if (is.na(ary)) {
-            inp <- as.character(sum(hit) + 1L)
-            opt <- list(create = TRUE)
-          } else {
-            inp <- setdiff(block_inputs(blk), upd$curr$input[hit])
-            opt <-  NULL
-          }
-
-          updateSelectizeInput(
-            sess,
-            inputId = paste0(row, "_input"),
-            choices = c("", inp),
-            selected = upd$curr[[row]][["input"]],
-            options = opt
-          )
+        if (new == cur || new == "") {
+          return()
         }
 
-      } else if (col != "input") {
+        if (col == "from") {
 
-        stop("Unexpected input: column ", col)
-      }
+          to_avail <- int_ply(blks, block_arity, use_names = TRUE)
 
-      upd$edit <- list(row = row, col = col, val = new)
-    },
-    ignoreInit = TRUE
-  )
+          cnt <- c(table(filter_empty(upd$curr$to)))
+
+          to_avail[names(cnt)] <- int_mply(`-`, to_avail[names(cnt)], cnt)
+          to_avail[is.na(to_avail)] <- 1L
+
+          to_avail <- c(
+            upd$curr[[row]][["to"]],
+            names(to_avail)[to_avail > 0L]
+          )
+
+          updateSelectizeInput(
+            sess,
+            inputId = paste0(row, "_to"),
+            choices = c("", setdiff(to_avail, new)),
+            selected = upd$curr[[row]][["to"]]
+          )
+
+        } else if (col == "to") {
+
+          ids <- names(blks)
+
+          updateSelectizeInput(
+            sess,
+            inputId = paste0(row, "_from"),
+            choices = c("", setdiff(ids, new)),
+            selected = upd$curr[[row]][["from"]]
+          )
+
+          if (identical(new, "")) {
+
+            updateSelectizeInput(
+              sess,
+              inputId = paste0(row, "_input"),
+              choices = list()
+            )
+
+          } else {
+
+            blk <- blks[[which(ids == new)]]
+            ary <- block_arity(blk)
+            hit <- upd$curr$to == new
+
+            if (is.na(ary)) {
+              inp <- as.character(sum(hit) + 1L)
+              opt <- list(create = TRUE)
+            } else {
+              inp <- setdiff(block_inputs(blk), upd$curr$input[hit])
+              opt <-  NULL
+            }
+
+            updateSelectizeInput(
+              sess,
+              inputId = paste0(row, "_input"),
+              choices = c("", inp),
+              selected = upd$curr[[row]][["input"]],
+              options = opt
+            )
+          }
+
+        } else if (col != "input") {
+
+          stop("Unexpected input: column ", col)
+        }
+
+        upd$edit <- list(row = row, col = col, val = new)
+      },
+      ignoreInit = TRUE
+    )
+  }
+
+  create_obs_for_id <- function(id, ...) {
+    lapply(
+      set_names(nm = c("from", "to", "input")),
+      create_obs,
+      id,
+      ...
+    )
+  }
+
+  upd$obs[ids] <- lapply(ids, create_obs_for_id, upd, ...)
+
+  upd
 }
 
-destroy_dt_observers <- function(ids, update) {
+destroy_dt_link_obs <- function(ids, update) {
 
   for (row in ids) {
     for (col in c("from", "to", "input")) {
+      log_debug("destroying link DT observer ", row, " ", col)
       update$obs[[row]][[col]]$destroy()
     }
     update$obs[[row]] <- NULL
