@@ -21,7 +21,7 @@ new_stack <- function(blocks, name = NULL, ..., class = character()) {
   }
 
   res <- validate_stack(
-    new_vctr(blocks, name = name, ..., class = c(class, "stack"))
+    structure(blocks, name = name, ..., class = c(class, "stack"))
   )
 
   set_globals(stack_counter + 1L, "stack_counter", session = NULL)
@@ -63,6 +63,15 @@ validate_stack <- function(x) {
     abort(
       "Expecting the stack blocks to be strings.",
       class = "stack_blocks_invalid"
+    )
+  }
+
+  nme <- names(x)
+
+  if (!is.null(nme) || any(nzchar(nme))) {
+    warn(
+      "Names are ignored in stack objects.",
+      class = "named_stack_obejct_warn"
     )
   }
 
@@ -112,10 +121,10 @@ anyDuplicated.stack <- function(x, incomparables = FALSE, ...) {
 }
 
 #' @export
-as.character.stack <- function(x, to, ...) vec_data(x)
+as.character.stack <- function(x, ...) c(unclass(x))
 
 #' @export
-as.list.stack <- function(x, to, ...) as.list(as.character(x))
+as.list.stack <- function(x, ...) as.list(as.character(x))
 
 #' @rdname new_stack
 #' @export
@@ -166,4 +175,36 @@ setequal.stack <- function(x, y, ...) {
 #' @export
 is.element.stack <- function(el, set, ...) {
   is.element(as.character(el), as.character(set), ...)
+}
+
+#' @export
+`[.stack` <- function(x, i, ...) {
+  vec_slice(as.character(x), vec_as_location(i, length(x)))
+}
+
+#' @export
+`[[.stack` <- function(x, i, ...) {
+  vec_slice(as.character(x), vec_as_location2(i, length(x)))
+}
+
+#' @export
+`[<-.stack` <- function(x, i, ..., value) {
+  abort(
+    paste(
+      "Subassignment of stack objects is not suported. Use set operations",
+      "instead."
+    ),
+    class = "stack_subassignment_invalid"
+  )
+}
+
+#' @export
+`[[<-.stack` <- function(x, i, ..., value) {
+  abort(
+    paste(
+      "Subassignment of stack objects is not suported. Use set operations",
+      "instead."
+    ),
+    class = "stack_subassignment_invalid"
+  )
 }

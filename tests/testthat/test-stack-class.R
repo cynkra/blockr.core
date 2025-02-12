@@ -63,4 +63,20 @@ test_that("stack class", {
 
   expect_true(is.element(y, x))
   expect_false(is.element("y", x))
+
+  expect_type(x[1], "character")
+  expect_type(x[[1]], "character")
+
+  expect_error(x["a"])
+  expect_error(x[[1:2]])
+
+  expect_error(
+    x[1] <- "c",
+    class = "stack_subassignment_invalid"
+  )
+
+  expect_error(
+    x[[1]] <- "c",
+    class = "stack_subassignment_invalid"
+  )
 })
