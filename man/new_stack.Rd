@@ -6,9 +6,10 @@
 \alias{as_stack}
 \alias{as_stack.stack}
 \alias{as_stack.character}
+\alias{as_stack.list}
 \title{Stacks}
 \usage{
-new_stack(blocks, id = rand_names(), name = NULL, ..., class = character())
+new_stack(blocks, name = NULL, ..., class = character())
 
 is_stack(x)
 
@@ -17,11 +18,11 @@ as_stack(x)
 \method{as_stack}{stack}(x)
 
 \method{as_stack}{character}(x)
+
+\method{as_stack}{list}(x)
 }
 \arguments{
 \item{blocks}{Set of blocks}
-
-\item{id}{Unique stack ID}
 
 \item{name}{Stack name}
 

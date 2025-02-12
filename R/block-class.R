@@ -340,7 +340,13 @@ as.list.block <- function(x, state = NULL, ...) {
 
 #' @export
 c.block <- function(...) {
-  as_blocks(lapply(list(...), as_block))
+
+  res <- unlist(
+    lapply(list(...), harmonize_list_of_blocks),
+    recursive = FALSE
+  )
+
+  as_blocks(res)
 }
 
 #' @rdname new_block

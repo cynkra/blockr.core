@@ -3,14 +3,12 @@
 #' Stacks are sets of blocks.
 #'
 #' @param blocks Set of blocks
-#' @param id Unique stack ID
 #' @param name Stack name
 #' @param ... Extensibility
 #' @param class (Optional) stack sub-class
 #'
 #' @export
-new_stack <- function(blocks, id = rand_names(), name = NULL, ...,
-                      class = character()) {
+new_stack <- function(blocks, name = NULL, ..., class = character()) {
 
   if (is_blocks(blocks)) {
     blocks <- names(blocks)
@@ -23,7 +21,7 @@ new_stack <- function(blocks, id = rand_names(), name = NULL, ...,
   }
 
   res <- validate_stack(
-    new_vctr(blocks, id = id, name = name, ..., class = c(class, "stack"))
+    new_vctr(blocks, name = name, ..., class = c(class, "stack"))
   )
 
   set_globals(stack_counter + 1L, "stack_counter", session = NULL)
@@ -41,55 +39,83 @@ is_stack <- function(x) {
 validate_stack <- function(x) {
 
   if (!is_stack(x)) {
-    stop("Expecting a stack to inherit from `stack`.")
-  }
-
-  if (!is_string(attr(x, "id"))) {
-    stop("Expecting the stack ID to be a string.")
+    abort(
+      "Expecting a stack to inherit from `stack`.",
+      class = "stack_class_invalid"
+    )
   }
 
   if (!is_string(attr(x, "name"))) {
-    stop("Expecting the stack name to be a string.")
+    abort(
+      "Expecting the stack name to be a string.",
+      class = "stack_name_invalid"
+    )
   }
 
   if (!is.character(x)) {
-    stop("Expecting the stack blocks to be strings.")
+    abort(
+      "Expecting stack blocks to be character-like.",
+      class = "stack_type_invalid"
+    )
   }
 
-  if (anyDuplicated(filter_empty(as.character(x))) != 0L) {
-    stop("Stack blocks have to be unique.")
+  if (anyNA(x) || !all(nzchar(x))) {
+    abort(
+      "Expecting the stack blocks to be strings.",
+      class = "stack_blocks_invalid"
+    )
+  }
+
+  if (anyDuplicated(x) != 0L) {
+    abort(
+      "Stack blocks have to be unique.",
+      class = "stack_block_duplicates"
+    )
   }
 
   x
 }
 
 #' @export
-vec_ptype_abbr.stack <- function(x, ...) {
-  "stack"
+format.stack <- function(x, ...) {
+
+  out <- paste0("[", length(x), "]")
+
+  for (cl in rev(setdiff(class(x), c("list", "vctrs_vctr")))) {
+    out <- paste0("<", cl, out, ">")
+  }
+
+  c(
+    out,
+    paste0("Name: \"", attr(x, "name"), "\""),
+    strwrap(
+      paste0("Blocks: ", paste_enum(as.character(x), quotes = "\"")),
+      exdent = 2
+    )
+  )
 }
 
 #' @export
-vec_restore.stack <- function(x, to, ...) {
-  validate_stack(NextMethod())
+print.stack <- function(x, ...) {
+  cat(format(x, ...), sep = "\n")
+  invisible(x)
 }
 
 #' @export
-vec_ptype2.stack.stack <- function(x, y, ...) x
+duplicated.stack <- function(x, incomparables = FALSE, ...) {
+  duplicated(as.character(x), incomparables = incomparables, ...)
+}
 
 #' @export
-vec_ptype2.character.stack <- function(x, y, ...) y
+anyDuplicated.stack <- function(x, incomparables = FALSE, ...) {
+  anyDuplicated(as.character(x), incomparables = incomparables, ...)
+}
 
 #' @export
-vec_ptype2.stack.character <- function(x, y, ...) x
+as.character.stack <- function(x, to, ...) vec_data(x)
 
 #' @export
-vec_cast.stack.stack <- function(x, to, ...) x
-
-#' @export
-vec_cast.stack.character <- function(x, to, ...) as_stack(x)
-
-#' @export
-vec_cast.character.stack <- function(x, to, ...) vec_data(x)
+as.list.stack <- function(x, to, ...) as.list(as.character(x))
 
 #' @rdname new_stack
 #' @export
@@ -97,26 +123,47 @@ as_stack <- function(x) UseMethod("as_stack")
 
 #' @rdname new_stack
 #' @export
-as_stack.stack <- function(x) x
+as_stack.stack <- function(x) validate_stack(x)
 
 #' @rdname new_stack
 #' @export
 as_stack.character <- function(x) new_stack(x)
 
+#' @rdname new_stack
+#' @export
+as_stack.list <- function(x) as_stack(chr_ply(x, identity))
+
+#' @export
+vec_restore.stack <- function(x, to, ...) {
+  validate_stack(NextMethod())
+}
+
 #' @importFrom generics intersect
 #' @export
 intersect.stack <- function(x, y, ...) {
-  vec_set_intersect(x, y, ...)
+  vec_restore(intersect(as.character(x), as.character(y), ...), x)
 }
 
 #' @importFrom generics union
 #' @export
 union.stack <- function(x, y, ...) {
-  vec_set_union(x, y, ...)
+  vec_restore(union(as.character(x), as.character(y), ...), x)
 }
 
 #' @importFrom generics setdiff
 #' @export
 setdiff.stack <- function(x, y, ...) {
-  vec_set_difference(x, y, ...)
+  vec_restore(setdiff(as.character(x), as.character(y), ...), x)
+}
+
+#' @importFrom generics setequal
+#' @export
+setequal.stack <- function(x, y, ...) {
+  setequal(as.character(x), as.character(y), ...)
+}
+
+#' @importFrom generics is.element
+#' @export
+is.element.stack <- function(el, set, ...) {
+  is.element(as.character(el), as.character(set), ...)
 }
