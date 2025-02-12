@@ -66,20 +66,27 @@ validate_stacks <- function(x) {
     )
   }
 
-  seq <- seq_along(ids)
+  if (stack_blocks_unique(x)) {
+    abort(
+      "Blocks cannot be in mutliple stacks at the same time.",
+      class = "stacks_blocks_invalid"
+    )
+  }
 
-  for (i in seq) {
+  x
+}
+
+stack_blocks_unique <- function(x) {
+
+  for (i in seq_along(x)) {
     for (j in seq[seq > i]) {
       if (length(intersect(x[[i]], x[[j]]))) {
-        abort(
-          "Blocks cannot be in mutliple stacks at the same time.",
-          class = "stacks_blocks_invalid"
-        )
+        return(TRUE)
       }
     }
   }
 
-  x
+  FALSE
 }
 
 #' @export
