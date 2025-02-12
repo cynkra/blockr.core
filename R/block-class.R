@@ -27,6 +27,10 @@ new_block <- function(server, ui, class, ctor, ctor_pkg, dat_valid = NULL,
     }
   }
 
+  if (missing(ctor)) {
+    ctor <- sys.parent()
+  }
+
   if (is.numeric(ctor)) {
 
     fun <- sys.function(ctor)

@@ -28,8 +28,11 @@ expr_ui <- function(id, x, ...) {
 expr_ui.block <- function(id, x, ...) {
 
   if (...length()) {
-    stop(
-      "Unknown arguments ", paste_enum(...names()), " in call to `expr_ui()`."
+    abort(
+      paste(
+        "Unknown arguments", paste_enum(...names()), "in call to `expr_ui()`."
+      ),
+      class = "superfluous_expr_ui_args"
     )
   }
 
