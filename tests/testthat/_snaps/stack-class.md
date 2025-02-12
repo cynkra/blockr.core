@@ -4,6 +4,6 @@
       print(x)
     Output
       <stack[5]>
-      Name: "Stack 1"
+      Name: "my stack"
       Blocks: "a", "b", "c", "d" and "e"
 

@@ -1,7 +1,7 @@
 test_that("stacks class", {
 
-  x <- new_stack(letters[1:5])
-  y <- new_stack(letters[6:8])
+  x <- new_stack(letters[1:5], "stack a")
+  y <- new_stack(letters[6:8], "stack b")
 
   stk <- stacks(x, y)
 

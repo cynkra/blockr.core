@@ -7,11 +7,11 @@
       
       a
        <stack[5]>
-       Name: "Stack 8"
+       Name: "stack a"
        Blocks: "a", "b", "c", "d" and "e"
       
       b
        <stack[3]>
-       Name: "Stack 9"
+       Name: "stack b"
        Blocks: "f", "g" and "h"
 

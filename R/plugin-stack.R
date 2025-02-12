@@ -452,5 +452,90 @@ cancel_stack_observer <- function(session, input, rv, upd) {
 
 
 check_add_rm_stack_val <- function(val, rv) {
+
+  observeEvent(
+    TRUE,
+    {
+      if (!is.reactive(val)) {
+        abort(
+          "Expecting `manage_stacks` to return a reactive value.",
+          class = "manage_stacks_return_invalid"
+        )
+      }
+    },
+    once = TRUE,
+    priority = 4
+  )
+
+  observeEvent(
+    val(),
+    {
+      if (!is.list(val()) || !setequal(names(val()), c("add", "rm"))) {
+        abort(
+          paste(
+            "Expecting the `manage_stacks` return value to evaluate to a list",
+            "with components `add` and `rm`."
+          ),
+          class = "manage_stacks_return_invalid"
+        )
+      }
+    },
+    once = TRUE,
+    priority = 3
+  )
+
+  observeEvent(
+    val()$add,
+    {
+      if (!is_stacks(val()$add)) {
+        abort(
+          paste(
+            "Expecting the `add` component of the `manage_stacks` return",
+            "value to be `NULL` or a `stacks` object."
+          ),
+          class = "manage_stacks_return_invalid"
+        )
+      }
+    },
+    once = TRUE,
+    priority = 2
+  )
+
+  observeEvent(
+    val()$add,
+    validate_stacks(val()$add),
+    priority = 1
+  )
+
+  observeEvent(
+    val()$rm,
+    {
+      if (!is.character(val()$rm)) {
+        abort(
+          paste(
+            "Expecting the `rm` component of the `manage_stacks` return",
+            "value to be a character vector."
+          ),
+          class = "manage_stacks_return_invalid"
+        )
+      }
+    },
+    once = TRUE,
+    priority = 2
+  )
+
+  observeEvent(
+    val()$rm,
+    {
+      if (!all(val()$rm %in% board_stack_ids(rv$board))) {
+        abort(
+          "Expecting all stack IDs to be removed to be known.",
+          class = "manage_stacks_return_invalid"
+        )
+      }
+    },
+    priority = 1
+  )
+
   val
 }
