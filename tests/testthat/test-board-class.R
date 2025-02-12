@@ -15,7 +15,8 @@ test_that("block constructor", {
       from = c("a", "c", "b", "d"),
       to = c("d", "d", "c", "e"),
       input = c("x", "y", "", "")
-    )
+    ),
+    list(bc = c("b", "c"))
   )
 
   expect_s3_class(board, "board")
@@ -60,6 +61,19 @@ test_that("block constructor", {
     ),
     class = "board_block_link_input_mismatch"
   )
+
+  expect_error(
+    new_board(
+      list(
+        a = new_dataset_block(),
+        b = new_subset_block()
+      ),
+      stacks = "ab"
+    ),
+    class = "board_block_stack_name_mismatch"
+  )
+
+  expect_snapshot(print(rm_blocks(board, "c")))
 })
 
 test_that("board app", {

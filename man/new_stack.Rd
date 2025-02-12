@@ -12,6 +12,7 @@
 \alias{as_stacks}
 \alias{as_stacks.stacks}
 \alias{as_stacks.list}
+\alias{as_stacks.character}
 \alias{as_stacks.stack}
 \title{Stacks}
 \usage{
@@ -36,6 +37,8 @@ as_stacks(x, ...)
 \method{as_stacks}{stacks}(x, ...)
 
 \method{as_stacks}{list}(x, ...)
+
+\method{as_stacks}{character}(x, ...)
 
 \method{as_stacks}{stack}(x, ...)
 }

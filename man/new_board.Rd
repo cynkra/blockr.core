@@ -8,12 +8,22 @@
 \alias{board_blocks<-}
 \alias{board_links}
 \alias{board_links<-}
+\alias{board_stacks}
+\alias{board_stacks<-}
 \alias{board_block_ids}
 \alias{board_link_ids}
+\alias{board_stack_ids}
 \alias{modify_links}
+\alias{rm_blocks}
 \title{Board}
 \usage{
-new_board(blocks = list(), links = NULL, ..., class = character())
+new_board(
+  blocks = list(),
+  links = list(),
+  stacks = list(),
+  ...,
+  class = character()
+)
 
 validate_board(x)
 
@@ -27,16 +37,26 @@ board_links(x)
 
 board_links(x) <- value
 
+board_stacks(x)
+
+board_stacks(x) <- value
+
 board_block_ids(x)
 
 board_link_ids(x)
 
+board_stack_ids(x)
+
 modify_links(x, add = NULL, rm = NULL)
+
+rm_blocks(x, rm)
 }
 \arguments{
-\item{blocks}{List of blocks}
+\item{blocks}{Set of blocks}
 
-\item{links}{Data frame with columns \code{from} and \code{to}}
+\item{links}{Set of links}
+
+\item{stacks}{Set of stacks}
 
 \item{...}{Further (metadata) attributes}
 

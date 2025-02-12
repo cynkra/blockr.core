@@ -226,7 +226,6 @@ setup_block <- function(blk, id, rv) {
 destroy_rm_blocks <- function(ids, rv) {
 
   links <- board_links(rv$board)
-  blocks <- board_blocks(rv$board)
 
   rv <- update_block_links(
     rv,
@@ -236,8 +235,7 @@ destroy_rm_blocks <- function(ids, rv) {
   rv$inputs <- rv$inputs[!names(rv$inputs) %in% ids]
   rv$blocks <- rv$blocks[!names(rv$blocks) %in% ids]
 
-  board_links(rv$board) <- links[!links$from %in% ids & !links$to %in% ids]
-  board_blocks(rv$board) <- blocks[!names(blocks) %in% ids]
+  rv$board <- rm_blocks(rv$board, ids)
 
   rv
 }

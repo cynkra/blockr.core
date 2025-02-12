@@ -2,23 +2,26 @@
 #'
 #' Blocks are placed on a board.
 #'
-#' @param blocks List of blocks
-#' @param links Data frame with columns `from` and `to`
+#' @param blocks Set of blocks
+#' @param links Set of links
+#' @param stacks Set of stacks
 #' @param ... Further (metadata) attributes
 #' @param class Board sub-class
 #'
 #' @export
-new_board <- function(blocks = list(), links = NULL, ..., class = character()) {
+new_board <- function(blocks = list(), links = list(), stacks = list(), ...,
+                      class = character()) {
 
   blocks <- as_blocks(blocks)
   links <- as_links(links)
+  stacks <- as_stacks(stacks)
 
   links <- complete_unary_inputs(links, blocks)
   links <- complete_variadic_inputs(links, blocks)
 
   validate_board(
     structure(
-      list(blocks = blocks, links = links, ...),
+      list(blocks = blocks, links = links, stacks = stacks, ...),
       class = c(class, "board")
     )
   )
@@ -103,6 +106,28 @@ validate_board_blocks_links <- function(blocks, links) {
   invisible()
 }
 
+validate_board_blocks_stacks <- function(blocks, stacks) {
+
+  for (i in seq_along(stacks)) {
+
+    stk <- stacks[[i]]
+    chk <- is.element(stk, names(blocks))
+
+    if (!all(chk)) {
+      abort(
+        paste0(
+          "Unknown block", if (sum(!chk) > 1L) "s" else "", " ",
+          paste_enum(stk[!chk]), " are assigned to stack ", names(stacks)[i],
+          "."
+        ),
+        class = "board_block_stack_name_mismatch"
+      )
+    }
+  }
+
+  invisible()
+}
+
 #' @param x Board object
 #' @rdname new_board
 #' @export
@@ -131,10 +156,10 @@ validate_board <- function(x) {
     )
   }
 
-  validate_board_blocks_links(
-    board_blocks(x),
-    board_links(x)
-  )
+  blks <- board_blocks(x)
+
+  validate_board_blocks_links(blks, board_links(x))
+  validate_board_blocks_stacks(blks, board_stacks(x))
 
   x
 }
@@ -253,6 +278,21 @@ board_links <- function(x) {
 
 #' @rdname new_board
 #' @export
+board_stacks <- function(x) {
+  stopifnot(is_board(x))
+  validate_stacks(x[["stacks"]])
+}
+
+#' @rdname new_board
+#' @export
+`board_stacks<-` <- function(x, value) {
+  stopifnot(is_board(x))
+  x[["stacks"]] <- value
+  validate_board(x)
+}
+
+#' @rdname new_board
+#' @export
 board_block_ids <- function(x) {
   names(board_blocks(x))
 }
@@ -261,6 +301,12 @@ board_block_ids <- function(x) {
 #' @export
 board_link_ids <- function(x) {
   names(board_links(x))
+}
+
+#' @rdname new_board
+#' @export
+board_stack_ids <- function(x) {
+  names(board_stacks(x))
 }
 
 #' @param add Links to add
@@ -285,6 +331,29 @@ modify_links <- function(x, add = NULL, rm = NULL) {
   x
 }
 
+#' @rdname new_board
+#' @export
+rm_blocks <- function(x, rm) {
+
+  if (is_blocks(rm)) {
+    rm <- names(rm)
+  }
+
+  blocks <- board_blocks(x)
+
+  stopifnot(is.character(rm), all(rm %in% names(blocks)))
+
+  links <- board_links(x)
+  board_links(x) <- links[!links$from %in% rm & !links$to %in% rm]
+
+  stacks <- board_stacks(x)
+  board_stacks(x) <- as_stacks(lapply(stacks, setdiff, rm))
+
+  board_blocks(x) <- blocks[!names(blocks) %in% rm]
+
+  x
+}
+
 #' @rdname new_block
 #' @export
 block_inputs.board <- function(x, ...) {
@@ -293,6 +362,10 @@ block_inputs.board <- function(x, ...) {
 
 #' @export
 format.board <- function(x, ...) {
+
+  paste_name_append_empty <- function(x, nme) {
+    c(paste0(nme, x[1L]), x[-1L], "")
+  }
 
   out <- ""
 
@@ -305,7 +378,7 @@ format.board <- function(x, ...) {
   if (length(blk)) {
 
     blk <- lapply(blk, format, ...)
-    blk <- lapply(blk, c, "")
+    blk <- map(paste_name_append_empty, blk, names(blk))
 
     out <- c(
       out,
@@ -326,6 +399,26 @@ format.board <- function(x, ...) {
       "",
       paste0(names(lnk), ": ", format(lnk))
     )
+  }
+
+  stk <- board_stacks(x)
+
+  if (length(stk)) {
+
+    stk <- lapply(stk, format, ...)
+    stk <- map(paste_name_append_empty, stk, names(stk))
+
+    out <- c(
+      out,
+      if (length(lnk)) "",
+      paste0("Stacks[", length(stk), "]:"),
+      "",
+      unlst(stk)
+    )
+  }
+
+  if ((length(blk) && !length(lnk)) || length(stk)) {
+    out <- out[-length(out)]
   }
 
   out

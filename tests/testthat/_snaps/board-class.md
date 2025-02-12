@@ -7,7 +7,7 @@
       
       Blocks[5]:
       
-      <merge_block<transform_block<block>>>
+      d<merge_block<transform_block<block>>>
       Name: "Merge block"
       Data inputs: "x" and "y"
       Initial block state:
@@ -16,7 +16,7 @@
        $ all_y: logi FALSE
       Constructor: blockr.core::new_merge_block()
       
-      <dataset_block<data_block<block>>>
+      a<dataset_block<data_block<block>>>
       Name: "Dataset block"
       No data inputs
       Initial block state:
@@ -24,7 +24,7 @@
        $ package: chr "datasets"
       Constructor: blockr.core::new_dataset_block()
       
-      <subset_block<transform_block<block>>>
+      c<subset_block<transform_block<block>>>
       Name: "Subset block"
       Data inputs: "data"
       Initial block state:
@@ -32,7 +32,7 @@
        $ select: chr ""
       Constructor: blockr.core::new_subset_block()
       
-      <subset_block<transform_block<block>>>
+      e<subset_block<transform_block<block>>>
       Name: "Subset block"
       Data inputs: "data"
       Initial block state:
@@ -40,7 +40,7 @@
        $ select: chr ""
       Constructor: blockr.core::new_subset_block()
       
-      <dataset_block<data_block<block>>>
+      b<dataset_block<data_block<block>>>
       Name: "Dataset block"
       No data inputs
       Initial block state:
@@ -54,4 +54,63 @@
       cd: c -> d (y)
       bc: b -> c (data)
       de: d -> e (data)
+      
+      Stacks[1]:
+      
+      bc<stack[2]>
+      Name: "Stack 1"
+      Blocks: "b" and "c"
+
+---
+
+    Code
+      print(rm_blocks(board, "c"))
+    Output
+      <board>
+      
+      Blocks[4]:
+      
+      d<merge_block<transform_block<block>>>
+      Name: "Merge block"
+      Data inputs: "x" and "y"
+      Initial block state:
+       $ by   : chr(0)
+       $ all_x: logi FALSE
+       $ all_y: logi FALSE
+      Constructor: blockr.core::new_merge_block()
+      
+      a<dataset_block<data_block<block>>>
+      Name: "Dataset block"
+      No data inputs
+      Initial block state:
+       $ dataset: chr(0)
+       $ package: chr "datasets"
+      Constructor: blockr.core::new_dataset_block()
+      
+      e<subset_block<transform_block<block>>>
+      Name: "Subset block"
+      Data inputs: "data"
+      Initial block state:
+       $ subset: chr ""
+       $ select: chr ""
+      Constructor: blockr.core::new_subset_block()
+      
+      b<dataset_block<data_block<block>>>
+      Name: "Dataset block"
+      No data inputs
+      Initial block state:
+       $ dataset: chr(0)
+       $ package: chr "datasets"
+      Constructor: blockr.core::new_dataset_block()
+      
+      Links[2]:
+      
+      ad: a -> d (x)
+      de: d -> e (data)
+      
+      Stacks[1]:
+      
+      bc<stack[1]>
+      Name: "Stack 1"
+      Blocks: "b"
 

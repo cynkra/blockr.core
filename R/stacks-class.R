@@ -132,6 +132,12 @@ as_stacks.list <- function(x, ...) {
 
 #' @rdname new_stack
 #' @export
+as_stacks.character <- function(x, ...) {
+  as_stacks(list(x))
+}
+
+#' @rdname new_stack
+#' @export
 as_stacks.stack <- function(x, ...) {
   as_stacks(list(x))
 }
