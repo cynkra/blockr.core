@@ -74,7 +74,15 @@
 <span></span>
 <span><span class="fu">board_stack_ids</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">available_stack_blocks</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  stacks <span class="op">=</span> <span class="fu">board_stacks</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  blocks <span class="op">=</span> <span class="fu">board_stack_ids</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">modify_links</span><span class="op">(</span><span class="va">x</span>, add <span class="op">=</span> <span class="cn">NULL</span>, rm <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">modify_stacks</span><span class="op">(</span><span class="va">x</span>, add <span class="op">=</span> <span class="cn">NULL</span>, rm <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">rm_blocks</span><span class="op">(</span><span class="va">x</span>, <span class="va">rm</span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -112,11 +120,11 @@
 
 
 <dt id="arg-add">add<a class="anchor" aria-label="anchor" href="#arg-add"></a></dt>
-<dd><p>Links to add</p></dd>
+<dd><p>Links/stacks to add</p></dd>
 
 
 <dt id="arg-rm">rm<a class="anchor" aria-label="anchor" href="#arg-rm"></a></dt>
-<dd><p>Link IDs to remove</p></dd>
+<dd><p>Link/stack IDs to remove</p></dd>
 
 </dl></div>
 
