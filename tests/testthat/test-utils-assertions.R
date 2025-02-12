@@ -8,7 +8,7 @@ test_that("assertions", {
   expect_false(is_bool(NA))
   expect_false(is_bool(list()))
   expect_false(is_bool(NULL))
-  expect_false(is_bool(c(T, F)))
+  expect_false(is_bool(c(TRUE, FALSE)))
 
   expect_true(is_count(1))
   expect_true(is_count(1L))

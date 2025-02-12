@@ -23,8 +23,8 @@ test_that("ply", {
 
   expect_length(chr_mply(paste, letters, LETTERS), length(letters))
 
-  a <- sample(c(T, F), 10, replace = TRUE)
-  b <- sample(c(T, F), 10, replace = TRUE)
+  a <- sample(c(TRUE, FALSE), 10, replace = TRUE)
+  b <- sample(c(TRUE, FALSE), 10, replace = TRUE)
 
   expect_length(lgl_mply(`|`, a, b), 10)
 
