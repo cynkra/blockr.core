@@ -332,18 +332,10 @@ create_link_observers_observer <- function(input, rv, upd, session) {
 
   links_proxy <- DT::dataTableProxy("links_dt")
 
-  curr_ids <- reactiveVal(NULL)
-
   observeEvent(
-    names(upd$curr),
+    upd$curr,
     {
       ids <- names(upd$curr)
-
-      if (identical(ids, curr_ids())) {
-        return()
-      }
-
-      curr_ids(ids)
 
       DT::replaceData(
         links_proxy,

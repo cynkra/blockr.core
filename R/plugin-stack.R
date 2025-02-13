@@ -19,6 +19,27 @@ add_rm_stack_server <- function(id, rv, ...) {
     function(input, output, session) {
 
       observeEvent(
+        TRUE,
+        setup_stack_div(rv$board_id),
+        once = TRUE
+      )
+
+      observeEvent(
+        chr_ply(board_stacks(rv$board), stack_name),
+        {
+          stcks <- board_stacks(rv$board)
+          map(
+            assign_output,
+            paste0(names(stcks), "_name"),
+            chr_ply(stcks, stack_name),
+            MoreArgs = list(out = output)
+          )
+        }
+      )
+
+      move_blocks_observer(rv, session)
+
+      observeEvent(
         input$stacks_mod,
         showModal(stacks_modal(session$ns))
       )
@@ -67,6 +88,138 @@ add_rm_stack_ui <- function(id, board) {
       NS(id, "stacks_mod"),
       "Edit stacks",
       icon = icon("stack-overflow")
+    )
+  )
+}
+
+assign_output <- function(key, val, out) {
+  out[[key]] <- renderText(val)
+  invisible()
+}
+
+setup_stack_div <- function(id) {
+
+  deps <- htmltools::htmlDependency(
+    "move-block-ui",
+    pkg_version(),
+    src = pkg_file("assets", "js"),
+    script = "moveBlockUi.js"
+  )
+
+  insertUI(
+    paste0("#", id, "_blocks"),
+    "afterBegin",
+    tagList(div(id = paste0(id, "_stacks")), deps),
+    immediate = TRUE
+  )
+}
+
+move_blocks_observer <- function(rv, session) {
+
+  rend_stacks <- reactiveVal(list())
+
+  observeEvent(
+    board_stacks(rv$board),
+    {
+      stks <- board_stacks(rv$board)
+      to_add <- setdiff(names(stks), names(rend_stacks()))
+
+      if (length(to_add)) {
+
+        insert_stack_ui(rv$board_id, stks[to_add], session)
+
+        for (i in to_add) {
+          for (j in stack_blocks(stks[[i]])) {
+            add_block_to_stack(j, i, session)
+          }
+        }
+
+        rend_stacks(
+          c(rend_stacks(), lapply(stks[to_add], stack_blocks))
+        )
+      }
+
+      to_rm <- setdiff(names(rend_stacks()), names(stks))
+
+      if (length(to_rm)) {
+
+        for (i in unlst(rend_stacks()[to_rm])) {
+          rm_block_from_stack(i, rv$board_id, session)
+        }
+
+        for (i in to_rm) {
+          rm_stack_ui(i, session)
+        }
+
+        rend_stacks(setdiff(rend_stacks(), to_rm))
+      }
+
+      to_mod <- lgl_mply(
+        Negate(identical),
+        lapply(stks, stack_blocks),
+        rend_stacks()[names(stks)]
+      )
+
+      if (any(to_mod)) {
+
+        to_mod <- names(stks)[to_mod]
+
+        for (i in unlst(rend_stacks()[to_mod])) {
+          rm_block_from_stack(i, rv$board_id, session)
+        }
+
+        for (i in to_mod) {
+          for (j in stack_blocks(stks[[i]])) {
+            add_block_to_stack(j, i, session)
+          }
+        }
+      }
+    }
+  )
+}
+
+insert_stack_ui <- function(id, stacks, sess) {
+  insertUI(
+    paste0("#", id, "_stacks"),
+    "beforeEnd",
+    map(empty_stack_card, stacks, names(stacks), MoreArgs = list(sess = sess)),
+    immediate = TRUE,
+    session = sess
+  )
+}
+
+empty_stack_card <- function(x, id, sess) {
+  bslib::card(
+    id = paste0(id, "_stack"),
+    bslib::card_header(textOutput(sess$ns(paste0(id, "_name")))),
+    bslib::card_body()
+  )
+}
+
+rm_stack_ui <- function(id, sess) {
+  removeUI(
+    paste0("#", id, "_stack"),
+    immediate = TRUE,
+    session = sess
+  )
+}
+
+add_block_to_stack <- function(block_id, stack_id, sess) {
+  sess$sendCustomMessage(
+    "move-block-ui",
+    list(
+      sel = paste0("#", block_id, "_block"),
+      dest = paste0("#", stack_id, "_stack > div.card-body")
+    )
+  )
+}
+
+rm_block_from_stack <- function(block_id, blocks_id, sess) {
+  sess$sendCustomMessage(
+    "move-block-ui",
+    list(
+      sel = paste0("#", block_id, "_block"),
+      dest = paste0("#", blocks_id, "_blocks")
     )
   )
 }
@@ -270,18 +423,10 @@ create_stack_observers_observer <- function(input, rv, upd, sess) {
 
   stacks_proxy <- DT::dataTableProxy("stacks_dt", sess)
 
-  curr_ids <- reactiveVal(NULL)
-
   observeEvent(
-    names(upd$curr),
+    upd$curr,
     {
       ids <- names(upd$curr)
-
-      if (identical(ids, curr_ids())) {
-        return()
-      }
-
-      curr_ids(ids)
 
       DT::replaceData(
         stacks_proxy,
