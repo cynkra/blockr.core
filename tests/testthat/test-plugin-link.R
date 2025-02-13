@@ -13,7 +13,8 @@ test_that("add/rm links", {
       expect_identical(upd$add, links())
       expect_identical(upd$rm, character())
       expect_null(upd$edit)
-      expect_identical(res(), list(add = NULL, rm = NULL))
+
+      expect_identical(session$returned(), list(add = NULL, rm = NULL))
 
       session$setInputs(add_link = 1)
 
@@ -48,7 +49,7 @@ test_that("add/rm links", {
       session$setInputs(modify_links = 1)
 
       expect_identical(
-        res(),
+        session$returned(),
         list(
           add = as_links(set_names(list(new_link("a", "b", "data")), lnk)),
           rm = character()
@@ -132,7 +133,7 @@ test_that("add/rm links", {
       session$setInputs(modify_links = 1)
 
       expect_identical(
-        res(),
+        session$returned(),
         list(add = links(), rm = "aa")
       )
 

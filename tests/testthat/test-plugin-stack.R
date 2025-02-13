@@ -13,7 +13,8 @@ test_that("add/rm stacks", {
       expect_identical(upd$add, stacks())
       expect_identical(upd$rm, character())
       expect_null(upd$edit)
-      expect_identical(res(), list(add = NULL, rm = NULL))
+
+      expect_identical(session$returned(), list(add = NULL, rm = NULL))
 
       session$setInputs(add_stack = 1)
 
@@ -44,7 +45,7 @@ test_that("add/rm stacks", {
       session$setInputs(modify_stacks = 1)
 
       expect_identical(
-        res(),
+        session$returned(),
         list(add = new, rm = character())
       )
 
@@ -127,7 +128,7 @@ test_that("add/rm stacks", {
       session$setInputs(modify_stacks = 1)
 
       expect_identical(
-        res(),
+        session$returned(),
         list(add = stacks(), rm = "ab")
       )
 

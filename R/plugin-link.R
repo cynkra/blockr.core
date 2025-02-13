@@ -44,86 +44,17 @@ add_rm_link_server <- function(id, rv, ...) {
         server = TRUE
       )
 
-      links_proxy <- DT::dataTableProxy("links_dt")
-
-      curr_ids <- reactiveVal(NULL)
-
-      observeEvent(
-        names(upd$curr),
-        {
-          ids <- names(upd$curr)
-
-          if (identical(ids, curr_ids())) {
-            return()
-          }
-
-          curr_ids(ids)
-
-          DT::replaceData(
-            links_proxy,
-            dt_board_link(upd$curr, session$ns, rv$board),
-            rownames = FALSE
-          )
-
-          upd <- create_dt_link_obs(setdiff(ids, names(upd$obs)), upd, input,
-                                    board_blocks(rv$board), session)
-          upd <- destroy_dt_link_obs(setdiff(names(upd$obs), ids), upd)
-        }
-      )
+      create_link_observers_observer(input, rv, upd, session)
 
       edit_link_observer(upd, rv)
 
       add_link_observer(input, rv, upd, session)
 
-      rm_link_observer(input, rv, upd)
+      rm_link_observer(input, rv, upd, session)
 
-      cancel_link_observer(session, input, rv, upd)
+      cancel_link_observer(input, rv, upd, session)
 
-      res <- reactiveVal(
-        list(add = NULL, rm = NULL)
-      )
-
-      observeEvent(
-        input$modify_links,
-        {
-          if (!length(upd$add) && !length(upd$rm)) {
-
-            showNotification(
-              "No changes specified.",
-              type = "warning"
-            )
-
-            return()
-          }
-
-          new <- tryCatch(
-            modify_links(rv$board, upd$add, upd$rm),
-            warning = function(e) {
-              showNotification(conditionMessage(e), duration = NULL,
-                               type = "warning")
-            },
-            error = function(e) {
-              showNotification(conditionMessage(e), duration = NULL,
-                               type = "error")
-            }
-          )
-
-          res(
-            list(
-              add = if (length(upd$add)) upd$add else links(),
-              rm = if (length(upd$rm)) upd$rm else character()
-            )
-          )
-
-          upd$add <- links()
-          upd$rm <- character()
-          upd$curr <- board_links(new)
-
-          removeModal()
-        }
-      )
-
-      res
+      modify_link_observer(input, rv, upd, session)
     }
   )
 }
@@ -397,6 +328,36 @@ links_modal <- function(ns) {
   )
 }
 
+create_link_observers_observer <- function(input, rv, upd, session) {
+
+  links_proxy <- DT::dataTableProxy("links_dt")
+
+  curr_ids <- reactiveVal(NULL)
+
+  observeEvent(
+    names(upd$curr),
+    {
+      ids <- names(upd$curr)
+
+      if (identical(ids, curr_ids())) {
+        return()
+      }
+
+      curr_ids(ids)
+
+      DT::replaceData(
+        links_proxy,
+        dt_board_link(upd$curr, session$ns, rv$board),
+        rownames = FALSE
+      )
+
+      upd <- create_dt_link_obs(setdiff(ids, names(upd$obs)), upd, input,
+                                board_blocks(rv$board), session)
+      upd <- destroy_dt_link_obs(setdiff(names(upd$obs), ids), upd)
+    }
+  )
+}
+
 edit_link_observer <- function(upd, rv) {
 
   observeEvent(
@@ -471,7 +432,7 @@ add_link_observer <- function(input, rv, upd, sess) {
   )
 }
 
-rm_link_observer <- function(input, rv, upd) {
+rm_link_observer <- function(input, rv, upd, sess) {
 
   observeEvent(
     input$rm_link,
@@ -489,13 +450,13 @@ rm_link_observer <- function(input, rv, upd) {
 
       } else {
 
-        showNotification("No row selected", type = "warning")
+        showNotification("No row selected", type = "warning", session = sess)
       }
     }
   )
 }
 
-cancel_link_observer <- function(session, input, rv, upd) {
+cancel_link_observer <- function(input, rv, upd, session) {
 
   observeEvent(
     input$cancel_links,
@@ -507,6 +468,55 @@ cancel_link_observer <- function(session, input, rv, upd) {
       upd$curr <- board_links(rv$board)
     }
   )
+}
+
+modify_link_observer <- function(input, rv, upd, session, res) {
+
+  res <- reactiveVal(
+    list(add = NULL, rm = NULL)
+  )
+
+  observeEvent(
+    input$modify_links,
+    {
+      if (!length(upd$add) && !length(upd$rm)) {
+
+        showNotification(
+          "No changes specified.",
+          type = "warning"
+        )
+
+        return()
+      }
+
+      new <- tryCatch(
+        modify_links(rv$board, upd$add, upd$rm),
+        warning = function(e) {
+          showNotification(conditionMessage(e), duration = NULL,
+                           type = "warning")
+        },
+        error = function(e) {
+          showNotification(conditionMessage(e), duration = NULL,
+                           type = "error")
+        }
+      )
+
+      res(
+        list(
+          add = if (length(upd$add)) upd$add else links(),
+          rm = if (length(upd$rm)) upd$rm else character()
+        )
+      )
+
+      upd$add <- links()
+      upd$rm <- character()
+      upd$curr <- board_links(new)
+
+      removeModal()
+    }
+  )
+
+  res
 }
 
 check_add_rm_link_val <- function(val, rv) {

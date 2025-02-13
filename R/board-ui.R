@@ -63,6 +63,7 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
 #' @rdname block_ui
 #' @export
 block_ui.board <- function(id, x, blocks = NULL, ...) {
+
   block_card <- function(x, id, ns) {
     div(
       class = "card shadow-sm p-2 mb-2 border",
@@ -103,6 +104,7 @@ insert_block_ui <- function(id, x, blocks = NULL, ...) {
 #' @rdname board_ui
 #' @export
 insert_block_ui.board <- function(id, x, blocks = NULL, ...) {
+
   stopifnot(is_string(id))
 
   insertUI(
@@ -122,6 +124,7 @@ remove_block_ui <- function(id, x, blocks = NULL, ...) {
 #' @rdname board_ui
 #' @export
 remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
+
   if (is.null(blocks)) {
     stopifnot(is_string(id))
 
@@ -130,7 +133,9 @@ remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
       multiple = TRUE,
       immediate = TRUE
     )
+
   } else {
+
     stopifnot(is.character(blocks), all(blocks %in% board_block_ids(x)))
 
     for (block in blocks) {
