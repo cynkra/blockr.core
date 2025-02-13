@@ -14,7 +14,6 @@ block_output.plot_block <- function(x, result) {
 #' @export
 block_ui.plot_block <- function(id, x, ...) {
   tagList(
-    expr_ui(id, x, ...),
     plotOutput(NS(id, "result"))
   )
 }

@@ -20,13 +20,17 @@ test_that("dummy block ui test", {
     )
   }
 
+  expect_null(
+    block_ui("identity_block", new_identity_block())
+  )
+
   expect_s3_class(
-    block_ui("identity_block", new_identity_block()),
+    expr_ui("identity_block", new_identity_block()),
     "shiny.tag.list"
   )
 
   expect_error(
-    block_ui("identity_block", new_identity_block(), abc = 1),
+    expr_ui("identity_block", new_identity_block(), abc = 1),
     class = "superfluous_expr_ui_args"
   )
 })

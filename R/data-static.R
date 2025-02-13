@@ -26,3 +26,8 @@ new_static_block <- function(data, ...) {
     ...
   )
 }
+
+#' @export
+as.list.static_block <- function(x, ...) {
+  stop("Cannot serialize upload blocks.")
+}

@@ -437,7 +437,11 @@ serve.block <- function(x, id = "block", ..., data = list()) {
     data <- c(data[!dot_args], list(...args = data[dot_args]))
   }
 
-  ui <- bslib::page_fluid(block_ui(id, x))
+  ui <- bslib::page_fluid(
+    title = id,
+    expr_ui(id, x),
+    block_ui(id, x)
+  )
 
   server <- function(input, output, session) {
 

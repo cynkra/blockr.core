@@ -14,7 +14,7 @@ block_ui <- function(id, x, ...) {
 #' @rdname block_ui
 #' @export
 block_ui.block <- function(id, x, ...) {
-  expr_ui(id, x, ...)
+  NULL
 }
 
 #' @rdname block_ui

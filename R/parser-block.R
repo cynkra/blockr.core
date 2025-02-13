@@ -24,7 +24,6 @@ block_output.parser_block <- function(x, result) {
 #' @export
 block_ui.parser_block <- function(id, x, ...) {
   tagList(
-    expr_ui(id, x, ...),
     DT::dataTableOutput(NS(id, "result"))
   )
 }

@@ -65,15 +65,15 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
 block_ui.board <- function(id, x, blocks = NULL, ...) {
 
   block_card <- function(x, id, ns) {
-    div(
-      class = "card shadow-sm p-2 mb-2 border",
+    bslib::card(
       id = paste0(id, "_block"),
-      div(
-        class = "card-body p-1",
-        h5(
-          class = "card-title",
-          paste0(block_name(x), " (", id, ")")
-        ),
+      bslib::card_header(
+        paste0(block_name(x), " (", id, ")")
+      ),
+      bslib::card_body(
+        expr_ui(ns(id), x)
+      ),
+      bslib::card_body(
         block_ui(ns(id), x)
       )
     )

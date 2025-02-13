@@ -26,7 +26,6 @@ block_output.transform_block <- function(x, result) {
 #' @export
 block_ui.transform_block <- function(id, x, ...) {
   tagList(
-    expr_ui(id, x, ...),
     DT::dataTableOutput(NS(id, "result"))
   )
 }
