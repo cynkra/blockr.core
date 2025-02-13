@@ -109,7 +109,14 @@ setup_stack_div <- function(id) {
   insertUI(
     paste0("#", id, "_blocks"),
     "afterBegin",
-    tagList(div(id = paste0(id, "_stacks")), deps),
+    tagList(
+      htmltools::tagQuery(
+        bslib::accordion(id = paste0(id, "_stacks"))
+      )$addAttrs(
+        style = "margin-bottom: 10px;"
+      )$allTags(),
+      deps
+    ),
     immediate = TRUE
   )
 }
@@ -122,7 +129,15 @@ move_blocks_observer <- function(rv, session) {
     board_stacks(rv$board),
     {
       stks <- board_stacks(rv$board)
+
       to_add <- setdiff(names(stks), names(rend_stacks()))
+      to_rm <- setdiff(names(rend_stacks()), names(stks))
+
+      to_mod <- lgl_mply(
+        Negate(identical),
+        lapply(stks, stack_blocks),
+        rend_stacks()[names(stks)]
+      )
 
       if (length(to_add)) {
 
@@ -139,8 +154,6 @@ move_blocks_observer <- function(rv, session) {
         )
       }
 
-      to_rm <- setdiff(names(rend_stacks()), names(stks))
-
       if (length(to_rm)) {
 
         for (i in unlst(rend_stacks()[to_rm])) {
@@ -151,14 +164,10 @@ move_blocks_observer <- function(rv, session) {
           rm_stack_ui(i, session)
         }
 
-        rend_stacks(setdiff(rend_stacks(), to_rm))
+        rend_stacks(
+          rend_stacks()[setdiff(names(rend_stacks()), to_rm)]
+        )
       }
-
-      to_mod <- lgl_mply(
-        Negate(identical),
-        lapply(stks, stack_blocks),
-        rend_stacks()[names(stks)]
-      )
 
       if (any(to_mod)) {
 
@@ -189,32 +198,62 @@ insert_stack_ui <- function(id, stacks, sess) {
 }
 
 empty_stack_card <- function(x, id, sess) {
-  bslib::card(
-    id = paste0(id, "_stack"),
-    bslib::card_header(textOutput(sess$ns(paste0(id, "_name")))),
-    bslib::card_body()
+
+  accordion_id <- paste0("stack-accordion-panel-", id)
+
+  btn <- tags$button(
+    class = "accordion-button collapsed",
+    type = "button",
+    `data-bs-toggle` = "collapse",
+    `data-bs-target` = paste0("#", accordion_id),
+    `aria-expanded` = "false",
+    `aria-controls` = accordion_id,
+    div(
+      class = "accordion-title",
+      textOutput(sess$ns(paste0(id, "_name")))
+    )
+  )
+
+  div(
+    id = paste0("stack-accordion-item-", id),
+    class = "accordion-item",
+    `data-value` = id,
+    div(class = "accordion-header", btn),
+    div(
+      id = accordion_id,
+      class = "accordion-collapse collapse",
+      div(class = "accordion-body")
+    )
   )
 }
 
 rm_stack_ui <- function(id, sess) {
   removeUI(
-    paste0("#", id, "_stack"),
+    paste0("#stack-accordion-item-", id),
     immediate = TRUE,
     session = sess
   )
 }
 
 add_block_to_stack <- function(block_id, stack_id, sess) {
+
+  log_debug("adding block ", block_id, " to stack ", stack_id)
+
   sess$sendCustomMessage(
     "move-block-ui",
     list(
       sel = paste0("#", block_id, "_block"),
-      dest = paste0("#", stack_id, "_stack > div.card-body")
+      dest = paste0(
+        "#stack-accordion-panel-", stack_id, " > div.accordion-body"
+      )
     )
   )
 }
 
 rm_block_from_stack <- function(block_id, blocks_id, sess) {
+
+  log_debug("removing block ", block_id, " from stacks")
+
   sess$sendCustomMessage(
     "move-block-ui",
     list(
