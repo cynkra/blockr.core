@@ -44,7 +44,7 @@ add_rm_link_server <- function(id, rv, ...) {
         server = TRUE
       )
 
-      create_link_observers_observer(input, rv, upd, session)
+      create_link_obs_observer(input, rv, upd, session)
 
       edit_link_observer(upd, rv)
 
@@ -328,7 +328,7 @@ links_modal <- function(ns) {
   )
 }
 
-create_link_observers_observer <- function(input, rv, upd, session) {
+create_link_obs_observer <- function(input, rv, upd, session) {
 
   links_proxy <- DT::dataTableProxy("links_dt")
 
