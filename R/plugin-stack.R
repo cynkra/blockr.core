@@ -213,7 +213,10 @@ empty_stack_card <- function(x, id, sess) {
     `aria-controls` = accordion_id,
     div(
       class = "accordion-title",
-      textOutput(sess$ns(paste0(id, "_name_out")))
+      bslib::tooltip(
+        textOutput(sess$ns(paste0(id, "_name_out")), inline = TRUE),
+        paste("Stack ID: ", id)
+      )
     )
   )
 

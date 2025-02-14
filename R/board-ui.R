@@ -68,16 +68,24 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
 block_ui.board <- function(id, x, blocks = NULL, ...) {
 
   block_card <- function(x, id, ns) {
+
+    blk_id <- ns(id)
+    blk_ns <- NS(blk_id)
+
     bslib::card(
       id = paste0(id, "_block"),
       bslib::card_header(
-        paste0(block_name(x), " (", id, ")")
+        bslib::popover(
+          uiOutput(blk_ns("block_name_out"), inline = TRUE),
+          title = "Provide a new block name",
+          textInput(blk_ns("block_name_in"), NULL)
+        )
       ),
       bslib::card_body(
-        expr_ui(ns(id), x)
+        expr_ui(blk_id, x)
       ),
       bslib::card_body(
-        block_ui(ns(id), x)
+        block_ui(blk_id, x)
       )
     )
   }

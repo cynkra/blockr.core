@@ -25,6 +25,23 @@ block_server.block <- function(id, x, data = list(), ...) {
 
       set_globals(0L, session = session)
 
+      curr_block_name <- reactiveVal(block_name(x))
+
+      observeEvent(
+        input$block_name_in,
+        {
+          req(input$block_name_in)
+          curr_block_name(input$block_name_in)
+        }
+      )
+
+      output$block_name_out <- renderUI({
+        list(
+          bslib::tooltip(curr_block_name(), paste("Block ID: ", id)),
+          bsicons::bs_icon("pencil-square")
+        )
+      })
+
       rv <- reactiveValues(
         data_valid = if (block_has_data_validator(x)) NULL else TRUE,
         data_cond = empty_block_condition,
@@ -67,7 +84,10 @@ block_server.block <- function(id, x, data = list(), ...) {
       list(
         result = res,
         expr = lang,
-        state = exp$state,
+        state = c(
+          exp$state,
+          list(name = curr_block_name)
+        ),
         cond = reactive(
           list(
             data = rv$data_cond,
@@ -338,7 +358,7 @@ check_expr_val <- function(val, x) {
 
       if (!setequal(current, expected)) {
         stop("The `state` component of the return value for ", class(x)[1L],
-             " is expected to return ",
+             " is expected to additionally return ",
              paste0("`", setdiff(expected, current), "`", collapse = ", "))
       }
     },

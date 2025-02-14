@@ -326,7 +326,12 @@ as.list.block <- function(x, state = NULL, ...) {
 
   state <- c(
     state,
-    attrs[setdiff(names(attrs), c("names", "ctor", "ctor_pkg", "class"))]
+    attrs[
+      setdiff(
+        names(attrs),
+        c("name", "names", "ctor", "ctor_pkg", "class", "allow_empty_state")
+      )
+    ]
   )
 
   list(
