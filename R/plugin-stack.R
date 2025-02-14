@@ -140,52 +140,78 @@ move_blocks_observer <- function(rv, session) {
         rend_stacks()[to_mod]
       )
 
-      if (length(to_add)) {
-
-        insert_stack_ui(rv$board_id, stks[to_add], session)
-
-        for (i in to_add) {
-          for (j in stack_blocks(stks[[i]])) {
-            add_block_to_stack(j, i, session)
-          }
-        }
-
-        rend_stacks(
-          c(rend_stacks(), lapply(stks[to_add], stack_blocks))
-        )
-      }
-
-      if (length(to_rm)) {
-
-        for (i in unlst(rend_stacks()[to_rm])) {
-          rm_block_from_stack(i, rv$board_id, session)
-        }
-
-        for (i in to_rm) {
-          rm_stack_ui(i, session)
-        }
-
-        rend_stacks(
-          rend_stacks()[setdiff(names(rend_stacks()), to_rm)]
-        )
-      }
-
-      if (any(to_mod)) {
-
-        to_mod <- names(stks)[to_mod]
-
-        for (i in unlst(rend_stacks()[to_mod])) {
-          rm_block_from_stack(i, rv$board_id, session)
-        }
-
-        for (i in to_mod) {
-          for (j in stack_blocks(stks[[i]])) {
-            add_block_to_stack(j, i, session)
-          }
-        }
-      }
+      add_stack_and_add_blocks(to_add, rv, stks, rend_stacks, session)
+      rm_stack_and_rm_blocks(to_rm, rv, stks, rend_stacks, session)
+      modify_stack_blocks(to_mod, rv, stks, rend_stacks, session)
     }
   )
+}
+
+add_stack_and_add_blocks <- function(to_add, rv, stks, rend_stacks, session) {
+
+  if (length(to_add)) {
+
+    insert_stack_ui(rv$board_id, stks[to_add], session)
+
+    for (i in to_add) {
+      for (j in stack_blocks(stks[[i]])) {
+        add_block_to_stack(j, i, session)
+      }
+    }
+
+    rend_stacks(
+      c(rend_stacks(), lapply(stks[to_add], stack_blocks))
+    )
+  }
+
+  invisible()
+}
+
+rm_stack_and_rm_blocks <- function(to_rm, rv, stks, rend_stacks, session) {
+
+  if (length(to_rm)) {
+
+    for (i in unlst(rend_stacks()[to_rm])) {
+      rm_block_from_stack(i, rv$board_id, session)
+    }
+
+    for (i in to_rm) {
+      rm_stack_ui(i, session)
+    }
+
+    rend_stacks(
+      rend_stacks()[setdiff(names(rend_stacks()), to_rm)]
+    )
+  }
+
+  invisible()
+}
+
+modify_stack_blocks <- function(to_mod, rv, stks, rend_stacks, session) {
+
+  if (any(to_mod)) {
+
+    to_mod <- names(stks)[to_mod]
+
+    for (i in unlst(rend_stacks()[to_mod])) {
+      rm_block_from_stack(i, rv$board_id, session)
+    }
+
+    for (i in to_mod) {
+      for (j in stack_blocks(stks[[i]])) {
+        add_block_to_stack(j, i, session)
+      }
+    }
+
+    rend_stacks(
+      c(
+        rend_stacks()[setdiff(names(rend_stacks()), to_mod)],
+        lapply(stks[to_mod], stack_blocks)
+      )
+    )
+  }
+
+  invisible()
 }
 
 insert_stack_ui <- function(id, stacks, sess) {
