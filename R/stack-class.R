@@ -154,7 +154,12 @@ anyDuplicated.stack <- function(x, incomparables = FALSE, ...) {
 as.character.stack <- function(x, ...) c(unclass(x))
 
 #' @export
-as.list.stack <- function(x, ...) as.list(as.character(x))
+as.list.stack <- function(x, ...) {
+  list(
+    blocks = as.character(x),
+    name = stack_name(x)
+  )
+}
 
 #' @rdname new_stack
 #' @export
@@ -170,7 +175,9 @@ as_stack.character <- function(x) new_stack(x)
 
 #' @rdname new_stack
 #' @export
-as_stack.list <- function(x) as_stack(chr_ply(x, identity))
+as_stack.list <- function(x) {
+  do.call(new_stack, x[c("blocks", "name")])
+}
 
 #' @export
 vec_restore.stack <- function(x, to, ...) {

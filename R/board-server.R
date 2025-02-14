@@ -62,13 +62,19 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         observeEvent(
           board_refresh(),
           {
+            log_trace("removing existing ui components")
             remove_block_ui(ns(NULL), rv$board)
 
+            log_trace("refreshing rv$board")
             rv$board <- board_refresh()
 
+            log_trace("inserting new ui components")
             insert_block_ui(ns(NULL), rv$board)
 
+            log_trace("setting up block observers")
             rv <- setup_blocks(rv)
+
+            log_trace("completed board refresh")
           }
         )
       }

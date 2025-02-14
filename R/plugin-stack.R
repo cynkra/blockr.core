@@ -30,7 +30,7 @@ add_rm_stack_server <- function(id, rv, ...) {
           stcks <- board_stacks(rv$board)
           map(
             assign_output,
-            paste0(names(stcks), "_name"),
+            paste0(names(stcks), "_name_out"),
             chr_ply(stcks, stack_name),
             MoreArgs = list(out = output)
           )
@@ -107,7 +107,7 @@ setup_stack_div <- function(id) {
   )
 
   insertUI(
-    paste0("#", id, "_blocks"),
+    paste0("#", id, "_board"),
     "afterBegin",
     tagList(
       htmltools::tagQuery(
@@ -133,10 +133,11 @@ move_blocks_observer <- function(rv, session) {
       to_add <- setdiff(names(stks), names(rend_stacks()))
       to_rm <- setdiff(names(rend_stacks()), names(stks))
 
+      to_mod <- intersect(names(stks), names(rend_stacks()))
       to_mod <- lgl_mply(
         Negate(identical),
-        lapply(stks, stack_blocks),
-        rend_stacks()[names(stks)]
+        lapply(stks[to_mod], stack_blocks),
+        rend_stacks()[to_mod]
       )
 
       if (length(to_add)) {
@@ -201,6 +202,8 @@ empty_stack_card <- function(x, id, sess) {
 
   accordion_id <- paste0("stack-accordion-panel-", id)
 
+  log_trace("setting up stack ui: ", accordion_id)
+
   btn <- tags$button(
     class = "accordion-button collapsed",
     type = "button",
@@ -210,7 +213,7 @@ empty_stack_card <- function(x, id, sess) {
     `aria-controls` = accordion_id,
     div(
       class = "accordion-title",
-      textOutput(sess$ns(paste0(id, "_name")))
+      textOutput(sess$ns(paste0(id, "_name_out")))
     )
   )
 

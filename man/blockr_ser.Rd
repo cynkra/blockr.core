@@ -7,6 +7,8 @@
 \alias{blockr_ser.board}
 \alias{blockr_ser.link}
 \alias{blockr_ser.links}
+\alias{blockr_ser.stack}
+\alias{blockr_ser.stacks}
 \alias{blockr_deser}
 \alias{blockr_deser.list}
 \alias{blockr_deser.block}
@@ -14,6 +16,8 @@
 \alias{blockr_deser.board}
 \alias{blockr_deser.link}
 \alias{blockr_deser.links}
+\alias{blockr_deser.stack}
+\alias{blockr_deser.stacks}
 \alias{to_json}
 \alias{from_json}
 \title{Serialization utilities}
@@ -30,6 +34,10 @@ blockr_ser(x, ...)
 
 \method{blockr_ser}{links}(x, ...)
 
+\method{blockr_ser}{stack}(x, ...)
+
+\method{blockr_ser}{stacks}(x, ...)
+
 blockr_deser(x, ...)
 
 \method{blockr_deser}{list}(x, ...)
@@ -43,6 +51,10 @@ blockr_deser(x, ...)
 \method{blockr_deser}{link}(x, data, ...)
 
 \method{blockr_deser}{links}(x, data, ...)
+
+\method{blockr_deser}{stack}(x, data, ...)
+
+\method{blockr_deser}{stacks}(x, data, ...)
 
 to_json(x, ...)
 

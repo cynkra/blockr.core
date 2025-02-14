@@ -49,6 +49,7 @@ blockr_ser.board <- function(x, blocks = NULL, ...) {
     object = class(x),
     blocks = blockr_ser(board_blocks(x), blocks),
     links = lapply(board_links(x), blockr_ser),
+    stacks = lapply(board_stacks(x), blockr_ser),
     version = as.character(pkg_version())
   )
 }
@@ -65,6 +66,24 @@ blockr_ser.link <- function(x, ...) {
 #' @rdname blockr_ser
 #' @export
 blockr_ser.links <- function(x, ...) {
+  list(
+    object = class(x),
+    payload = lapply(x, blockr_ser)
+  )
+}
+
+#' @rdname blockr_ser
+#' @export
+blockr_ser.stack <- function(x, ...) {
+  list(
+    object = class(x),
+    payload = as.list(x)
+  )
+}
+
+#' @rdname blockr_ser
+#' @export
+blockr_ser.stacks <- function(x, ...) {
   list(
     object = class(x),
     payload = lapply(x, blockr_ser)
@@ -105,6 +124,7 @@ blockr_deser.board <- function(x, data, ...) {
   new_board(
     blockr_deser(data[["blocks"]]),
     lapply(data[["links"]], blockr_deser),
+    lapply(data[["stacks"]], blockr_deser),
     class = setdiff(class(x), "board")
   )
 }
@@ -119,6 +139,20 @@ blockr_deser.link <- function(x, data, ...) {
 #' @export
 blockr_deser.links <- function(x, data, ...) {
   as_links(
+    lapply(data[["payload"]], blockr_deser)
+  )
+}
+
+#' @rdname blockr_ser
+#' @export
+blockr_deser.stack <- function(x, data, ...) {
+  as_stack(data[["payload"]])
+}
+
+#' @rdname blockr_ser
+#' @export
+blockr_deser.stacks <- function(x, data, ...) {
+  as_stacks(
     lapply(data[["payload"]], blockr_deser)
   )
 }

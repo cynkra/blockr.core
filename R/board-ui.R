@@ -55,7 +55,10 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
       )
     ),
     do.call(div, block_notifications),
-    do.call(div, c(id = paste0(id, "_blocks"), block_ui(id, x)))
+    div(
+      id = paste0(id, "_board"),
+      do.call(div, c(id = paste0(id, "_blocks"), block_ui(id, x)))
+    )
   )
 }
 

@@ -8,7 +8,7 @@ test_that("stack class", {
 
   expect_setequal(as_stack(x), x)
   expect_setequal(as_stack(letters[1:5]), x)
-  expect_setequal(as_stack(as.list(letters[1:5])), x)
+  expect_setequal(as_stack(list(blocks = letters[1:5])), x)
 
   expect_setequal(as_stack(as.character(x)), x)
   expect_setequal(as_stack(as.list(x)), x)
