@@ -13,9 +13,11 @@
 \title{Board options}
 \usage{
 new_board_options(
+  board_name = "Board",
   n_rows = get_option("n_rows", 50L),
   page_size = get_option("page_size", 5L),
   filter_rows = get_option("filter_rows", FALSE),
+  dark_mode = get_option("dark_mode", NULL),
   ...,
   class = character()
 )
@@ -37,10 +39,14 @@ list_board_options(x)
 board_option(opt, x)
 }
 \arguments{
+\item{board_name}{String valued board name}
+
 \item{n_rows, page_size}{Numer of rows and page size to show for tabular
 block previews}
 
 \item{filter_rows}{Enable filtering of rows in tabular block previews}
+
+\item{dark_mode}{Toggle between dark and light modes}
 
 \item{...}{Further options}
 

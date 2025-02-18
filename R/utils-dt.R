@@ -12,8 +12,8 @@ dt_result <- function(result, session) {
     if (is.na(dat_row)) rows > page else min(dat_row, rows) > page
   }
 
-  rows <- board_option_from_userdata("n_rows", session)
-  page <- board_option_from_userdata("page_size", session)
+  rows <- get_userdata_or_option("n_rows", session)
+  page <- get_userdata_or_option("page_size", session)
 
   dom <- "rti"
 
@@ -21,7 +21,7 @@ dt_result <- function(result, session) {
     dom <- paste0(dom, "p")
   }
 
-  if (board_option_from_userdata("filter_rows", session)) {
+  if (get_userdata_or_option("filter_rows", session)) {
     dom <- paste0("f", dom)
   }
 

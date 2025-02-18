@@ -217,6 +217,7 @@ is_acyclic.board <- function(x) {
 serve.board <- function(x, id = rand_names(), ...) {
 
   ui <- bslib::page_fluid(
+    title = board_option("board_name", x),
     board_ui(id, x,
       list(
         preserve_board = ser_deser_ui,
@@ -225,10 +226,25 @@ serve.board <- function(x, id = rand_names(), ...) {
         manage_stacks = add_rm_stack_ui,
         generate_code = gen_code_ui
       )
+    ),
+    htmltools::htmlDependency(
+      "change-board-title",
+      pkg_version(),
+      src = pkg_file("assets", "js"),
+      script = "changeBoardTitle.js"
     )
   )
 
   server <- function(input, output, session) {
+
+    observeEvent(
+      board_option_from_userdata("board_name", session),
+      session$sendCustomMessage(
+        "change-board-title",
+        board_option_from_userdata("board_name", session)
+      )
+    )
+
     res <- board_server(id, x,
       list(
         preserve_board = ser_deser_server,
@@ -474,7 +490,12 @@ format.board <- function(x, ...) {
     out <- out[-length(out)]
   }
 
-  out
+  c(
+    out,
+    "",
+    "Options:",
+    format(board_options(x))
+  )
 }
 
 #' @export

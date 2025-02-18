@@ -70,6 +70,9 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
             log_trace("refreshing rv$board")
             rv$board <- board_refresh()
 
+            log_trace("updating board ui")
+            update_ui(rv$board, session)
+
             log_trace("inserting new ui components")
             insert_block_ui(ns(NULL), rv$board)
 

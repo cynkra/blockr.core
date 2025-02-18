@@ -7,7 +7,10 @@
 \alias{insert_block_ui.board}
 \alias{remove_block_ui}
 \alias{remove_block_ui.board}
+\alias{update_ui}
+\alias{update_ui.board}
 \alias{board_ui.board_options}
+\alias{update_ui.board_options}
 \title{Board UI}
 \usage{
 board_ui(id, x, ...)
@@ -22,7 +25,13 @@ remove_block_ui(id, x, blocks = NULL, ...)
 
 \method{remove_block_ui}{board}(id, x, blocks = NULL, ...)
 
+update_ui(x, session, ...)
+
+\method{update_ui}{board}(x, session, ...)
+
 \method{board_ui}{board_options}(id, x, ...)
+
+\method{update_ui}{board_options}(x, session, ...)
 }
 \arguments{
 \item{id}{Namespace ID}
@@ -34,6 +43,8 @@ remove_block_ui(id, x, blocks = NULL, ...)
 \item{plugins}{UI for board plugins}
 
 \item{blocks}{(Additional) blocks (or IDs) for which to generate the UI}
+
+\item{session}{Shiny session}
 }
 \description{
 Shiny UI function for \code{board} objects.

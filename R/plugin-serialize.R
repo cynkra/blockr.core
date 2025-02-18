@@ -15,9 +15,10 @@ ser_deser_server <- function(id, rv, ...) {
   moduleServer(
     id,
     function(input, output, session) {
+
       output$serialize <- downloadHandler(
         board_filename(rv),
-        write_board_to_disk(rv)
+        write_board_to_disk(rv, session)
       )
 
       res <- reactiveVal()
@@ -60,16 +61,24 @@ board_filename <- function(rv) {
   }
 }
 
-write_board_to_disk <- function(rv) {
+write_board_to_disk <- function(rv, session) {
+
   function(con) {
+
     blocks <- lapply(
       lst_xtr(rv$blocks, "server", "state"),
       lapply,
       reval_if
     )
 
+    opts <- lapply(
+      set_names(nm = list_board_options(rv$board)),
+      board_option_from_userdata,
+      session
+    )
+
     json <- jsonlite::prettify(
-      to_json(rv$board, blocks)
+      to_json(rv$board, blocks, opts)
     )
 
     writeLines(json, con)

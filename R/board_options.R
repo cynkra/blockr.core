@@ -2,24 +2,30 @@
 #'
 #' User settings at the board level.
 #'
+#' @param board_name String valued board name
 #' @param n_rows,page_size Numer of rows and page size to show for tabular
 #' block previews
 #' @param filter_rows Enable filtering of rows in tabular block previews
+#' @param dark_mode Toggle between dark and light modes
 #' @param ... Further options
 #' @param class Optional sub-class
 #'
 #' @export
-new_board_options <- function(n_rows = get_option("n_rows", 50L),
+new_board_options <- function(board_name = "Board",
+                              n_rows = get_option("n_rows", 50L),
 		    											page_size = get_option("page_size", 5L),
                               filter_rows = get_option("filter_rows", FALSE),
+                              dark_mode = get_option("dark_mode", NULL),
                               ...,
                               class = character()) {
 
   res <- structure(
     list(
+      board_name = board_name,
       n_rows = as.integer(n_rows),
       page_size = as.integer(page_size),
-      filter_rows = as.logical(filter_rows),
+      filter_rows = filter_rows,
+      dark_mode = dark_mode,
       ...
     ),
     class = c(class, "board_options")
@@ -72,7 +78,9 @@ validate_board_options.board_options <- function(x) {
     )
   }
 
-  expected <- c("n_rows", "page_size")
+  expected <- c(
+    "board_name", "n_rows", "page_size", "filter_rows", "dark_mode"
+  )
 
   if (!all(expected %in% names(x))) {
     abort(
@@ -81,6 +89,13 @@ validate_board_options.board_options <- function(x) {
         "to be available as board options."
       ),
       class = "board_options_components_invalid"
+    )
+  }
+
+  if (!is_string(x[["board_name"]])) {
+    abort(
+      "Expecting `board_name` to represent a string.",
+      class = "board_options_board_name_invalid"
     )
   }
 
@@ -105,12 +120,30 @@ validate_board_options.board_options <- function(x) {
     )
   }
 
+  dm <- x[["dark_mode"]]
+
+  if (!(is.null(dm) || (is_string(dm) && dm %in% c("light", "dark")))) {
+    abort(
+      "Expecting `dark_mode` to be either `NULL`, \"light\" or \"dark\".",
+      class = "board_options_dark_mode_invalid"
+    )
+  }
+
   x
+}
+
+#' @export
+as.list.board_options <- function(x, ...) {
+  unclass(x)
 }
 
 #' @rdname new_board_options
 #' @export
 list_board_options <- function(x) {
+
+  if (is_board(x)) {
+    x <- board_options(x)
+  }
 
   if (!is_board_options(x)) {
     abort(
@@ -126,6 +159,10 @@ list_board_options <- function(x) {
 #' @rdname new_board_options
 #' @export
 board_option <- function(opt, x) {
+
+  if (is_board(x)) {
+    x <- board_options(x)
+  }
 
   if (!is_board_options(x)) {
     abort(
@@ -159,6 +196,11 @@ board_ui.board_options <- function(id, x, ...) {
 
   bslib::popover(
     bsicons::bs_icon("gear", size = "1.5em"),
+    textInput(
+      ns("board_name"),
+      "Board name",
+      board_option("board_name", x)
+    ),
     numericInput(
       ns("n_rows"),
       "Preview rows",
@@ -177,8 +219,54 @@ board_ui.board_options <- function(id, x, ...) {
       "Enable preview search",
       board_option("filter_rows", x)
     ),
+    span(
+      bslib::input_dark_mode(
+        id = ns("dark_mode"),
+        mode = board_option("dark_mode", x)
+      ),
+      tags$label(
+        "Light/dark mode",
+        style = "vertical-align: top; margin-top: 3px;"
+      )
+    ),
     title = "Board options"
   )
+}
+
+#' @rdname board_ui
+#' @export
+update_ui.board_options <- function(x, session, ...) {
+
+  updateTextInput(
+    session,
+    "board_name",
+    value = board_option("board_name", x)
+  )
+
+  updateNumericInput(
+    session,
+    "n_rows",
+    value = board_option("n_rows", x)
+  )
+
+  updateSelectInput(
+    session,
+    "page_size",
+    selected = board_option("page_size", x)
+  )
+
+  bslib::toggle_switch(
+    "filter_rows",
+    value = board_option("filter_rows", x),
+    session = session
+  )
+
+  bslib::toggle_dark_mode(
+    mode = board_option("dark_mode", x),
+    session = session
+  )
+
+  invisible()
 }
 
 board_option_to_userdata <- function(x, input, session) {
@@ -197,33 +285,45 @@ board_options_to_userdata <- function(x, input, session) {
   invisible()
 }
 
-get_userdata_or_option <- function(session, name) {
+board_option_from_userdata <- function(name, session) {
 
-  user_data <- session$userData
+  rv <- get0(name, envir = session$userData, inherits = FALSE)
 
-  if (!exists(name, envir = user_data)) {
-    return(board_option(name, new_board_options()))
+  if (is.null(rv)) {
+    return(NULL)
   }
 
-  res <- get(name, envir = user_data)()
+  res <- rv()
 
-  if (!length(res)) {
+  if (is.null(res)) {
+    return(NULL)
+  }
+
+  if (identical(name, "page_size")) {
+    res <- as.integer(res)
+  }
+
+  res
+}
+
+get_userdata_or_option <- function(name, session) {
+
+  res <- board_option_from_userdata(name, session)
+
+  if (is.null(res)) {
     return(board_option(name, new_board_options()))
   }
 
   res
 }
 
-board_option_from_userdata <- function(name, session) {
+#' @export
+format.board_options <- function(x, ...) {
+  trimws(utils::capture.output(utils::str(as.list(x)))[-1L], "right")
+}
 
-  switch(
-    name,
-    n_rows = get_userdata_or_option(session, "n_rows"),
-    page_size = as.integer(get_userdata_or_option(session, "page_size")),
-    filter_rows = get_userdata_or_option(session, "filter_rows"),
-    abort(
-      paste0("Unknown option \"", name, "\"."),
-      class = "board_option_name_invalid"
-    )
-  )
+#' @export
+print.board_options <- function(x, ...) {
+  cat(format(x, ...), sep = "\n")
+  invisible(x)
 }

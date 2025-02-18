@@ -159,3 +159,16 @@ remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
     }
   }
 }
+
+#' @param session Shiny session
+#' @rdname board_ui
+#' @export
+update_ui <- function(x, session, ...) {
+  UseMethod("update_ui", x)
+}
+
+#' @rdname board_ui
+#' @export
+update_ui.board <- function(x, session, ...) {
+  update_ui(board_options(x), session)
+}

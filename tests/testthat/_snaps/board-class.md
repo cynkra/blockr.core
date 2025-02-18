@@ -60,6 +60,13 @@
       bc<stack[2]>
       Name: "Stack 1"
       Blocks: "b" and "c"
+      
+      Options:
+       $ board_name : chr "Board"
+       $ n_rows     : int 50
+       $ page_size  : int 5
+       $ filter_rows: logi FALSE
+       $ dark_mode  : NULL
 
 ---
 
@@ -113,4 +120,11 @@
       bc<stack[1]>
       Name: "Stack 1"
       Blocks: "b"
+      
+      Options:
+       $ board_name : chr "Board"
+       $ n_rows     : int 50
+       $ page_size  : int 5
+       $ filter_rows: logi FALSE
+       $ dark_mode  : NULL
 

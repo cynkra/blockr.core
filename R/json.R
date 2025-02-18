@@ -42,14 +42,41 @@ blockr_ser.blocks <- function(x, blocks = NULL, ...) {
   )
 }
 
+#' @param options Board option values (`NULL` means default values)
 #' @rdname blockr_ser
 #' @export
-blockr_ser.board <- function(x, blocks = NULL, ...) {
+blockr_ser.board_options <- function(x, options = NULL, ...) {
+
+  if (is.null(options)) {
+    options <- as.list(new_board_options())
+  }
+
+  expected <- list_board_options(x)
+
+  stopifnot(is.list(options), setequal(expected, names(options)))
+
+  board_opts <- as.list(x)
+
+  list(
+    object = class(x),
+    payload = Map(
+      coal,
+      options[expected],
+      board_opts[expected],
+      MoreArgs = list(fail_null = FALSE)
+    )
+  )
+}
+
+#' @rdname blockr_ser
+#' @export
+blockr_ser.board <- function(x, blocks = NULL, options = NULL, ...) {
   list(
     object = class(x),
     blocks = blockr_ser(board_blocks(x), blocks),
     links = lapply(board_links(x), blockr_ser),
     stacks = lapply(board_stacks(x), blockr_ser),
+    options = blockr_ser(board_options(x), options),
     version = as.character(pkg_version())
   )
 }
@@ -122,9 +149,10 @@ blockr_deser.blocks <- function(x, data, ...) {
 #' @export
 blockr_deser.board <- function(x, data, ...) {
   new_board(
-    blockr_deser(data[["blocks"]]),
-    lapply(data[["links"]], blockr_deser),
-    lapply(data[["stacks"]], blockr_deser),
+    blocks = blockr_deser(data[["blocks"]]),
+    links = lapply(data[["links"]], blockr_deser),
+    stacks = lapply(data[["stacks"]], blockr_deser),
+    options = blockr_deser(data[["options"]]),
     class = setdiff(class(x), "board")
   )
 }
@@ -159,8 +187,14 @@ blockr_deser.stacks <- function(x, data, ...) {
 
 #' @rdname blockr_ser
 #' @export
+blockr_deser.board_options <- function(x, data, ...) {
+  as_board_options(data[["payload"]])
+}
+
+#' @rdname blockr_ser
+#' @export
 to_json <- function(x, ...) {
-  jsonlite::toJSON(blockr_ser(x, ...), auto_unbox = TRUE)
+  jsonlite::toJSON(blockr_ser(x, ...), auto_unbox = TRUE, null = "null")
 }
 
 #' @rdname blockr_ser
