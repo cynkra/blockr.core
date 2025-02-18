@@ -40,14 +40,15 @@ expr_ui.block <- function(id, x, ...) {
 }
 
 #' @param result Reactive block result
+#' @param session Shiny session object
 #' @rdname block_ui
 #' @export
-block_output <- function(x, result) {
+block_output <- function(x, result, session) {
   UseMethod("block_output")
 }
 
 #' @rdname block_ui
 #' @export
-block_output.block <- function(x, result) {
+block_output.block <- function(x, result, session) {
   NULL
 }

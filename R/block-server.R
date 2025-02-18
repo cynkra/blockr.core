@@ -329,10 +329,9 @@ data_eval_observer <- function(id, x, dat, res, exp, lang, rv, sess) {
 
 output_result_observer <- function(x, res, output, sess) {
 
-  observeEvent(
-    res(),
+  observe(
     {
-      output$result <- block_output(x, res())
+      output$result <- block_output(x, res(), sess)
     },
     domain = sess
   )

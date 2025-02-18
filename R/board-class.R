@@ -5,23 +5,32 @@
 #' @param blocks Set of blocks
 #' @param links Set of links
 #' @param stacks Set of stacks
+#' @param options Board-level user settings
 #' @param ... Further (metadata) attributes
 #' @param class Board sub-class
 #'
 #' @export
-new_board <- function(blocks = list(), links = list(), stacks = list(), ...,
+new_board <- function(blocks = list(), links = list(), stacks = list(),
+                      options = new_board_options(), ...,
                       class = character()) {
 
   blocks <- as_blocks(blocks)
   links <- as_links(links)
   stacks <- as_stacks(stacks)
+  options <- as_board_options(options)
 
   links <- complete_unary_inputs(links, blocks)
   links <- complete_variadic_inputs(links, blocks)
 
   validate_board(
     structure(
-      list(blocks = blocks, links = links, stacks = stacks, ...),
+      list(
+        blocks = blocks,
+        links = links,
+        stacks = stacks,
+        options = options,
+        ...
+      ),
       class = c(class, "board")
     )
   )
@@ -291,6 +300,20 @@ board_stacks <- function(x) {
   stopifnot(is_board(x))
   x[["stacks"]] <- value
   validate_board(x)
+}
+
+#' @rdname new_board
+#' @export
+board_options <- function(x) {
+
+  if (!inherits(x, "board")) {
+    abort(
+      "Can only extract board options from a board object.",
+      class = "board_options_board_invalid"
+    )
+  }
+
+  validate_board_options(x[["options"]])
 }
 
 #' @rdname new_board

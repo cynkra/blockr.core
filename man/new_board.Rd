@@ -10,6 +10,7 @@
 \alias{board_links<-}
 \alias{board_stacks}
 \alias{board_stacks<-}
+\alias{board_options}
 \alias{board_block_ids}
 \alias{board_link_ids}
 \alias{board_stack_ids}
@@ -23,6 +24,7 @@ new_board(
   blocks = list(),
   links = list(),
   stacks = list(),
+  options = new_board_options(),
   ...,
   class = character()
 )
@@ -42,6 +44,8 @@ board_links(x) <- value
 board_stacks(x)
 
 board_stacks(x) <- value
+
+board_options(x)
 
 board_block_ids(x)
 
@@ -67,6 +71,8 @@ rm_blocks(x, rm)
 \item{links}{Set of links}
 
 \item{stacks}{Set of stacks}
+
+\item{options}{Board-level user settings}
 
 \item{...}{Further (metadata) attributes}
 

@@ -8,18 +8,8 @@ new_transform_block <- function(server, ui, class,
 
 #' @rdname block_ui
 #' @export
-block_output.transform_block <- function(x, result) {
-  DT::renderDT(
-    DT::datatable(
-      result,
-      selection = "none",
-      options = list(
-        pageLength = 5L,
-        processing = FALSE
-      )
-    ),
-    server = TRUE
-  )
+block_output.transform_block <- function(x, result, session) {
+  dt_result(result, session)
 }
 
 #' @rdname block_ui

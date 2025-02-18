@@ -15,6 +15,7 @@ board_ui <- function(id, x, ...) {
 #' @rdname board_ui
 #' @export
 board_ui.board <- function(id, x, plugins = list(), ...) {
+
   validate_plugins(plugins)
 
   ser_deser <- get_plugin("preserve_board", plugins)
@@ -31,7 +32,8 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
     if (length(add_rm_block)) add_rm_block(ns("manage_blocks"), x),
     if (length(add_rm_link)) add_rm_link(ns("manage_links"), x),
     if (length(add_rm_stack)) add_rm_stack(ns("manage_stacks"), x),
-    if (length(gen_code)) gen_code(ns("generate_code"), x)
+    if (length(gen_code)) gen_code(ns("generate_code"), x),
+    board_ui(id, board_options(x))
   )
 
   toolbar_args <- do.call(tagList, toolbar_args)
