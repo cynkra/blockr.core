@@ -64,7 +64,9 @@ add_rm_stack_server <- function(id, rv, ...) {
         server = TRUE
       )
 
-      create_stack_obs_observer(input, rv, upd, session)
+      stacks_proxy <- DT::dataTableProxy("stacks_dt", sess)
+
+      create_stack_obs_observer(input, rv, upd, session, stacks_proxy)
 
       edit_stack_observer(upd, rv)
 
@@ -74,7 +76,7 @@ add_rm_stack_server <- function(id, rv, ...) {
 
       cancel_stack_observer(input, rv, upd, session)
 
-      modify_stack_observer(input, rv, upd, session)
+      modify_stack_observer(input, rv, upd, session, stacks_proxy)
     }
   )
 }
@@ -490,9 +492,7 @@ destroy_dt_stack_obs <- function(ids, update) {
   update
 }
 
-create_stack_obs_observer <- function(input, rv, upd, sess) {
-
-  stacks_proxy <- DT::dataTableProxy("stacks_dt", sess)
+create_stack_obs_observer <- function(input, rv, upd, sess, proxy) {
 
   observeEvent(
     upd$curr,
@@ -500,7 +500,7 @@ create_stack_obs_observer <- function(input, rv, upd, sess) {
       ids <- names(upd$curr)
 
       DT::replaceData(
-        stacks_proxy,
+        proxy,
         dt_board_stack(upd$curr, sess$ns, rv$board),
         rownames = FALSE
       )
@@ -627,7 +627,7 @@ cancel_stack_observer <- function(input, rv, upd, session) {
   )
 }
 
-modify_stack_observer <- function(input, rv, upd, sess, res) {
+modify_stack_observer <- function(input, rv, upd, sess, proxy) {
 
   res <- reactiveVal(
     list(add = NULL, rm = NULL)
@@ -669,6 +669,11 @@ modify_stack_observer <- function(input, rv, upd, sess, res) {
       upd$rm <- character()
       upd$curr <- board_stacks(new)
 
+      DT::replaceData(
+        proxy,
+        dt_board_stack(upd$curr, sess$ns, rv$board),
+        rownames = FALSE
+      )
       removeModal(sess)
     }
   )
