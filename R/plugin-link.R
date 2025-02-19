@@ -44,7 +44,9 @@ add_rm_link_server <- function(id, rv, ...) {
         server = TRUE
       )
 
-      create_link_obs_observer(input, rv, upd, session)
+      links_proxy <- DT::dataTableProxy("links_dt")
+
+      create_link_obs_observer(input, rv, upd, session, links_proxy)
 
       edit_link_observer(upd, rv)
 
@@ -54,7 +56,7 @@ add_rm_link_server <- function(id, rv, ...) {
 
       cancel_link_observer(input, rv, upd, session)
 
-      modify_link_observer(input, rv, upd, session)
+      modify_link_observer(input, rv, upd, session, links_proxy)
     }
   )
 }
@@ -328,17 +330,15 @@ links_modal <- function(ns) {
   )
 }
 
-create_link_obs_observer <- function(input, rv, upd, session) {
-
-  links_proxy <- DT::dataTableProxy("links_dt")
+create_link_obs_observer <- function(input, rv, upd, session, proxy) {
 
   observeEvent(
-    upd$curr,
+    names(upd$curr),
     {
       ids <- names(upd$curr)
 
       DT::replaceData(
-        links_proxy,
+        proxy,
         dt_board_link(upd$curr, session$ns, rv$board),
         rownames = FALSE
       )
@@ -462,7 +462,7 @@ cancel_link_observer <- function(input, rv, upd, session) {
   )
 }
 
-modify_link_observer <- function(input, rv, upd, session, res) {
+modify_link_observer <- function(input, rv, upd, session, proxy) {
 
   res <- reactiveVal(
     list(add = NULL, rm = NULL)
@@ -503,6 +503,12 @@ modify_link_observer <- function(input, rv, upd, session, res) {
       upd$add <- links()
       upd$rm <- character()
       upd$curr <- board_links(new)
+
+      DT::replaceData(
+        proxy,
+        dt_board_link(upd$curr, session$ns, rv$board),
+        rownames = FALSE
+      )
 
       removeModal()
     }
