@@ -311,15 +311,11 @@ links_modal <- function(ns) {
       )$allTags(),
       tags$style(
         type = "text/css",
-        paste0(
-          "#", ns("new_link_id"), " {padding: 0.75em 2em; margin: 4px;}"
-        )
+        paste0("#", ns("new_link_id"), " {padding: 0.75em 2em; margin: 4px;}")
       ),
       tags$style(
         type = "text/css",
-        paste0(
-          "#", ns("new_link_id"), "-label {text-align: left;}"
-        )
+        paste0("#", ns("new_link_id"), "-label {text-align: left;}")
       ),
       actionButton(ns("add_link"), "Add", icon = icon("plus")),
       actionButton(ns("rm_link"), "Remove", icon = icon("minus")),

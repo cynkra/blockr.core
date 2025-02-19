@@ -43,10 +43,15 @@ ser_deser_ui <- function(id, board) {
       NS(id, "serialize"),
       "Save",
     ),
-    fileInput(
-      NS(id, "restore"),
-      "Restore"
-    )
+    htmltools::tagQuery(
+      fileInput(
+        NS(id, "restore"),
+        "",
+        buttonLabel = tagList(icon("upload"), "Restore")
+      )
+    )$addAttrs(
+      style = "margin-bottom: 8px;"
+    )$allTags()
   )
 }
 
