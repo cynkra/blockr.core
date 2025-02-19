@@ -44,7 +44,7 @@ add_rm_link_server <- function(id, rv, ...) {
         server = TRUE
       )
 
-      links_proxy <- DT::dataTableProxy("links_dt")
+      links_proxy <- DT::dataTableProxy("links_dt", session)
 
       create_link_obs_observer(input, rv, upd, session, links_proxy)
 

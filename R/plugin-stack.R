@@ -64,7 +64,7 @@ add_rm_stack_server <- function(id, rv, ...) {
         server = TRUE
       )
 
-      stacks_proxy <- DT::dataTableProxy("stacks_dt", sess)
+      stacks_proxy <- DT::dataTableProxy("stacks_dt", session)
 
       create_stack_obs_observer(input, rv, upd, session, stacks_proxy)
 
