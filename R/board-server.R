@@ -46,15 +46,18 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         msgs = list()
       )
 
+      edit_block_server <- get_plugin_server("edit_block", plugins)
+      edit_block_ui <- get_plugin_ui("edit_block", plugins)
+
       observeEvent(
         TRUE,
         {
-          rv <- setup_blocks(rv)
+          rv <- setup_blocks(rv, edit_block_server, dot_args)
         },
         once = TRUE
       )
 
-      ser_deser <- get_plugin("preserve_board", plugins)
+      ser_deser <- get_plugin_server("preserve_board", plugins)
 
       if (not_null(ser_deser)) {
         board_refresh <- check_ser_deser_val(
@@ -74,17 +77,17 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
             update_ui(rv$board, session)
 
             log_trace("inserting new ui components")
-            insert_block_ui(ns(NULL), rv$board)
+            insert_block_ui(ns(NULL), rv$board, edit_ui = edit_block_ui)
 
             log_trace("setting up block observers")
-            rv <- setup_blocks(rv)
+            rv <- setup_blocks(rv, edit_block_server, dot_args)
 
             log_trace("completed board refresh")
           }
         )
       }
 
-      add_rm_block <- get_plugin("manage_blocks", plugins)
+      add_rm_block <- get_plugin_server("manage_blocks", plugins)
 
       if (not_null(add_rm_block)) {
 
@@ -96,12 +99,15 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         observeEvent(
           blocks$add,
           {
-            insert_block_ui(ns(NULL), rv$board, blocks$add)
+            insert_block_ui(ns(NULL), rv$board, blocks$add,
+                            edit_ui = edit_block_ui)
 
             board_blocks(rv$board) <- c(board_blocks(rv$board), blocks$add)
 
             for (blk in names(blocks$add)) {
-              rv <- setup_block(blocks$add[[blk]], blk, rv)
+              rv <- setup_block(
+                blocks$add[[blk]], blk, rv, edit_block_server, dot_args
+              )
             }
           }
         )
@@ -116,7 +122,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         )
       }
 
-      add_rm_link <- get_plugin("manage_links", plugins)
+      add_rm_link <- get_plugin_server("manage_links", plugins)
 
       if (not_null(add_rm_link)) {
 
@@ -139,7 +145,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         )
       }
 
-      add_rm_stack <- get_plugin("manage_stacks", plugins)
+      add_rm_stack <- get_plugin_server("manage_stacks", plugins)
 
       if (not_null(add_rm_stack)) {
 
@@ -158,7 +164,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         )
       }
 
-      block_notifications <- get_plugin("notify_user", plugins)
+      block_notifications <- get_plugin_server("notify_user", plugins)
 
       if (is.null(block_notifications)) {
 
@@ -176,7 +182,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         )
       }
 
-      gen_code <- get_plugin("generate_code", plugins)
+      gen_code <- get_plugin_server("generate_code", plugins)
 
       if (not_null(gen_code)) {
 
@@ -196,7 +202,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
   )
 }
 
-setup_blocks <- function(rv) {
+setup_blocks <- function(rv, edit_mod, dots) {
 
   stopifnot(
     is.reactivevalues(rv),
@@ -215,13 +221,13 @@ setup_blocks <- function(rv) {
   blks <- board_blocks(rv$board)
 
   for (i in names(blks)) {
-    rv <- setup_block(blks[[i]], i, rv)
+    rv <- setup_block(blks[[i]], i, rv, edit_mod, dots)
   }
 
   rv
 }
 
-setup_block <- function(blk, id, rv) {
+setup_block <- function(blk, id, rv, mod, dots) {
 
   arity <- block_arity(blk)
   inpts <- block_inputs(blk)
@@ -242,12 +248,18 @@ setup_block <- function(blk, id, rv) {
   todo <- as.list(links[links$to == id])
 
   for (i in names(todo)) {
-    rv <- do.call(setup_link, c(list(rv, i), todo[[i]]))
+    rv <- do.call(
+      setup_link,
+      c(list(rv, i), todo[[i]])
+    )
   }
 
   rv$blocks[[id]] <- list(
     block = blk,
-    server = block_server(id, blk, rv$inputs[[id]])
+    server = do.call(
+      block_server,
+      c(list(id, blk, rv$inputs[[id]], mod), dots)
+    )
   )
 
   rv
@@ -328,53 +340,4 @@ update_block_links <- function(rv, add = NULL, rm = NULL) {
   }
 
   rv
-}
-
-validate_plugins <- function(plugins) {
-
-  if (!is.list(plugins)) {
-    stop("Expecting a list of plugins.")
-  }
-
-  unknown <- setdiff(
-    names(plugins),
-    c("preserve_board", "manage_blocks", "manage_links", "manage_stacks",
-      "notify_user", "generate_code")
-  )
-
-  if (length(unknown)) {
-    stop("Cannot deal with plungin(s) ", paste_enum(unknown), ".")
-  }
-
-  for (plugin in plugins) {
-    if (!is.function(plugin)) {
-      stop("Expecting plugings to be passed as functions.")
-    }
-  }
-
-  invisible()
-}
-
-get_plugin <- function(plugin, plugins) {
-
-  if (plugin %in% names(plugins)) {
-    return(plugins[[plugin]])
-  }
-
-  NULL
-}
-
-validate_callbacks <- function(x) {
-
-  if (!is.list(x)) {
-    stop("Expecting a list of callbacks.")
-  }
-
-  for (f in x) {
-    if (!is.function(f)) {
-      stop("Expecting callbacks to be passed as functions.")
-    }
-  }
-
-  invisible()
 }

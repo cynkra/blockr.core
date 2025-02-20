@@ -17,7 +17,7 @@
 #'
 #' @export
 new_block <- function(server, ui, class, ctor, ctor_pkg, dat_valid = NULL,
-                      name = NULL, allow_empty_state = FALSE, ...) {
+                      allow_empty_state = FALSE, name = NULL, ...) {
 
   stopifnot(is.character(class), length(class) > 0L)
 
@@ -443,6 +443,7 @@ serve.block <- function(x, id = "block", ..., data = list()) {
   }
 
   ui <- bslib::page_fluid(
+    theme = bslib::bs_theme(version = 5),
     title = id,
     expr_ui(id, x),
     block_ui(id, x)
@@ -487,6 +488,14 @@ initial_block_state <- function(x) {
     set_names(nm = block_ctor_inputs(x)),
     get,
     envir = environment(block_expr_server(x))
+  )
+}
+
+block_base_attrs <- function() {
+  setdiff(
+    names(formals(new_block)),
+    c("server", "ui", "class", "ctor", "ctor_pkg", "dat_valid",
+      "allow_empty_state")
   )
 }
 

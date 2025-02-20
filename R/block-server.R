@@ -14,7 +14,17 @@ block_server <- function(id, x, data = list(), ...) {
 
 #' @rdname block_server
 #' @export
-block_server.block <- function(id, x, data = list(), ...) {
+block_server.block <- function(id, x, data = list(), edit_block = NULL, ...) {
+
+  dot_args <- list(...)
+
+  if (is.null(edit_block) && length(dot_args)) {
+    warn(
+      paste0("Arguments ", paste_enum(names(dot_args)), " will not be used."),
+      class = "no_edit_block_module"
+    )
+  }
+
   moduleServer(
     id,
     function(input, output, session) {
@@ -24,23 +34,6 @@ block_server.block <- function(id, x, data = list(), ...) {
       )
 
       set_globals(0L, session = session)
-
-      curr_block_name <- reactiveVal(block_name(x))
-
-      observeEvent(
-        input$block_name_in,
-        {
-          req(input$block_name_in)
-          curr_block_name(input$block_name_in)
-        }
-      )
-
-      output$block_name_out <- renderUI({
-        list(
-          bslib::tooltip(curr_block_name(), paste("Block ID: ", id)),
-          bsicons::bs_icon("pencil-square")
-        )
-      })
 
       rv <- reactiveValues(
         data_valid = if (block_has_data_validator(x)) NULL else TRUE,
@@ -81,12 +74,23 @@ block_server.block <- function(id, x, data = list(), ...) {
       data_eval_observer(id, x, dat, res, exp, lang, rv, session)
       output_result_observer(x, res, output, session)
 
+      if (not_null(edit_block)) {
+
+        edit_block_state <- check_edit_block_val(
+          do.call(edit_block, c(list("edit_block", x, res), dot_args))
+        )
+
+      } else {
+
+        edit_block_state <- NULL
+      }
+
       list(
         result = res,
         expr = lang,
         state = c(
           exp$state,
-          list(name = curr_block_name)
+          edit_block_state
         ),
         cond = reactive(
           list(

@@ -212,21 +212,15 @@ is_acyclic.board <- function(x) {
 }
 
 #' @param id Board namespace ID
+#' @param plugins Board plugins
 #' @rdname serve
 #' @export
-serve.board <- function(x, id = rand_names(), ...) {
+serve.board <- function(x, id = rand_names(), plugins = borad_plugins(), ...) {
 
   ui <- bslib::page_fluid(
+    theme = bslib::bs_theme(version = 5),
     title = board_option("board_name", x),
-    board_ui(id, x,
-      list(
-        preserve_board = ser_deser_ui,
-        manage_blocks = add_rm_block_ui,
-        manage_links = add_rm_link_ui,
-        manage_stacks = add_rm_stack_ui,
-        generate_code = gen_code_ui
-      )
-    ),
+    board_ui(id, x, plugins),
     htmltools::htmlDependency(
       "change-board-title",
       pkg_version(),
@@ -245,16 +239,7 @@ serve.board <- function(x, id = rand_names(), ...) {
       )
     )
 
-    res <- board_server(id, x,
-      list(
-        preserve_board = ser_deser_server,
-        manage_blocks = add_rm_block_server,
-        manage_links = add_rm_link_server,
-        manage_stacks = add_rm_stack_server,
-        notify_user = block_notification_server,
-        generate_code = gen_code_server
-      )
-    )
+    res <- board_server(id, x, plugins)
 
     exportTestValues(
       result = lapply(
