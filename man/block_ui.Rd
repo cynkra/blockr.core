@@ -31,7 +31,7 @@ block_output(x, result, session)
 
 \method{block_output}{block}(x, result, session)
 
-\method{block_ui}{board}(id, x, blocks = NULL, ...)
+\method{block_ui}{board}(id, x, blocks = NULL, edit_ui = NULL, ...)
 
 \method{block_output}{data_block}(x, result, session)
 

@@ -18,12 +18,12 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
 
   validate_plugins(plugins)
 
-  ser_deser <- get_plugin("preserve_board", plugins)
-  add_rm_block <- get_plugin("manage_blocks", plugins)
-  add_rm_link <- get_plugin("manage_links", plugins)
-  add_rm_stack <- get_plugin("manage_stacks", plugins)
-  block_notifications <- get_plugin("notify_user", plugins)
-  gen_code <- get_plugin("generate_code", plugins)
+  ser_deser <- get_plugin_ui("preserve_board", plugins)
+  add_rm_block <- get_plugin_ui("manage_blocks", plugins)
+  add_rm_link <- get_plugin_ui("manage_links", plugins)
+  add_rm_stack <- get_plugin_ui("manage_stacks", plugins)
+  block_notifications <- get_plugin_ui("notify_user", plugins)
+  gen_code <- get_plugin_ui("generate_code", plugins)
 
   ns <- NS(id)
 
@@ -59,7 +59,13 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
     do.call(div, block_notifications),
     div(
       id = paste0(id, "_board"),
-      do.call(div, c(id = paste0(id, "_blocks"), block_ui(id, x)))
+      do.call(
+        div,
+        c(
+          id = paste0(id, "_blocks"),
+          block_ui(id, x, edit_ui = get_plugin_ui("edit_block", plugins))
+        )
+      )
     )
   )
 }
@@ -67,27 +73,23 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
 #' @param blocks (Additional) blocks (or IDs) for which to generate the UI
 #' @rdname block_ui
 #' @export
-block_ui.board <- function(id, x, blocks = NULL, ...) {
+block_ui.board <- function(id, x, blocks = NULL, edit_ui = NULL, ...) {
 
-  block_card <- function(x, id, ns) {
+  block_card <- function(x, block_id, board_ns, card_elems) {
 
-    blk_id <- ns(id)
-    blk_ns <- NS(blk_id)
+    blk_id <- board_ns(block_id)
 
     bslib::card(
-      id = paste0(id, "_block"),
-      bslib::card_header(
-        bslib::popover(
-          uiOutput(blk_ns("block_name_out"), inline = TRUE),
-          title = "Provide a new block name",
-          textInput(blk_ns("block_name_in"), NULL)
+      id = paste0(block_id, "_block"),
+      card_elems(
+        x,
+        NS(blk_id, "edit_block"),
+        bslib::card_body(
+          expr_ui(blk_id, x)
+        ),
+        bslib::card_body(
+          block_ui(blk_id, x)
         )
-      ),
-      bslib::card_body(
-        expr_ui(blk_id, x)
-      ),
-      bslib::card_body(
-        block_ui(blk_id, x)
       )
     )
   }
@@ -102,8 +104,22 @@ block_ui.board <- function(id, x, blocks = NULL, ...) {
 
   stopifnot(is_blocks(blocks))
 
+  if (is.null(edit_ui)) {
+    edit_ui <- function(x, id, ...) {
+      tagList(
+        bslib::card_header(block_name(x)),
+        ...
+      )
+    }
+  }
+
+  args <- list(
+    board_ns = NS(id),
+    card_elems = edit_ui
+  )
+
   tagList(
-    map(block_card, blocks, names(blocks), MoreArgs = list(ns = NS(id)))
+    map(block_card, blocks, names(blocks), MoreArgs = args)
   )
 }
 
@@ -123,7 +139,7 @@ insert_block_ui.board <- function(id, x, blocks = NULL, ...) {
   insertUI(
     paste0("#", id, "_blocks"),
     "beforeEnd",
-    block_ui(id, x, blocks),
+    block_ui(id, x, blocks, ...),
     immediate = TRUE
   )
 }

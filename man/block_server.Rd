@@ -12,7 +12,7 @@
 \usage{
 block_server(id, x, data = list(), ...)
 
-\method{block_server}{block}(id, x, data = list(), ...)
+\method{block_server}{block}(id, x, data = list(), edit_block = NULL, ...)
 
 expr_server(x, data, ...)
 
