@@ -33,6 +33,8 @@ block_eval(x, expr, data, ...)
 
 \item{...}{Generic consistency}
 
+\item{edit_block}{Block edit plugin}
+
 \item{expr}{Quoted expression to evaluate in the context of \code{data}}
 }
 \description{

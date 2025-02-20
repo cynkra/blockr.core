@@ -16,7 +16,7 @@ gen_code_server <- function(id, rv, ...) {
     function(input, output, session) {
 
       code <- reactive(
-        generate_code(rv)
+        gen_code(rv)
       )
 
       observeEvent(

@@ -16,8 +16,6 @@ board_ui <- function(id, x, ...) {
 #' @export
 board_ui.board <- function(id, x, plugins = list(), ...) {
 
-  validate_plugins(plugins)
-
   ser_deser <- get_plugin_ui("preserve_board", plugins)
   add_rm_block <- get_plugin_ui("manage_blocks", plugins)
   add_rm_link <- get_plugin_ui("manage_links", plugins)
@@ -63,7 +61,7 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
         div,
         c(
           id = paste0(id, "_blocks"),
-          block_ui(id, x, edit_ui = get_plugin_ui("edit_block", plugins))
+          block_ui(id, x, edit_ui = get_plugin("edit_block", plugins))
         )
       )
     )
@@ -71,6 +69,7 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
 }
 
 #' @param blocks (Additional) blocks (or IDs) for which to generate the UI
+#' @param edit_ui Block edit plugin
 #' @rdname block_ui
 #' @export
 block_ui.board <- function(id, x, blocks = NULL, edit_ui = NULL, ...) {
@@ -111,6 +110,8 @@ block_ui.board <- function(id, x, blocks = NULL, edit_ui = NULL, ...) {
         ...
       )
     }
+  } else {
+    edit_ui <- get_plugin_ui(edit_ui)
   }
 
   args <- list(

@@ -12,6 +12,7 @@ block_server <- function(id, x, data = list(), ...) {
   UseMethod("block_server", x)
 }
 
+#' @param edit_block Block edit plugin
 #' @rdname block_server
 #' @export
 block_server.block <- function(id, x, data = list(), edit_block = NULL, ...) {
@@ -74,16 +75,10 @@ block_server.block <- function(id, x, data = list(), edit_block = NULL, ...) {
       data_eval_observer(id, x, dat, res, exp, lang, rv, session)
       output_result_observer(x, res, output, session)
 
-      if (not_null(edit_block)) {
-
-        edit_block_state <- check_edit_block_val(
-          do.call(edit_block, c(list("edit_block", x, res), dot_args))
-        )
-
-      } else {
-
-        edit_block_state <- NULL
-      }
+      edit_block_state <- call_plugin_server(
+        edit_block,
+        server_args = c(list(x, res), dot_args)
+      )
 
       list(
         result = res,

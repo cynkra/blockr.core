@@ -61,6 +61,8 @@ block_output(x, result, session)
 \item{session}{Shiny session object}
 
 \item{blocks}{(Additional) blocks (or IDs) for which to generate the UI}
+
+\item{edit_ui}{Block edit plugin}
 }
 \description{
 Generics for creating fields and block UI containers.

@@ -1,4 +1,4 @@
-generate_code <- function(rv) {
+gen_code <- function(rv) {
 
   exprs <- lapply(lst_xtr(rv$blocks, c("server", "expr")), reval)
 

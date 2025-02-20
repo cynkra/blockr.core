@@ -19,8 +19,6 @@ board_server <- function(id, x, ...) {
 board_server.board <- function(id, x, plugins = list(), callbacks = list(),
                                ...) {
 
-  validate_plugins(plugins)
-
   if (is.function(callbacks)) {
     callbacks <- list(callbacks)
   }
@@ -46,23 +44,23 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         msgs = list()
       )
 
-      edit_block_server <- get_plugin_server("edit_block", plugins)
-      edit_block_ui <- get_plugin_ui("edit_block", plugins)
+      edit_block <- get_plugin("edit_block", plugins)
 
       observeEvent(
         TRUE,
         {
-          rv <- setup_blocks(rv, edit_block_server, dot_args)
+          rv <- setup_blocks(rv, edit_block, dot_args)
         },
         once = TRUE
       )
 
-      ser_deser <- get_plugin_server("preserve_board", plugins)
+      board_refresh <- call_plugin_server(
+        "preserve_board",
+        server_args = c(list(rv), dot_args),
+        plugins = plugins
+      )
 
-      if (not_null(ser_deser)) {
-        board_refresh <- check_ser_deser_val(
-          do.call(ser_deser, c(list("preserve_board", rv), dot_args))
-        )
+      if (not_null(board_refresh)) {
 
         observeEvent(
           board_refresh(),
@@ -77,36 +75,36 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
             update_ui(rv$board, session)
 
             log_trace("inserting new ui components")
-            insert_block_ui(ns(NULL), rv$board, edit_ui = edit_block_ui)
+            insert_block_ui(ns(NULL), rv$board, edit_ui = edit_block)
 
             log_trace("setting up block observers")
-            rv <- setup_blocks(rv, edit_block_server, dot_args)
+            rv <- setup_blocks(rv, edit_block, dot_args)
 
             log_trace("completed board refresh")
           }
         )
       }
 
-      add_rm_block <- get_plugin_server("manage_blocks", plugins)
+      blocks <- call_plugin_server(
+        "manage_blocks",
+        server_args = c(list(rv), dot_args),
+        validator_args = list(rv),
+        plugins = plugins
+      )
 
-      if (not_null(add_rm_block)) {
-
-        blocks <- check_add_rm_block_val(
-          do.call(add_rm_block, c(list("manage_blocks", rv), dot_args)),
-          rv
-        )
+      if (not_null(blocks)) {
 
         observeEvent(
           blocks$add,
           {
             insert_block_ui(ns(NULL), rv$board, blocks$add,
-                            edit_ui = edit_block_ui)
+                            edit_ui = edit_block)
 
             board_blocks(rv$board) <- c(board_blocks(rv$board), blocks$add)
 
             for (blk in names(blocks$add)) {
               rv <- setup_block(
-                blocks$add[[blk]], blk, rv, edit_block_server, dot_args
+                blocks$add[[blk]], blk, rv, edit_block, dot_args
               )
             }
           }
@@ -122,14 +120,14 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         )
       }
 
-      add_rm_link <- get_plugin_server("manage_links", plugins)
+      links <- call_plugin_server(
+        "manage_links",
+        server_args = c(list(rv), dot_args),
+        validator_args = list(rv),
+        plugins = plugins
+      )
 
-      if (not_null(add_rm_link)) {
-
-        links <- check_add_rm_link_val(
-          do.call(add_rm_link, c(list("manage_links", rv), dot_args)),
-          rv
-        )
+      if (not_null(links)) {
 
         observeEvent(
           links(),
@@ -145,14 +143,14 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         )
       }
 
-      add_rm_stack <- get_plugin_server("manage_stacks", plugins)
+      stacks <- call_plugin_server(
+        "manage_stacks",
+        server_args = c(list(rv), dot_args),
+        validator_args = list(rv),
+        plugins = plugins
+      )
 
-      if (not_null(add_rm_stack)) {
-
-        stacks <- check_add_rm_stack_val(
-          do.call(add_rm_stack, c(list("manage_stacks", rv), dot_args)),
-          rv
-        )
+      if (not_null(stacks)) {
 
         observeEvent(
           stacks(),
@@ -164,32 +162,22 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         )
       }
 
-      block_notifications <- get_plugin_server("notify_user", plugins)
-
-      if (is.null(block_notifications)) {
-
-        rv$msgs <- reactive(
+      rv$msgs <- coal(
+        call_plugin_server(
+          "notify_user",
+          server_args = c(list(rv), dot_args),
+          plugins = plugins
+        ),
+        reactive(
           filter_all_zero_len(lst_xtr_reval(rv$blocks, "server", "cond"))
         )
+      )
 
-      } else {
-
-        rv$msgs <- check_block_notifications_val(
-          do.call(
-            block_notification_server,
-            c(list("notify_user", rv), dot_args)
-          )
-        )
-      }
-
-      gen_code <- get_plugin_server("generate_code", plugins)
-
-      if (not_null(gen_code)) {
-
-        check_gen_code_val(
-          do.call(gen_code, c(list("generate_code", rv), dot_args))
-        )
-      }
+      call_plugin_server(
+        "generate_code",
+        server_args = c(list(rv), dot_args),
+        plugins = plugins
+      )
 
       cb_res <- vector("list", length(callbacks))
 
