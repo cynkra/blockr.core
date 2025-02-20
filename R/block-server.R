@@ -342,23 +342,58 @@ check_expr_val <- function(val, x) {
   observeEvent(
     val,
     {
+      if (!is.list(val)) {
+        abort(
+          paste(
+            "The block server for", class(x)[1L],
+            "is expected to return a list."
+          ),
+          class = "expr_server_return_type_invalid"
+        )
+      }
+
       if (!setequal(names(val), c("expr", "state"))) {
-        stop("The block server for ", class(x)[1L],
-             " is expected to return values `expr` and `state`.")
+        abort(
+          paste(
+            "The block server for", class(x)[1L],
+            "is expected to return values `expr` and `state`."
+          ),
+          class = "expr_server_return_component_missing"
+        )
       }
 
       if (!is.reactive(val[["expr"]])) {
-        stop("The `expr` component of the return value for ", class(x)[1L],
-             " is expected to be a reactive.")
+        abort(
+          paste(
+            "The `expr` component of the return value for", class(x)[1L],
+            "is expected to be a reactive."
+          ),
+          class = "expr_server_return_type_invalid"
+        )
+      }
+
+      if (!is.list(val[["state"]])) {
+        abort(
+          paste(
+            "The `state` component of the return value for", class(x)[1L],
+            "is expected to be a list."
+          ),
+          class = "expr_server_return_type_invalid"
+        )
       }
 
       expected <- block_ctor_inputs(x)
       current <- names(val[["state"]])
 
       if (!setequal(current, expected)) {
-        stop("The `state` component of the return value for ", class(x)[1L],
-             " is expected to additionally return ",
-             paste0("`", setdiff(expected, current), "`", collapse = ", "))
+        abort(
+          paste0(
+            "The `state` component of the return value for ", class(x)[1L],
+            " is expected to additionally return ",
+            paste_enum(setdiff(expected, current))
+          ),
+          class = "expr_server_return_state_invalid"
+        )
       }
     },
     once = TRUE
