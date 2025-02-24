@@ -78,7 +78,89 @@ serve(
 )
 ```
 
-## NOTE: MOVE THE REST TO VIGNETTES/ARTICLES
+## Creating blocks
+
+As blockr is built on top of Shiny, at it’s heart, a block is just a
+specialised Shiny module. If you are not already familiar with [Shiny
+modules](https://shiny.posit.co/r/articles/improve/modules/), it is
+recommended you do so before continuing with this section.
+
+Blocks differ from standard Shiny modules in the following ways:
+
+- They separate state (persistent user selections) from data inputs
+  (dynamic values passed from other blocks).
+- They expose an expression (called “expr”), a reactive expression
+  defining their computation. This allows blockr to export R code to
+  recreate data analysis workflows, outside of blockr and a reactive
+  Shiny context.
+- They return a state object (called “state”), a list of reactive values
+  tracking user inputs.
+
+Blocks consists of three elements:
+
+1.  A **Constructor function** to intialize block state.
+2.  A **UI function** to define the user interface.
+3.  A **Server function** to handle reactive logic.
+
+Now, let’s go through each element, seeing the similarities and
+differences to standard Shiny modules.
+
+### Constructor function
+
+The constructor function initializes the block and should expose
+arguments for defining its state (i.e., anything the user might set via
+the UI). Inputs from other block should not be exposed as arguments, as
+these are dynamically provided in the server function (see below).
+
+The constructor return value should be a call to `new_block()` (or if
+applicable a call to the more specific *virtual* constructors
+`new_data_block()`, `new_transform_block()`, etc.). Arguments `server`
+and `ui` both expect closures with a specific structure.
+
+### UI Function
+
+A UI function in blockr is the same as a UI function in a Shiny module.
+
+This means that:
+
+- The function signature is expected to contain a single `id` argument,
+  which can be used with `shiny::NS()` to construct namespaced IDs.
+- A call to appropriate shiny UI functions is expected that return
+  `shiny.tag` or `shiny.tag.list` objects, typically via the use of
+  `shiny::tagList()` in the UI to list separate UI elements.
+
+It should be noted that the initial evaluation of the `ui` function will
+be performed in the context of the constructor scope (i.e. if a value of
+name `xyz` is bound the the constructor scope or a parent thereof, this
+value will be passed as `xyz` argument).
+
+### Server function
+
+The server function takes an id and any additional inputs (e.g., data).
+
+It returns a `moduleServer()` call, defining:
+
+- **expr**: A quoted reactive expression representing the block’s
+  computation.
+- **state**: A list of reactive values tracking user selections.
+
+Example: A simple identity transform block:
+
+``` r
+function(id, ...) {
+  moduleServer(id, function(input, output, session) {
+    # Reactive logic goes here
+
+    # Return a list with "expr" and "state"
+    list(
+      expr = reactive(quote(identity(...))),
+      state = list()
+    )
+  })
+}
+```
+
+# OLD README —
 
 ## How to create a block
 
