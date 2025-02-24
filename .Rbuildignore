@@ -3,3 +3,7 @@
 ^\.github$
 ^\.lintr$
 _\.new\.png$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^vignettes/*_files$
