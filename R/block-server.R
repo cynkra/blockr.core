@@ -13,9 +13,11 @@ block_server <- function(id, x, data = list(), ...) {
 }
 
 #' @param edit_block Block edit plugin
+#' @param update Reactive value object to initiate board updates
 #' @rdname block_server
 #' @export
-block_server.block <- function(id, x, data = list(), edit_block = NULL, ...) {
+block_server.block <- function(id, x, data = list(), edit_block = NULL,
+                               update = reactiveVal(), ...) {
 
   dot_args <- list(...)
 

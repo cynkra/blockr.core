@@ -12,7 +12,14 @@
 \usage{
 block_server(id, x, data = list(), ...)
 
-\method{block_server}{block}(id, x, data = list(), edit_block = NULL, ...)
+\method{block_server}{block}(
+  id,
+  x,
+  data = list(),
+  edit_block = NULL,
+  update = reactiveVal(),
+  ...
+)
 
 expr_server(x, data, ...)
 
@@ -34,6 +41,8 @@ block_eval(x, expr, data, ...)
 \item{...}{Generic consistency}
 
 \item{edit_block}{Block edit plugin}
+
+\item{update}{Reactive value object to initiate board updates}
 
 \item{expr}{Quoted expression to evaluate in the context of \code{data}}
 }

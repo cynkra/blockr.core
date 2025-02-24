@@ -10,11 +10,14 @@ test_that("add/rm stacks", {
   testServer(
     add_rm_stack_server,
     {
+      expect_null(session$returned)
+      expect_null(update())
+
       expect_identical(upd$add, stacks())
       expect_identical(upd$rm, character())
       expect_null(upd$edit)
 
-      expect_identical(session$returned(), list(add = NULL, rm = NULL))
+      expect_null(update())
 
       session$setInputs(add_stack = 1)
 
@@ -45,14 +48,16 @@ test_that("add/rm stacks", {
       session$setInputs(modify_stacks = 1)
 
       expect_identical(
-        session$returned(),
-        list(add = new, rm = character())
+        update()$stacks,
+        list(add = new, rm = NULL)
       )
 
       expect_identical(upd$add, stacks())
       expect_identical(upd$rm, character())
+
+      expect_null(session$returned)
     },
-    args = list(rv = reactiveValues(board = board))
+    args = list(rv = reactiveValues(board = board), update = reactiveVal())
   )
 
   testServer(
@@ -100,7 +105,8 @@ test_that("add/rm stacks", {
           ),
           stacks = stacks(ac = c("a", "c"))
         )
-      )
+      ),
+      update = reactiveVal()
     )
   )
 
@@ -115,6 +121,9 @@ test_that("add/rm stacks", {
   testServer(
     add_rm_stack_server,
     {
+      expect_null(session$returned)
+      expect_null(update())
+
       expect_s3_class(upd$curr, "stacks")
       expect_length(upd$curr, 1L)
       expect_named(upd$curr, "ab")
@@ -128,15 +137,17 @@ test_that("add/rm stacks", {
       session$setInputs(modify_stacks = 1)
 
       expect_identical(
-        session$returned(),
-        list(add = stacks(), rm = "ab")
+        update()$stacks,
+        list(add = NULL, rm = "ab")
       )
 
       expect_identical(upd$add, stacks())
       expect_identical(upd$rm, character())
       expect_identical(upd$curr, stacks())
+
+      expect_null(session$returned)
     },
-    args = list(rv = reactiveValues(board = board))
+    args = list(rv = reactiveValues(board = board), update = reactiveVal())
   )
 })
 
@@ -145,7 +156,7 @@ test_that("add/rm stacks return validation", {
   with_mock_session(
     {
       val <- reactiveVal(
-        list(add = stacks(a = "a"), rm = "ab")
+        list(stacks = list(add = stacks(a = "a"), rm = "ab"))
       )
 
       rv <- list(
@@ -158,112 +169,71 @@ test_that("add/rm stacks return validation", {
         )
       )
 
-      res <- check_add_rm_stack_val(val, rv)
+      res <- validate_board_update(val, rv)
 
-      expect_s3_class(isolate(res()$add), "stacks")
-      expect_length(isolate(res()$add), 1L)
+      expect_s3_class(res$stacks$add, "stacks")
+      expect_length(res$stacks$add, 1L)
 
-      expect_type(isolate(res()$rm), "character")
-      expect_length(isolate(res()$rm), 1L)
-
-
-      val(list(add = NULL, rm = "bc"))
-
-      sink_msg(
-        expect_warning(
-          session$flushReact(),
-          "Expecting all stack IDs to be removed to be known"
-        )
-      )
+      expect_type(res$stacks$rm, "character")
+      expect_length(res$stacks$rm, 1L)
     }
   )
 
   with_mock_session(
     {
-      check_add_rm_stack_val(list(), list())
-      sink_msg(
-        expect_warning(
-          session$flushReact(),
-          "Expecting `manage_stacks` to return a reactive value"
-        )
+      expect_error(
+        validate_board_update(
+          reactiveVal(list(stacks = "a")),
+          list()
+        ),
+        class = "board_update_component_type_invalid"
       )
-    }
-  )
 
-  with_mock_session(
-    {
-      check_add_rm_stack_val(reactiveVal(1), list())
-      sink_msg(
-        expect_warning(
-          session$flushReact(),
-          paste(
-            "Expecting the `manage_stacks` return value to evaluate to a list",
-            "with components `add` and `rm`"
-          )
-        )
+      expect_error(
+        validate_board_update(
+          reactiveVal(list(stacks = list(abc = NULL))),
+          list()
+        ),
+        class = "board_update_component_components_invalid"
       )
-    }
-  )
 
-  with_mock_session(
-    {
-      check_add_rm_stack_val(reactiveVal(list(add = 1, rm = NULL)), list())
-      sink_msg(
-        expect_warning(
-          session$flushReact(),
-          paste(
-            "Expecting the `add` component of the `manage_stacks` return",
-            "value to be `NULL` or a `stacks` object"
-          )
-        )
+      expect_error(
+        validate_board_update(
+          reactiveVal(list(stacks = list(add = "a"))),
+          list()
+        ),
+        class = "board_update_stacks_add_invalid"
       )
-    }
-  )
 
-  with_mock_session(
-    {
-      check_add_rm_stack_val(
-        reactiveVal(
+      expect_error(
+        validate_board_update(
+          reactiveVal(
+            list(stacks = list(add = stacks(a = new_stack())))
+          ),
           list(
-            add = structure(list(1), class = class(stacks())),
-            rm = NULL
+            board = new_board(
+              blocks = c(a = new_dataset_block()),
+              stacks = stacks(a = "a")
+            )
           )
         ),
-        list()
+        class = "board_update_stacks_add_invalid"
       )
 
-      sink_msg(
-        expect_warning(session$flushReact(), "Error in validate_stack")
+      expect_error(
+        validate_board_update(
+          reactiveVal(list(stacks = list(rm = 1))),
+          list(board = new_board())
+        ),
+        class = "board_update_stacks_rm_invalid"
       )
-    }
-  )
 
-  with_mock_session(
-    {
-      check_add_rm_stack_val(reactiveVal(list(add = NULL, rm = 1)), list())
-      sink_msg(
-        expect_warning(
-          session$flushReact(),
-          paste(
-            "Expecting the `rm` component of the `manage_stacks` return",
-            "value to be a character vector"
-          )
-        )
-      )
-    }
-  )
-
-  with_mock_session(
-    {
-      check_add_rm_stack_val(
-        reactiveVal(list(add = NULL, rm = "a")),
-        list(board = new_board())
-      )
-      sink_msg(
-        expect_warning(
-          session$flushReact(),
-          "Expecting all stack IDs to be removed to be known"
-        )
+      expect_error(
+        validate_board_update(
+          reactiveVal(list(stacks = list(rm = "a"))),
+          list(board = new_board())
+        ),
+        class = "board_update_stacks_rm_invalid"
       )
     }
   )

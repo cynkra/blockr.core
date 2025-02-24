@@ -100,22 +100,19 @@ preserve_board <- function(server, ui) {
 #' @rdname new_plugin
 #' @export
 manage_blocks <- function(server, ui) {
-  new_plugin(server, ui, validator = check_add_rm_block_val,
-             class = "manage_blocks")
+  new_plugin(server, ui, validator = expect_null, class = "manage_blocks")
 }
 
 #' @rdname new_plugin
 #' @export
 manage_links <- function(server, ui) {
-  new_plugin(server, ui, validator = check_add_rm_link_val,
-             class = "manage_links")
+  new_plugin(server, ui, validator = expect_null, class = "manage_links")
 }
 
 #' @rdname new_plugin
 #' @export
 manage_stacks <- function(server, ui) {
-  new_plugin(server, ui, validator = check_add_rm_stack_val,
-             class = "manage_stacks")
+  new_plugin(server, ui, validator = expect_null, class = "manage_stacks")
 }
 
 #' @rdname new_plugin
