@@ -52,8 +52,11 @@
 <span><span class="co"># S3 method for class 'blocks'</span></span>
 <span><span class="fu">blockr_ser</span><span class="op">(</span><span class="va">x</span>, blocks <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for class 'board_options'</span></span>
+<span><span class="fu">blockr_ser</span><span class="op">(</span><span class="va">x</span>, options <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for class 'board'</span></span>
-<span><span class="fu">blockr_ser</span><span class="op">(</span><span class="va">x</span>, blocks <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">blockr_ser</span><span class="op">(</span><span class="va">x</span>, blocks <span class="op">=</span> <span class="cn">NULL</span>, options <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'link'</span></span>
 <span><span class="fu">blockr_ser</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -93,6 +96,9 @@
 <span><span class="co"># S3 method for class 'stacks'</span></span>
 <span><span class="fu">blockr_deser</span><span class="op">(</span><span class="va">x</span>, <span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for class 'board_options'</span></span>
+<span><span class="fu">blockr_deser</span><span class="op">(</span><span class="va">x</span>, <span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">to_json</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">from_json</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
@@ -116,6 +122,10 @@
 
 <dt id="arg-blocks">blocks<a class="anchor" aria-label="anchor" href="#arg-blocks"></a></dt>
 <dd><p>Block states (<code>NULL</code> defaults to values from ctor scope)</p></dd>
+
+
+<dt id="arg-options">options<a class="anchor" aria-label="anchor" href="#arg-options"></a></dt>
+<dd><p>Board option values (<code>NULL</code> means default values)</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>

@@ -54,34 +54,34 @@
 <span><span class="co"># S3 method for class 'block'</span></span>
 <span><span class="fu">expr_ui</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span><span class="op">)</span></span>
+<span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span>, <span class="va">session</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'block'</span></span>
-<span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span><span class="op">)</span></span>
+<span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span>, <span class="va">session</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'board'</span></span>
 <span><span class="fu">block_ui</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, blocks <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'data_block'</span></span>
-<span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span><span class="op">)</span></span>
+<span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span>, <span class="va">session</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'data_block'</span></span>
 <span><span class="fu">block_ui</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'parser_block'</span></span>
-<span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span><span class="op">)</span></span>
+<span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span>, <span class="va">session</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'parser_block'</span></span>
 <span><span class="fu">block_ui</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'plot_block'</span></span>
-<span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span><span class="op">)</span></span>
+<span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span>, <span class="va">session</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'plot_block'</span></span>
 <span><span class="fu">block_ui</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'transform_block'</span></span>
-<span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span><span class="op">)</span></span>
+<span><span class="fu">block_output</span><span class="op">(</span><span class="va">x</span>, <span class="va">result</span>, <span class="va">session</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'transform_block'</span></span>
 <span><span class="fu">block_ui</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
@@ -105,6 +105,10 @@
 
 <dt id="arg-result">result<a class="anchor" aria-label="anchor" href="#arg-result"></a></dt>
 <dd><p>Reactive block result</p></dd>
+
+
+<dt id="arg-session">session<a class="anchor" aria-label="anchor" href="#arg-session"></a></dt>
+<dd><p>Shiny session object</p></dd>
 
 
 <dt id="arg-blocks">blocks<a class="anchor" aria-label="anchor" href="#arg-blocks"></a></dt>
