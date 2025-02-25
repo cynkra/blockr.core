@@ -7,7 +7,7 @@
 \alias{block_summary.block}
 \title{Edit block module}
 \usage{
-edit_block_server(id, x, res, block_id, board, update, ...)
+edit_block_server(id, block_id, board, update, ...)
 
 edit_block_ui(x, id, ...)
 
@@ -18,10 +18,6 @@ block_summary(x, data)
 \arguments{
 \item{id}{Namespace ID}
 
-\item{x}{Static block}
-
-\item{res}{Reactive result}
-
 \item{block_id}{Block ID}
 
 \item{board}{Reactive values object containing board information}
@@ -29,6 +25,8 @@ block_summary(x, data)
 \item{update}{Reactive value object to initiate board updates}
 
 \item{...}{Extra arguments passed from parent scope}
+
+\item{x}{Block}
 
 \item{data}{Result data}
 }

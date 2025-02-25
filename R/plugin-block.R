@@ -3,8 +3,6 @@
 #' Customizable logic for editing block attributes such as block title.
 #'
 #' @param id Namespace ID
-#' @param x Static block
-#' @param res Reactive result
 #' @param block_id Block ID
 #' @param board Reactive values object containing board information
 #' @param update Reactive value object to initiate board updates
@@ -15,12 +13,18 @@
 #'
 #' @rdname edit_block
 #' @export
-edit_block_server <- function(id, x, res, block_id, board, update, ...) {
+edit_block_server <- function(id, block_id, board, update, ...) {
   moduleServer(
     id,
     function(input, output, session) {
 
-      curr_block_name <- reactiveVal(block_name(x))
+      initial_block <- isolate(
+        board_blocks(board$board)[[block_id]]
+      )
+
+      curr_block_name <- reactiveVal(
+        block_name(initial_block)
+      )
 
       observeEvent(
         input$block_name_in,
@@ -34,7 +38,12 @@ edit_block_server <- function(id, x, res, block_id, board, update, ...) {
         bslib::tooltip(curr_block_name(), paste("Block ID: ", block_id))
       )
 
-      output$block_summary <- renderText(block_summary(x, res()))
+      output$block_summary <- renderText(
+        block_summary(
+          initial_block,
+          board$blocks[[block_id]]$server$result()
+        )
+      )
 
       observeEvent(
         input$rm_block,
@@ -48,6 +57,7 @@ edit_block_server <- function(id, x, res, block_id, board, update, ...) {
   )
 }
 
+#' @param x Block
 #' @rdname edit_block
 #' @export
 edit_block_ui <- function(x, id, ...) {

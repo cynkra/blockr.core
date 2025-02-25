@@ -82,7 +82,7 @@ block_server.block <- function(id, x, data = list(), edit_block = NULL,
       edit_block_state <- call_plugin_server(
         edit_block,
         server_args = c(
-          list(x, res, block_id = id, board = board, update = update),
+          list(block_id = id, board = board, update = update),
           dot_args
         )
       )
