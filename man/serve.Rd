@@ -4,15 +4,15 @@
 \name{serve.block}
 \alias{serve.block}
 \alias{serve.board}
-\alias{borad_plugins}
+\alias{board_plugins}
 \alias{serve}
 \title{Serve object}
 \usage{
 \method{serve}{block}(x, id = "block", ..., data = list())
 
-\method{serve}{board}(x, id = rand_names(), plugins = borad_plugins(), ...)
+\method{serve}{board}(x, id = rand_names(), plugins = board_plugins(), ...)
 
-borad_plugins(which = NULL)
+board_plugins(which = NULL)
 
 serve(x, ...)
 }

@@ -305,7 +305,7 @@ call_plugin_ui <- function(plugin, ns, ..., plugins = NULL) {
 #' @param which (Optional) character vectors of plugins to include
 #' @rdname serve
 #' @export
-borad_plugins <- function(which = NULL) {
+board_plugins <- function(which = NULL) {
 
   plugins <- plugins(
     preserve_board(server = ser_deser_server, ui = ser_deser_ui),

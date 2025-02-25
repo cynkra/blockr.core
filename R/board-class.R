@@ -215,7 +215,7 @@ is_acyclic.board <- function(x) {
 #' @param plugins Board plugins
 #' @rdname serve
 #' @export
-serve.board <- function(x, id = rand_names(), plugins = borad_plugins(), ...) {
+serve.board <- function(x, id = rand_names(), plugins = board_plugins(), ...) {
 
   ui <- bslib::page_fluid(
     theme = bslib::bs_theme(version = 5),
