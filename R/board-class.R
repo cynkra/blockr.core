@@ -244,7 +244,7 @@ serve.board <- function(x, id = rand_names(), plugins = borad_plugins(), ...) {
     exportTestValues(
       result = lapply(
         lapply(
-          lapply(lst_xtr(res$blocks, "server", "result"), safely_export),
+          lapply(lst_xtr(res[[1L]]$blocks, "server", "result"), safely_export),
           reval
         ),
         reval

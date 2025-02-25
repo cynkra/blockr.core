@@ -46,7 +46,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         msgs = list()
       )
 
-      rv_lst <- list(rv)
+      rv_lst <- list(make_read_only(rv))
 
       board_update <- reactiveVal()
 
@@ -176,7 +176,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         cb_res[[i]] <- do.call(callbacks[[i]], c(rv_lst, plugin_args))
       }
 
-      rv
+      c(rv_lst, dot_args)
     }
   )
 }
