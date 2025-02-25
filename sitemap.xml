@@ -13,6 +13,7 @@
 <url><loc>/reference/blockr_ser.html</loc></url>
 <url><loc>/reference/board_server.html</loc></url>
 <url><loc>/reference/board_ui.html</loc></url>
+<url><loc>/reference/edit_block.html</loc></url>
 <url><loc>/reference/gen_code.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/new_block.html</loc></url>
@@ -23,6 +24,7 @@
 <url><loc>/reference/new_head_block.html</loc></url>
 <url><loc>/reference/new_link.html</loc></url>
 <url><loc>/reference/new_merge_block.html</loc></url>
+<url><loc>/reference/new_plugin.html</loc></url>
 <url><loc>/reference/new_rbind_block.html</loc></url>
 <url><loc>/reference/new_scatter_block.html</loc></url>
 <url><loc>/reference/new_stack.html</loc></url>

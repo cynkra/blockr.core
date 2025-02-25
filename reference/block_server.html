@@ -47,7 +47,14 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">block_server</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'block'</span></span>
-<span><span class="fu">block_server</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">block_server</span><span class="op">(</span></span>
+<span>  <span class="va">id</span>,</span>
+<span>  <span class="va">x</span>,</span>
+<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  edit_block <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  update <span class="op">=</span> <span class="fu">reactiveVal</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">expr_server</span><span class="op">(</span><span class="va">x</span>, <span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -81,6 +88,14 @@
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Generic consistency</p></dd>
+
+
+<dt id="arg-edit-block">edit_block<a class="anchor" aria-label="anchor" href="#arg-edit-block"></a></dt>
+<dd><p>Block edit plugin</p></dd>
+
+
+<dt id="arg-update">update<a class="anchor" aria-label="anchor" href="#arg-update"></a></dt>
+<dd><p>Reactive value object to initiate board updates</p></dd>
 
 
 <dt id="arg-expr">expr<a class="anchor" aria-label="anchor" href="#arg-expr"></a></dt>

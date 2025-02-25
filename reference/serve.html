@@ -48,7 +48,9 @@
 <span><span class="fu">serve</span><span class="op">(</span><span class="va">x</span>, id <span class="op">=</span> <span class="st">"block"</span>, <span class="va">...</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'board'</span></span>
-<span><span class="fu">serve</span><span class="op">(</span><span class="va">x</span>, id <span class="op">=</span> <span class="fu"><a href="rand_names.html">rand_names</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">serve</span><span class="op">(</span><span class="va">x</span>, id <span class="op">=</span> <span class="fu"><a href="rand_names.html">rand_names</a></span><span class="op">(</span><span class="op">)</span>, plugins <span class="op">=</span> <span class="fu">borad_plugins</span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">borad_plugins</span><span class="op">(</span>which <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">serve</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -71,6 +73,14 @@
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>Data inputs</p></dd>
+
+
+<dt id="arg-plugins">plugins<a class="anchor" aria-label="anchor" href="#arg-plugins"></a></dt>
+<dd><p>Board plugins</p></dd>
+
+
+<dt id="arg-which">which<a class="anchor" aria-label="anchor" href="#arg-which"></a></dt>
+<dd><p>(Optional) character vectors of plugins to include</p></dd>
 
 </dl></div>
 
