@@ -31,7 +31,7 @@ block_output(x, result, session)
 
 \method{block_output}{block}(x, result, session)
 
-\method{block_ui}{board}(id, x, blocks = NULL, ...)
+\method{block_ui}{board}(id, x, blocks = NULL, edit_ui = NULL, ...)
 
 \method{block_output}{data_block}(x, result, session)
 
@@ -61,6 +61,8 @@ block_output(x, result, session)
 \item{session}{Shiny session object}
 
 \item{blocks}{(Additional) blocks (or IDs) for which to generate the UI}
+
+\item{edit_ui}{Block edit plugin}
 }
 \description{
 Generics for creating fields and block UI containers.

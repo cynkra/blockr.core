@@ -39,8 +39,8 @@ new_block(
   ctor,
   ctor_pkg,
   dat_valid = NULL,
-  name = NULL,
   allow_empty_state = FALSE,
+  name = NULL,
   ...
 )
 
@@ -109,10 +109,10 @@ new_transform_block(server, ui, class, ctor = sys.parent(), ...)
 
 \item{dat_valid}{(Optioanl) input data validator}
 
-\item{name}{Block name}
-
 \item{allow_empty_state}{Either \code{TRUE}, \code{FALSE} or a character vector of
 \code{state} values that may be empty while still moving forward with block eval}
+
+\item{name}{Block name}
 
 \item{...}{Further (metadata) attributes}
 

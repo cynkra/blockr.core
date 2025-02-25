@@ -4,6 +4,7 @@
 #'
 #' @param id Namespace ID
 #' @param rv Reactive values object
+#' @param update Reactive value object to initiate board updates
 #' @param ... Extra arguments passed from parent scope
 #'
 #' @return A [shiny::reactiveValues()] object with components `add` and `rm`,
@@ -12,12 +13,10 @@
 #'
 #' @rdname add_rm_block
 #' @export
-add_rm_block_server <- function(id, rv, ...) {
+add_rm_block_server <- function(id, rv, update, ...) {
   moduleServer(
     id,
     function(input, output, session) {
-
-      res <- reactiveValues(add = NULL, rm = NULL)
 
       observeEvent(
         input$add_block,
@@ -60,8 +59,12 @@ add_rm_block_server <- function(id, rv, ...) {
             return()
           }
 
-          res$add <- as_blocks(
+          add <- as_blocks(
             set_names(list(create_block(sel)), bid)
+          )
+
+          update(
+            list(blocks = list(add = add))
           )
 
           removeModal()
@@ -70,10 +73,7 @@ add_rm_block_server <- function(id, rv, ...) {
 
       observeEvent(
         input$cancel_add,
-        {
-          res$add <- NULL
-          removeModal()
-        }
+        removeModal()
       )
 
       observeEvent(
@@ -106,20 +106,20 @@ add_rm_block_server <- function(id, rv, ...) {
             return()
           }
 
-          res$rm <- sel
+          update(
+            list(blocks = list(rm = sel))
+          )
+
           removeModal()
         }
       )
 
       observeEvent(
         input$cancel_rm,
-        {
-          res$rm <- NULL
-          removeModal()
-        }
+        removeModal()
       )
 
-      res
+      NULL
     }
   )
 }
@@ -183,91 +183,4 @@ rm_block_modal <- function(ns, board) {
       )
     )
   )
-}
-
-check_add_rm_block_val <- function(val, rv) {
-  observeEvent(
-    TRUE,
-    {
-      if (!is.reactivevalues(val)) {
-        abort(
-          "Expecting `manage_blocks` to return a `reactivevalues` object.",
-          class = "manage_blocks_return_invalid"
-        )
-      }
-
-      if (!setequal(names(val), c("add", "rm"))) {
-        abort(
-          paste(
-            "Expecting the `manage_blocks` return value to contain",
-            "components `add` and `rm`."
-          ),
-          class = "manage_blocks_return_invalid"
-        )
-      }
-    },
-    once = TRUE
-  )
-
-  observeEvent(
-    val$add,
-    {
-      if (!is_blocks(val$add)) {
-        abort(
-          paste(
-            "Expecting the `add` component of the `manage_blocks` return",
-            "value to be `NULL` or a `blocks` object."
-          ),
-          class = "manage_blocks_return_invalid"
-        )
-      }
-    },
-    once = TRUE,
-    priority = 2
-  )
-
-  observeEvent(
-    val$add,
-    {
-      if (any(names(val$add) %in% board_block_ids(rv$board))) {
-        abort(
-          "Expecting the newly added block to have a unique ID.",
-          class = "manage_blocks_return_invalid"
-        )
-      }
-    },
-    priority = 1
-  )
-
-  observeEvent(
-    val$rm,
-    {
-      if (!is.character(val$rm)) {
-        abort(
-          paste(
-            "Expecting the `rm` component of the `manage_blocks` return",
-            "value to be `NULL` or a character vector."
-          ),
-          class = "manage_blocks_return_invalid"
-        )
-      }
-    },
-    once = TRUE,
-    priority = 2
-  )
-
-  observeEvent(
-    val$rm,
-    {
-      if (all(!val$rm %in% board_block_ids(rv$board))) {
-        abort(
-          "Expecting the removed block to be specified by a known ID.",
-          class = "manage_blocks_return_invalid"
-        )
-      }
-    },
-    priority = 1
-  )
-
-  val
 }

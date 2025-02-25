@@ -16,32 +16,25 @@ board_ui <- function(id, x, ...) {
 #' @export
 board_ui.board <- function(id, x, plugins = list(), ...) {
 
-  validate_plugins(plugins)
+  plugins <- as_plugins(plugins)
 
-  ser_deser <- get_plugin("preserve_board", plugins)
-  add_rm_block <- get_plugin("manage_blocks", plugins)
-  add_rm_link <- get_plugin("manage_links", plugins)
-  add_rm_stack <- get_plugin("manage_stacks", plugins)
-  block_notifications <- get_plugin("notify_user", plugins)
-  gen_code <- get_plugin("generate_code", plugins)
+  toolbar_plugins <- c("preserve_board", "manage_blocks", "manage_links",
+                       "manage_stacks", "generate_code")
 
-  ns <- NS(id)
+  toolbar_plugins <- plugins[intersect(toolbar_plugins, names(plugins))]
 
-  toolbar_args <- list(
-    if (length(ser_deser)) ser_deser(ns("preserve_board"), x),
-    if (length(add_rm_block)) add_rm_block(ns("manage_blocks"), x),
-    if (length(add_rm_link)) add_rm_link(ns("manage_links"), x),
-    if (length(add_rm_stack)) add_rm_stack(ns("manage_stacks"), x),
-    if (length(gen_code)) gen_code(ns("generate_code"), x),
-    board_ui(id, board_options(x))
+  toolbar_ui <- do.call(
+    tagList,
+    list(
+      board_ui(id, toolbar_plugins, x),
+      board_ui(id, board_options(x))
+    )
   )
 
-  toolbar_args <- do.call(tagList, toolbar_args)
-
-  if (length(block_notifications)) {
-    block_notifications <- block_notifications(ns("notify_user"), x)
+  if ("edit_block" %in% names(plugins)) {
+    block_plugin <- plugins[["edit_block"]]
   } else {
-    block_notifications <- tagList()
+    block_plugin <- NULL
   }
 
   tagList(
@@ -53,41 +46,50 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
           "bg-light-subtle sticky-top border rounded-4",
           "m-2 gap-5 p-2"
         ),
-        toolbar_args
+        toolbar_ui
       )
     ),
-    do.call(div, block_notifications),
+    if ("notify_user" %in% names(plugins)) {
+      div(board_ui(id, plugins[["notify_user"]], x))
+    },
     div(
       id = paste0(id, "_board"),
-      do.call(div, c(id = paste0(id, "_blocks"), block_ui(id, x)))
+      do.call(
+        div,
+        c(
+          id = paste0(id, "_blocks"),
+          block_ui(id, x, edit_ui = block_plugin)
+        )
+      )
     )
   )
 }
 
+#' @rdname board_ui
+#' @export
+board_ui.NULL <- function(id, x, ...) NULL
+
 #' @param blocks (Additional) blocks (or IDs) for which to generate the UI
+#' @param edit_ui Block edit plugin
 #' @rdname block_ui
 #' @export
-block_ui.board <- function(id, x, blocks = NULL, ...) {
+block_ui.board <- function(id, x, blocks = NULL, edit_ui = NULL, ...) {
 
-  block_card <- function(x, id, ns) {
+  block_card <- function(x, block_id, board_ns, card_elems) {
 
-    blk_id <- ns(id)
-    blk_ns <- NS(blk_id)
+    blk_id <- board_ns(block_id)
 
     bslib::card(
-      id = paste0(id, "_block"),
-      bslib::card_header(
-        bslib::popover(
-          uiOutput(blk_ns("block_name_out"), inline = TRUE),
-          title = "Provide a new block name",
-          textInput(blk_ns("block_name_in"), NULL)
+      id = paste0(block_id, "_block"),
+      card_elems(
+        x,
+        NS(blk_id, "edit_block"),
+        bslib::card_body(
+          expr_ui(blk_id, x)
+        ),
+        bslib::card_body(
+          block_ui(blk_id, x)
         )
-      ),
-      bslib::card_body(
-        expr_ui(blk_id, x)
-      ),
-      bslib::card_body(
-        block_ui(blk_id, x)
       )
     )
   }
@@ -102,8 +104,24 @@ block_ui.board <- function(id, x, blocks = NULL, ...) {
 
   stopifnot(is_blocks(blocks))
 
+  if (is.null(edit_ui)) {
+    edit_ui <- function(x, id, ...) {
+      tagList(
+        bslib::card_header(block_name(x)),
+        ...
+      )
+    }
+  } else {
+    edit_ui <- get_plugin_ui(edit_ui)
+  }
+
+  args <- list(
+    board_ns = NS(id),
+    card_elems = edit_ui
+  )
+
   tagList(
-    map(block_card, blocks, names(blocks), MoreArgs = list(ns = NS(id)))
+    map(block_card, blocks, names(blocks), MoreArgs = args)
   )
 }
 
@@ -123,7 +141,7 @@ insert_block_ui.board <- function(id, x, blocks = NULL, ...) {
   insertUI(
     paste0("#", id, "_blocks"),
     "beforeEnd",
-    block_ui(id, x, blocks),
+    block_ui(id, x, blocks, ...),
     immediate = TRUE
   )
 }

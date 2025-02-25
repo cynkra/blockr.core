@@ -58,7 +58,12 @@ test_that("ser/deser board", {
       ser_deser <- session$makeScope("preserve_board")
       file.copy(ser_deser$output$serialize, temp)
     },
-    args = list(x = board, plugins = list(preserve_board = ser_deser_server))
+    args = list(
+      x = board,
+      plugins = list(
+        preserve_board(server = ser_deser_server, ui = ser_deser_ui)
+      )
+    )
   )
 
   testServer(
@@ -77,7 +82,9 @@ test_that("ser/deser board", {
     },
     args = list(
       x = new_board(),
-      plugins = list(preserve_board = ser_deser_server)
+      plugins = list(
+        preserve_board(server = ser_deser_server, ui = ser_deser_ui)
+      )
     )
   )
 })
