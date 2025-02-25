@@ -9,3 +9,14 @@ reorder_rv <- function(x, new) {
 
   invisible(x)
 }
+
+make_read_only <- function(x) {
+
+  stopifnot(is.reactivevalues(x))
+
+  res <- unclass(x)
+  res[["readonly"]] <- TRUE
+  class(res) <- class(x)
+
+  res
+}
