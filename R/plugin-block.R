@@ -35,6 +35,11 @@ edit_block_server <- function(id, x, res, block_id, update, ...) {
 
       output$block_summary <- renderText(block_summary(x, res()))
 
+      observeEvent(
+        input$rm_block,
+        update(list(blocks = list(rm = block_id)))
+      )
+
       list(
         name = curr_block_name
       )
@@ -49,7 +54,16 @@ edit_block_ui <- function(x, id, ...) {
   opts <- bslib::popover(
     title = "Block options",
     bsicons::bs_icon("gear"),
-    textInput(NS(id, "block_name_in"), "Block name"),
+    textInput(
+      NS(id, "block_name_in"),
+      "Block name"
+    ),
+    actionButton(
+      NS(id, "rm_block"),
+      "Remove block",
+      icon = icon("circle-minus"),
+      class = "btn-danger"
+    )
   )
 
   tagList(
