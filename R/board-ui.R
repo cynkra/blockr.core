@@ -16,30 +16,25 @@ board_ui <- function(id, x, ...) {
 #' @export
 board_ui.board <- function(id, x, plugins = list(), ...) {
 
-  ser_deser <- get_plugin_ui("preserve_board", plugins)
-  add_rm_block <- get_plugin_ui("manage_blocks", plugins)
-  add_rm_link <- get_plugin_ui("manage_links", plugins)
-  add_rm_stack <- get_plugin_ui("manage_stacks", plugins)
-  block_notifications <- get_plugin_ui("notify_user", plugins)
-  gen_code <- get_plugin_ui("generate_code", plugins)
+  plugins <- as_plugins(plugins)
 
-  ns <- NS(id)
+  toolbar_plugins <- c("preserve_board", "manage_blocks", "manage_links",
+                       "manage_stacks", "generate_code")
 
-  toolbar_args <- list(
-    if (length(ser_deser)) ser_deser(ns("preserve_board"), x),
-    if (length(add_rm_block)) add_rm_block(ns("manage_blocks"), x),
-    if (length(add_rm_link)) add_rm_link(ns("manage_links"), x),
-    if (length(add_rm_stack)) add_rm_stack(ns("manage_stacks"), x),
-    if (length(gen_code)) gen_code(ns("generate_code"), x),
-    board_ui(id, board_options(x))
+  toolbar_plugins <- plugins[intersect(toolbar_plugins, names(plugins))]
+
+  toolbar_ui <- do.call(
+    tagList,
+    list(
+      board_ui(id, toolbar_plugins, x),
+      board_ui(id, board_options(x))
+    )
   )
 
-  toolbar_args <- do.call(tagList, toolbar_args)
-
-  if (length(block_notifications)) {
-    block_notifications <- block_notifications(ns("notify_user"), x)
+  if ("edit_block" %in% names(plugins)) {
+    block_plugin <- plugins[["edit_block"]]
   } else {
-    block_notifications <- tagList()
+    block_plugin <- NULL
   }
 
   tagList(
@@ -51,22 +46,28 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
           "bg-light-subtle sticky-top border rounded-4",
           "m-2 gap-5 p-2"
         ),
-        toolbar_args
+        toolbar_ui
       )
     ),
-    do.call(div, block_notifications),
+    if ("notify_user" %in% names(plugins)) {
+      div(board_ui(id, plugins[["notify_user"]], x))
+    },
     div(
       id = paste0(id, "_board"),
       do.call(
         div,
         c(
           id = paste0(id, "_blocks"),
-          block_ui(id, x, edit_ui = get_plugin("edit_block", plugins))
+          block_ui(id, x, edit_ui = block_plugin)
         )
       )
     )
   )
 }
+
+#' @rdname board_ui
+#' @export
+board_ui.NULL <- function(id, x, ...) NULL
 
 #' @param blocks (Additional) blocks (or IDs) for which to generate the UI
 #' @param edit_ui Block edit plugin

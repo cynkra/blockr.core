@@ -3,6 +3,10 @@
 \name{new_plugin}
 \alias{new_plugin}
 \alias{is_plugin}
+\alias{as_plugin}
+\alias{as_plugin.plugin}
+\alias{as_plugin.list}
+\alias{as_plugin.plugins}
 \alias{preserve_board}
 \alias{manage_blocks}
 \alias{manage_links}
@@ -10,6 +14,13 @@
 \alias{notify_user}
 \alias{generate_code}
 \alias{edit_block}
+\alias{plugins}
+\alias{is_plugins}
+\alias{as_plugins}
+\alias{as_plugins.plugins}
+\alias{as_plugins.list}
+\alias{as_plugins.plugin}
+\alias{validate_plugins}
 \title{Board plugin}
 \usage{
 new_plugin(
@@ -20,6 +31,14 @@ new_plugin(
 )
 
 is_plugin(x)
+
+as_plugin(x)
+
+\method{as_plugin}{plugin}(x)
+
+\method{as_plugin}{list}(x)
+
+\method{as_plugin}{plugins}(x)
 
 preserve_board(server, ui)
 
@@ -34,6 +53,20 @@ notify_user(server, ui = NULL)
 generate_code(server, ui)
 
 edit_block(server, ui)
+
+plugins(...)
+
+is_plugins(x)
+
+as_plugins(x)
+
+\method{as_plugins}{plugins}(x)
+
+\method{as_plugins}{list}(x)
+
+\method{as_plugins}{plugin}(x)
+
+validate_plugins(x)
 }
 \arguments{
 \item{server, ui}{Server/UI for the plugin module}
@@ -43,6 +76,8 @@ edit_block(server, ui)
 \item{class}{Plugin subclass}
 
 \item{x}{Plugin object}
+
+\item{...}{Plugin objects}
 }
 \description{
 Plugins are used to customize/enhance UX aspects of the board bodule.

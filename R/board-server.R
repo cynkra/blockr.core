@@ -19,6 +19,8 @@ board_server <- function(id, x, ...) {
 board_server.board <- function(id, x, plugins = list(), callbacks = list(),
                                ...) {
 
+  plugins <- as_plugins(plugins)
+
   if (is.function(callbacks)) {
     callbacks <- list(callbacks)
   }
