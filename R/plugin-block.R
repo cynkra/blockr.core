@@ -6,6 +6,7 @@
 #' @param x Static block
 #' @param res Reactive result
 #' @param block_id Block ID
+#' @param board Reactive values object containing board information
 #' @param update Reactive value object to initiate board updates
 #' @param ... Extra arguments passed from parent scope
 #'
@@ -14,7 +15,7 @@
 #'
 #' @rdname edit_block
 #' @export
-edit_block_server <- function(id, x, res, block_id, update, ...) {
+edit_block_server <- function(id, x, res, block_id, board, update, ...) {
   moduleServer(
     id,
     function(input, output, session) {

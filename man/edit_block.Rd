@@ -7,7 +7,7 @@
 \alias{block_summary.block}
 \title{Edit block module}
 \usage{
-edit_block_server(id, x, res, block_id, update, ...)
+edit_block_server(id, x, res, block_id, board, update, ...)
 
 edit_block_ui(x, id, ...)
 
@@ -23,6 +23,8 @@ block_summary(x, data)
 \item{res}{Reactive result}
 
 \item{block_id}{Block ID}
+
+\item{board}{Reactive values object containing board information}
 
 \item{update}{Reactive value object to initiate board updates}
 

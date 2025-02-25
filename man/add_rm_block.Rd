@@ -5,20 +5,18 @@
 \alias{add_rm_block_ui}
 \title{Add/remove block module}
 \usage{
-add_rm_block_server(id, rv, update, ...)
+add_rm_block_server(id, board, update, ...)
 
 add_rm_block_ui(id, board)
 }
 \arguments{
 \item{id}{Namespace ID}
 
-\item{rv}{Reactive values object}
+\item{board}{The initial \code{board} object}
 
 \item{update}{Reactive value object to initiate board updates}
 
 \item{...}{Extra arguments passed from parent scope}
-
-\item{board}{The initial \code{board} object}
 }
 \value{
 A \code{\link[shiny:reactiveValues]{shiny::reactiveValues()}} object with components \code{add} and \code{rm},

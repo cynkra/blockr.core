@@ -4,7 +4,7 @@
 #' the board.
 #'
 #' @param id Namespace ID
-#' @param rv Reactive values object
+#' @param board Reactive values object
 #' @param update Reactive value object to initiate board updates
 #' @param ... Extra arguments passed from parent scope
 #'
@@ -14,21 +14,21 @@
 #'
 #' @rdname add_rm_stack
 #' @export
-add_rm_stack_server <- function(id, rv, update, ...) {
+add_rm_stack_server <- function(id, board, update, ...) {
   moduleServer(
     id,
     function(input, output, session) {
 
       observeEvent(
         TRUE,
-        setup_stack_div(rv$board_id),
+        setup_stack_div(board$board_id),
         once = TRUE
       )
 
       observeEvent(
-        chr_ply(board_stacks(rv$board), stack_name),
+        chr_ply(board_stacks(board$board), stack_name),
         {
-          stcks <- board_stacks(rv$board)
+          stcks <- board_stacks(board$board)
           map(
             assign_output,
             paste0(names(stcks), "_name_out"),
@@ -38,7 +38,7 @@ add_rm_stack_server <- function(id, rv, update, ...) {
         }
       )
 
-      move_blocks_observer(rv, session)
+      move_blocks_observer(board, session)
 
       observeEvent(
         input$stacks_mod,
@@ -48,36 +48,36 @@ add_rm_stack_server <- function(id, rv, update, ...) {
       upd <- reactiveValues(
         add = stacks(),
         rm = character(),
-        curr = isolate(board_stacks(rv$board)),
+        curr = isolate(board_stacks(board$board)),
         obs = list(),
         edit = NULL
       )
 
       observeEvent(
-        board_stacks(rv$board),
+        board_stacks(board$board),
         {
-          upd$curr <- board_stacks(rv$board)
+          upd$curr <- board_stacks(board$board)
         }
       )
 
       output$stacks_dt <- DT::renderDataTable(
-        stack_dt(isolate(upd$curr), session$ns, isolate(rv$board)),
+        stack_dt(isolate(upd$curr), session$ns, isolate(board$board)),
         server = TRUE
       )
 
       stacks_proxy <- DT::dataTableProxy("stacks_dt", session)
 
-      create_stack_obs_observer(input, rv, upd, session, stacks_proxy)
+      create_stack_obs_observer(input, board, upd, session, stacks_proxy)
 
-      edit_stack_observer(upd, rv)
+      edit_stack_observer(upd, board)
 
-      add_stack_observer(input, rv, upd, session)
+      add_stack_observer(input, board, upd, session)
 
-      rm_stack_observer(input, rv, upd, session)
+      rm_stack_observer(input, board, upd, session)
 
-      cancel_stack_observer(input, rv, upd, session)
+      cancel_stack_observer(input, board, upd, session)
 
-      modify_stack_observer(input, rv, upd, session, stacks_proxy, update)
+      modify_stack_observer(input, board, upd, session, stacks_proxy, update)
 
       NULL
     }

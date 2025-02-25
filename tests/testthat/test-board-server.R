@@ -81,8 +81,8 @@ test_that("board server", {
     },
     args = list(
       x = empty,
-      callbacks = function(rv, ...) {
-        expect_length(board_blocks(rv$board), 0L)
+      callbacks = function(board, ...) {
+        expect_length(board_blocks(board$board), 0L)
         NULL
       }
     )
@@ -113,7 +113,7 @@ test_that("board server", {
     session$flushReact(),
     args = list(
       board = empty,
-      plugin_a = function(id, rv, update, parent) {
+      plugin_a = function(id, board, update, parent) {
         moduleServer(
           id,
           function(input, output, session) {
@@ -122,7 +122,7 @@ test_that("board server", {
           }
         )
       },
-      plugin_b = function(id, rv, update, parent) {
+      plugin_b = function(id, board, update, parent) {
         moduleServer(
           id,
           function(input, output, session) {
@@ -147,13 +147,13 @@ test_that("board server", {
       x = empty,
       plugins = list(
         preserve_board(
-          function(id, rv, ...) {
+          function(id, board, ...) {
             moduleServer(
               id,
               function(input, output, session) {
                 observeEvent(
-                  rv$abc,
-                  expect_identical(rv$abc, 1L)
+                  board$abc,
+                  expect_identical(board$abc, 1L)
                 )
                 reactiveVal()
               }
@@ -177,7 +177,7 @@ test_that("board server", {
     session$flushReact(),
     args = list(
       board = empty,
-      plugin = function(id, rv, ...) {
+      plugin = function(id, board, ...) {
         moduleServer(
           id,
           function(input, output, session) {
@@ -186,7 +186,7 @@ test_that("board server", {
               {
                 expect_error(
                   {
-                    rv$abc <- 1
+                    board$abc <- 1
                   }
                 )
               },
