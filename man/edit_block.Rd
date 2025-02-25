@@ -3,11 +3,17 @@
 \name{edit_block_server}
 \alias{edit_block_server}
 \alias{edit_block_ui}
+\alias{block_summary}
+\alias{block_summary.block}
 \title{Edit block module}
 \usage{
-edit_block_server(id, x, res, ...)
+edit_block_server(id, x, res, block_id, update, ...)
 
 edit_block_ui(x, id, ...)
+
+block_summary(x, data)
+
+\method{block_summary}{block}(x, data)
 }
 \arguments{
 \item{id}{Namespace ID}
@@ -16,7 +22,13 @@ edit_block_ui(x, id, ...)
 
 \item{res}{Reactive result}
 
+\item{block_id}{Block ID}
+
+\item{update}{Reactive value object to initiate board updates}
+
 \item{...}{Extra arguments passed from parent scope}
+
+\item{data}{Result data}
 }
 \value{
 A list of \code{\link[shiny:reactiveVal]{shiny::reactiveVal()}} objects interpreted as block state

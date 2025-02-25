@@ -5,6 +5,8 @@
 #' @param id Namespace ID
 #' @param x Static block
 #' @param res Reactive result
+#' @param block_id Block ID
+#' @param update Reactive value object to initiate board updates
 #' @param ... Extra arguments passed from parent scope
 #'
 #' @return A list of [shiny::reactiveVal()] objects interpreted as block state
@@ -12,7 +14,7 @@
 #'
 #' @rdname edit_block
 #' @export
-edit_block_server <- function(id, x, res, ...) {
+edit_block_server <- function(id, x, res, block_id, update, ...) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -27,12 +29,11 @@ edit_block_server <- function(id, x, res, ...) {
         }
       )
 
-      output$block_name_out <- renderUI({
-        list(
-          bslib::tooltip(curr_block_name(), paste("Block ID: ", id)),
-          bsicons::bs_icon("pencil-square")
-        )
-      })
+      output$block_name_out <- renderUI(
+        bslib::tooltip(curr_block_name(), paste("Block ID: ", block_id))
+      )
+
+      output$block_summary <- renderText(block_summary(x, res()))
 
       list(
         name = curr_block_name
@@ -45,16 +46,37 @@ edit_block_server <- function(id, x, res, ...) {
 #' @export
 edit_block_ui <- function(x, id, ...) {
 
+  opts <- bslib::popover(
+    title = "Block options",
+    bsicons::bs_icon("gear"),
+    textInput(NS(id, "block_name_in"), "Block name"),
+  )
+
   tagList(
     bslib::card_header(
-      bslib::popover(
-        uiOutput(NS(id, "block_name_out"), inline = TRUE),
-        title = "Provide a new block name",
-        textInput(NS(id, "block_name_in"), NULL)
-      )
+      class = "d-flex justify-content-between",
+      uiOutput(NS(id, "block_name_out"), inline = TRUE),
+      opts
     ),
-    ...
+    ...,
+    bslib::card_footer(
+      class = "text-center",
+      uiOutput(NS(id, "block_summary"), inline = TRUE)
+    )
   )
+}
+
+#' @param data Result data
+#' @rdname edit_block
+#' @export
+block_summary <- function(x, data) {
+  UseMethod("block_summary")
+}
+
+#' @rdname edit_block
+#' @export
+block_summary.block <- function(x, data) {
+  paste0("&lt;", type_desc(data), "[", dim_desc(data), "]&gt;")
 }
 
 check_edit_block_val <- function(val) {
@@ -90,4 +112,35 @@ check_edit_block_val <- function(val) {
   )
 
   val
+}
+
+type_desc <- function(x) {
+ if (is.object(x)) {
+    class(x)[[1]]
+  } else if (rlang::is_vector(x)) {
+    typeof(x)
+  }
+}
+
+dim_desc <- function(x) {
+  dim <- coal(dim(x), vec_size(x))
+  format_dim <- big_mark(dim)
+  format_dim[is.na(dim)] <- "??"
+  paste0(format_dim, collapse = paste0(" &#10005; "))
+}
+
+big_mark <- function(x) {
+
+  if (identical(getOption("OutDec"), ",")) {
+    mark <- "."
+  } else {
+    mark <- ","
+  }
+
+  ret <- formatC(x, big.mark = mark, format = "d",
+                 preserve.width = "individual")
+
+  ret[is.na(x)] <- "??"
+
+  ret
 }

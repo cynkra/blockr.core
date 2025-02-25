@@ -85,9 +85,7 @@ block_ui.board <- function(id, x, blocks = NULL, edit_ui = NULL, ...) {
         x,
         NS(blk_id, "edit_block"),
         bslib::card_body(
-          expr_ui(blk_id, x)
-        ),
-        bslib::card_body(
+          expr_ui(blk_id, x),
           block_ui(blk_id, x)
         )
       )
