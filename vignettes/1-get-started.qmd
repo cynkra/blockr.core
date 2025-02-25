@@ -1,0 +1,75 @@
+---
+title: "1. Getting started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{1. Getting started}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(blockr.core)
+```
+
+## Get started
+
+Spin up an app with a single block:
+
+```{r eval = FALSE}
+serve(new_dataset_block("iris"))
+```
+
+For a block that requires input, additionally pass static data:
+
+```{r, eval = FALSE}
+serve(
+  new_merge_block(by = "name"),
+  data = list(x = datasets::BOD, y = datasets::ChickWeight)
+)
+```
+
+Use the board object to manage and spin up an app with multiple blocks (more on boards, links, and stacks, later):
+
+```{r simple-board, eval = FALSE}
+serve(
+  new_board(
+    blocks = c(
+      a = new_dataset_block("BOD"),
+      b = new_dataset_block("ChickWeight"),
+      c = new_merge_block("Time")
+    ),
+    links = c(
+      ac = new_link("a", "c", "x"),
+      bc = new_link("b", "c", "y")
+    ),
+    stacks = list(ac = c("a", "c"))
+  )
+)
+```
+
+```{r shinylive_url, echo = FALSE, results = 'asis'}
+# extract the code from knitr code chunks by ID
+code <- paste0(
+  c(
+    "webr::install(\"blockr.core\", repos = \"https://cynkra.github.io/blockr.webR/\")",
+    "library(blockr.core)",
+    "library(bsicons)",
+    knitr::knit_code$get("simple-board")
+  ),
+  collapse = "\n"
+)
+
+url <- roxy.shinylive::create_shinylive_url(code)
+cat(sprintf("[Open in Shinylive](%s)\n\n", url))
+```
+
+```{r shinylive_iframe, echo = FALSE, out.width = '150%', out.extra = 'style = "position: relative; z-index:1"', eval = knitr::is_html_output()}
+knitr::include_url(url, height = "800px")
+```

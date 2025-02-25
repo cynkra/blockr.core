@@ -10,9 +10,26 @@
 [![coverage](https://codecov.io/gh/cynkra/blockr.core/graph/badge.svg?token=VoOPRU65KA)](https://codecov.io/gh/cynkra/blockr.core)
 <!-- badges: end -->
 
-Designed to democratize data analysis, `blockr.core` provides a
-flexible, intuitive, and **code-free** approach to building data
-pipelines.
+## Overview
+
+blockr is a framework for data analysis, using a web-based point and
+click user interface. Use blockr to create web apps that perform visual
+programming, leveraging the power of R.
+
+## What is a block?
+
+A block is a fundamental unit of a data analysis workflow. A single
+block performs a single tasks, such as loading or filtering or
+visualisation. Blocks can be joined together using a DAG to create
+powerful data workflows.
+
+## What is blockr.core
+
+`blockr.core` is the entry point to blockr, providing the core
+functionality needed to get started. It can be run as a stand-alone app,
+but is designed with extensibility in mind. A rich API is provided to
+connect your own blocks and override the default behaviours (e.g., you
+can add your own GUI layer or seralisation).
 
 ## Installation
 
@@ -20,48 +37,10 @@ You can install the development version of blockr.core from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("cynkra/blockr.core")
+pak::pak("cynkra/blockr.core")
 ```
 
-## Example
-
-A single block server instance can be spun up as
-
-``` r
-library(blockr.core)
-serve(new_dataset_block("iris"))
-```
-
-or for a block that requires input, by additionally passing static data
-such as
-
-``` r
-serve(
-  new_merge_block(by = "name"),
-  data = list(x = datasets::BOD, y = datasets::ChickWeight)
-)
-```
-
-If previewing multiple connected block is desired, a board can be
-created and passed to `serve()`, e.g.
-
-``` r
-serve(
-  new_board(
-    blocks = c(
-      a = new_dataset_block("BOD"),
-      b = new_dataset_block("ChickWeight"),
-      c = new_merge_block("Time")
-    ),
-    links = c(
-      ac = new_link("a", "c", "x"),
-      bc = new_link("b", "c", "y")
-    ),
-    stacks = list(ac = c("a", "c"))
-  )
-)
-```
+# OLD README —
 
 ## How to create a block
 
@@ -138,9 +117,10 @@ function(id) {
 Putting this together, a dataset block could be constructed as
 
 ``` r
-new_dataset_block <- function(dataset = character(), package = "datasets",
-                              ...) {
-
+new_dataset_block <- function(
+    dataset = character(),
+    package = "datasets",
+    ...) {
   envir <- as.environment(paste0("package:", package))
 
   choices <- ls(envir = envir)
@@ -153,7 +133,6 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
       moduleServer(
         id,
         function(input, output, session) {
-
           dat <- reactiveVal(dataset)
 
           observeEvent(input$dataset, dat(input$dataset))
@@ -215,13 +194,11 @@ Another example is a `utils::head()` block, such as the one offered as
 
 ``` r
 new_head_block <- function(n = 6L, ...) {
-
   new_transform_block(
     function(id, data) {
       moduleServer(
         id,
         function(input, output, session) {
-
           n_rows <- reactiveVal(n)
 
           observeEvent(input$n, n_rows(input$n))
