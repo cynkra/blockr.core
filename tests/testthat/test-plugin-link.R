@@ -13,7 +13,8 @@ test_that("add/rm links", {
       expect_identical(upd$add, links())
       expect_identical(upd$rm, character())
       expect_null(upd$edit)
-      expect_identical(res(), list(add = NULL, rm = NULL))
+
+      expect_identical(session$returned(), list(add = NULL, rm = NULL))
 
       session$setInputs(add_link = 1)
 
@@ -48,7 +49,7 @@ test_that("add/rm links", {
       session$setInputs(modify_links = 1)
 
       expect_identical(
-        res(),
+        session$returned(),
         list(
           add = as_links(set_names(list(new_link("a", "b", "data")), lnk)),
           rm = character()
@@ -73,11 +74,11 @@ test_that("add/rm links", {
       expect_named(upd$obs, "ac")
       expect_type(upd$obs, "list")
 
-      expect_length(upd$obs[["ac"]], 4L)
-      expect_named(upd$obs[["ac"]], c("id", "from", "to", "input"))
+      expect_length(upd$obs[["ac"]], 3L)
+      expect_named(upd$obs[["ac"]], c("from", "to", "input"))
       expect_type(upd$obs[["ac"]], "list")
 
-      for (i in c("id", "from", "to", "input")) {
+      for (i in c("from", "to", "input")) {
         expect_s3_class(upd$obs[["ac"]][[i]], "Observer")
       }
 
@@ -125,14 +126,14 @@ test_that("add/rm links", {
 
       expect_identical(upd$rm, character())
 
-      session$setInputs(links_rows_selected = 1, rm_link = 1)
+      session$setInputs(links_dt_rows_selected = 1, rm_link = 1)
 
       expect_identical(upd$rm, "aa")
 
       session$setInputs(modify_links = 1)
 
       expect_identical(
-        res(),
+        session$returned(),
         list(add = links(), rm = "aa")
       )
 
@@ -144,7 +145,7 @@ test_that("add/rm links", {
   )
 })
 
-test_that("add/rm links retun validation", {
+test_that("add/rm links return validation", {
 
   with_mock_session(
     {
@@ -174,7 +175,10 @@ test_that("add/rm links retun validation", {
       val(list(add = NULL, rm = "bc"))
 
       sink_msg(
-        expect_warning(session$flushReact(), "Error in observe")
+        expect_warning(
+          session$flushReact(),
+          "Expecting all link IDs to be removed to be known"
+        )
       )
     }
   )
@@ -183,7 +187,10 @@ test_that("add/rm links retun validation", {
     {
       check_add_rm_link_val(list(), list())
       sink_msg(
-        expect_warning(session$flushReact(), "Error in observe")
+        expect_warning(
+          session$flushReact(),
+          "Expecting `manage_links` to return a reactive value"
+        )
       )
     }
   )
@@ -192,7 +199,13 @@ test_that("add/rm links retun validation", {
     {
       check_add_rm_link_val(reactiveVal(1), list())
       sink_msg(
-        expect_warning(session$flushReact(), "Error in observe")
+        expect_warning(
+          session$flushReact(),
+          paste(
+            "Expecting the `manage_links` return value to evaluate to a list",
+            "with components `add` and `rm`"
+          )
+        )
       )
     }
   )
@@ -201,7 +214,13 @@ test_that("add/rm links retun validation", {
     {
       check_add_rm_link_val(reactiveVal(list(add = 1, rm = NULL)), list())
       sink_msg(
-        expect_warning(session$flushReact(), "Error in observe")
+        expect_warning(
+          session$flushReact(),
+          paste(
+            "Expecting the `add` component of the `manage_links` return",
+            "value to be `NULL` or a `links` object"
+          )
+        )
       )
     }
   )
@@ -231,16 +250,28 @@ test_that("add/rm links retun validation", {
     {
       check_add_rm_link_val(reactiveVal(list(add = NULL, rm = 1)), list())
       sink_msg(
-        expect_warning(session$flushReact(), "Error in observe")
+        expect_warning(
+          session$flushReact(),
+          paste(
+            "Expecting the `rm` component of the `manage_links` return",
+            "value to be a character vector"
+          )
+        )
       )
     }
   )
 
   with_mock_session(
     {
-      check_add_rm_link_val(reactiveVal(list(add = NULL, rm = 1)), list())
+      check_add_rm_link_val(
+        reactiveVal(list(add = NULL, rm = "a")),
+        list(board = new_board())
+      )
       sink_msg(
-        expect_warning(session$flushReact(), "Error in observe")
+        expect_warning(
+          session$flushReact(),
+          "Expecting all link IDs to be removed to be known"
+        )
       )
     }
   )

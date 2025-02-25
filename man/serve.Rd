@@ -6,7 +6,7 @@
 \alias{serve}
 \title{Serve object}
 \usage{
-\method{serve}{block}(x, data = list(), id = "block", ...)
+\method{serve}{block}(x, id = "block", ..., data = list())
 
 \method{serve}{board}(x, id = rand_names(), ...)
 
@@ -15,11 +15,11 @@ serve(x, ...)
 \arguments{
 \item{x}{Object}
 
-\item{data}{Data inputs}
-
 \item{id}{Board namespace ID}
 
 \item{...}{Generic consistency}
+
+\item{data}{Data inputs}
 }
 \description{
 Start up shiny app.

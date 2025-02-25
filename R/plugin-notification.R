@@ -16,13 +16,15 @@ block_notification_server <- function(id, rv, ...) {
     id,
     function(input, output, session) {
 
-      onStop(function() set_globals("notification_ids", list()))
+      onStop(
+        function() set_globals(list(), session = session)
+      )
 
-      if (length(get_globals("notification_ids"))) {
+      if (length(get_globals(session = session))) {
         warning("Existing notification IDs will be purged.")
       }
 
-      set_globals("notification_ids", list())
+      set_globals(list(), session = session)
 
       cnd <- reactive(
         lst_xtr_reval(rv$blocks, "server", "cond")
@@ -32,7 +34,7 @@ block_notification_server <- function(id, rv, ...) {
         cnd(),
         {
           notf <- cnd()
-          ids <- get_globals("notification_ids")
+          ids <- get_globals(session = session)
 
           for (blk in setdiff(names(ids), names(notf))) {
 
@@ -41,7 +43,7 @@ block_notification_server <- function(id, rv, ...) {
             }
 
             ids[[blk]] <- NULL
-            set_globals("notification_ids", ids)
+            set_globals(ids, session = session)
           }
 
           for (blk in names(notf)) {
@@ -53,7 +55,7 @@ block_notification_server <- function(id, rv, ...) {
             }
 
             ids[[blk]] <- cur
-            set_globals("notification_ids", ids)
+            set_globals(ids, session = session)
           }
         }
       )
@@ -65,7 +67,8 @@ block_notification_server <- function(id, rv, ...) {
   )
 }
 
-create_block_notifications <- function(notf, blk) {
+create_block_notifications <- function(notf, blk,
+                                       session = getDefaultReactiveDomain()) {
 
   cur <- c()
 
@@ -73,7 +76,7 @@ create_block_notifications <- function(notf, blk) {
     for (cnd in names(notf[[blk]][[typ]])) {
       for (msg in notf[[blk]][[typ]][[cnd]]) {
 
-        id <- paste0(blk, "_", attr(msg, "id"))
+        id <- session_to_id(attr(msg, "id"), session)
 
         showNotification(
           paste0("Block ", blk, ": ", msg),
@@ -96,8 +99,10 @@ check_block_notifications_val <- function(val) {
     TRUE,
     {
       if (!is.reactive(val)) {
-        stop("Expecting a `block_notifications` server to return a reactive ",
-             "value.")
+        abort(
+          "Expecting `notify_user` to return a reactive value.",
+          class = "notify_user_return_invalid"
+        )
       }
     },
     once = TRUE
@@ -107,8 +112,10 @@ check_block_notifications_val <- function(val) {
     val(),
     {
       if (!is.list(val())) {
-        stop("Expecting the `block_notifications` return value to evaluate ",
-             "to a list.")
+        abort(
+          "Expecting the `notify_user` return value to evaluate to a list.",
+          class = "notify_user_return_invalid"
+        )
       }
     },
     once = TRUE

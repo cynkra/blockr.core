@@ -1,3 +1,34 @@
+test_that("assertions", {
+
+  expect_true(is_bool(TRUE))
+  expect_true(is_bool(FALSE))
+
+  expect_false(is_bool(0L))
+  expect_false(is_bool(1))
+  expect_false(is_bool(NA))
+  expect_false(is_bool(list()))
+  expect_false(is_bool(NULL))
+  expect_false(is_bool(c(TRUE, FALSE)))
+
+  expect_true(is_count(1))
+  expect_true(is_count(1L))
+
+  expect_false(is_count(1.5))
+  expect_false(is_count(-1L))
+  expect_false(is_count(1L:3L))
+  expect_false(is_count(0L, allow_zero = FALSE))
+
+  expect_true(is_number(1))
+  expect_true(is_number(1L))
+  expect_true(is_number(1.5))
+  expect_true(is_number(-1L))
+
+  expect_false(is_number(1:3))
+  expect_false(is_number(NaN))
+  expect_false(is_number(Inf))
+  expect_false(is_number(NA_integer_))
+})
+
 test_that("zero length", {
 
   x <- list()

@@ -86,9 +86,18 @@ copy_to_clipboard <- function(session, id) {
 
 check_gen_code_val <- function(val) {
 
-  if (!is.null(val)) {
-    stop("Expecting a `gen_code` server to return `NULL`.")
-  }
+  observeEvent(
+    TRUE,
+    {
+      if (!is.null(val)) {
+        abort(
+          "Expecting `generate_code` to return `NULL`.",
+          class = "generate_code_return_invalid"
+        )
+      }
+    },
+    once = TRUE
+  )
 
   invisible(val)
 }

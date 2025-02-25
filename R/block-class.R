@@ -27,6 +27,10 @@ new_block <- function(server, ui, class, ctor, ctor_pkg, dat_valid = NULL,
     }
   }
 
+  if (missing(ctor)) {
+    ctor <- sys.parent()
+  }
+
   if (is.numeric(ctor)) {
 
     fun <- sys.function(ctor)
@@ -322,7 +326,12 @@ as.list.block <- function(x, state = NULL, ...) {
 
   state <- c(
     state,
-    attrs[setdiff(names(attrs), c("names", "ctor", "ctor_pkg", "class"))]
+    attrs[
+      setdiff(
+        names(attrs),
+        c("name", "names", "ctor", "ctor_pkg", "class", "allow_empty_state")
+      )
+    ]
   )
 
   list(
@@ -336,7 +345,13 @@ as.list.block <- function(x, state = NULL, ...) {
 
 #' @export
 c.block <- function(...) {
-  as_blocks(lapply(list(...), as_block))
+
+  res <- unlist(
+    lapply(list(...), harmonize_list_of_blocks),
+    recursive = FALSE
+  )
+
+  as_blocks(res)
 }
 
 #' @rdname new_block
@@ -403,17 +418,39 @@ validate_data_inputs <- function(x, data) {
   NULL
 }
 
-#' @param data Data inputs
 #' @param id Block ID
+#' @param data Data inputs
 #' @rdname serve
 #' @export
-serve.block <- function(x, data = list(), id = "block", ...) {
+serve.block <- function(x, id = "block", ..., data = list()) {
 
-  ui <- bslib::page_fluid(block_ui(id, x))
+  init_data <- function(x, is_variadic) {
+    if (is_variadic) do.call(reactiveValues, x) else reactiveVal(x)
+  }
+
+  if (...length() && !length(data)) {
+    data <- list(...)
+  }
+
+  dot_args <- !names(data) %in% block_inputs(x)
+
+  if (!is.na(block_arity(x)) && any(dot_args)) {
+    stop("Unexpected arguments.")
+  }
+
+  if (any(dot_args)) {
+    data <- c(data[!dot_args], list(...args = data[dot_args]))
+  }
+
+  ui <- bslib::page_fluid(
+    title = id,
+    expr_ui(id, x),
+    block_ui(id, x)
+  )
 
   server <- function(input, output, session) {
 
-    res <- block_server(id, x, lapply(data, reactiveVal))
+    res <- block_server(id, x, Map(init_data, data, names(data) == "...args"))
 
     exportTestValues(
       result = safely_export(res$result())()

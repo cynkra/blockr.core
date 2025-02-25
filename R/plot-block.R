@@ -6,7 +6,7 @@ new_plot_block <- function(server, ui, class, ctor = sys.parent(), ...) {
 
 #' @rdname block_ui
 #' @export
-block_output.plot_block <- function(x, result) {
+block_output.plot_block <- function(x, result, session) {
   renderPlot(grDevices::replayPlot(attr(result, "plot")))
 }
 
@@ -14,7 +14,6 @@ block_output.plot_block <- function(x, result) {
 #' @export
 block_ui.plot_block <- function(id, x, ...) {
   tagList(
-    expr_ui(id, x, ...),
     plotOutput(NS(id, "result"))
   )
 }

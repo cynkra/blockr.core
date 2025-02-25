@@ -6,25 +6,14 @@ new_parser_block <- function(server, ui, class, ctor = sys.parent(), ...) {
 
 #' @rdname block_ui
 #' @export
-block_output.parser_block <- function(x, result) {
-  DT::renderDT(
-    DT::datatable(
-      result,
-      selection = "none",
-      options = list(
-        pageLength = 5L,
-        processing = FALSE
-      )
-    ),
-    server = TRUE
-  )
+block_output.parser_block <- function(x, result, session) {
+  dt_result(result, session)
 }
 
 #' @rdname block_ui
 #' @export
 block_ui.parser_block <- function(id, x, ...) {
   tagList(
-    expr_ui(id, x, ...),
     DT::dataTableOutput(NS(id, "result"))
   )
 }

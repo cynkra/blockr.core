@@ -14,7 +14,7 @@ block_ui <- function(id, x, ...) {
 #' @rdname block_ui
 #' @export
 block_ui.block <- function(id, x, ...) {
-  expr_ui(id, x, ...)
+  NULL
 }
 
 #' @rdname block_ui
@@ -28,8 +28,11 @@ expr_ui <- function(id, x, ...) {
 expr_ui.block <- function(id, x, ...) {
 
   if (...length()) {
-    stop(
-      "Unknown arguments ", paste_enum(...names()), " in call to `expr_ui()`."
+    abort(
+      paste(
+        "Unknown arguments", paste_enum(...names()), "in call to `expr_ui()`."
+      ),
+      class = "superfluous_expr_ui_args"
     )
   }
 
@@ -37,14 +40,15 @@ expr_ui.block <- function(id, x, ...) {
 }
 
 #' @param result Reactive block result
+#' @param session Shiny session object
 #' @rdname block_ui
 #' @export
-block_output <- function(x, result) {
+block_output <- function(x, result, session) {
   UseMethod("block_output")
 }
 
 #' @rdname block_ui
 #' @export
-block_output.block <- function(x, result) {
+block_output.block <- function(x, result, session) {
   NULL
 }

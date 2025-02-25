@@ -155,15 +155,15 @@ test_that("block utils", {
   expect_s3_class(c(blk, lst), "blocks")
 })
 
-test_that("block app", {
+test_that("merge app", {
 
   skip_on_cran()
 
-  app_path <- pkg_file("examples", "block", "app.R")
+  app_path <- pkg_file("examples", "block", "merge", "app.R")
 
   app <- shinytest2::AppDriver$new(
     app_path,
-    name = "block",
+    name = "merge",
     seed = 42
   )
 
@@ -182,6 +182,23 @@ test_that("block app", {
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
   app$set_inputs(`block-expr-type` = character(0))
+  app$expect_values(export = TRUE, screenshot_args = FALSE)
+
+  app$stop()
+})
+
+test_that("rbind app", {
+
+  skip_on_cran()
+
+  app_path <- pkg_file("examples", "block", "rbind", "app.R")
+
+  app <- shinytest2::AppDriver$new(
+    app_path,
+    name = "rbind",
+    seed = 42
+  )
+
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
   app$stop()

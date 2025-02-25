@@ -15,11 +15,30 @@ test_that("block constructor", {
       from = c("a", "c", "b", "d"),
       to = c("d", "d", "c", "e"),
       input = c("x", "y", "", "")
-    )
+    ),
+    list(bc = c("b", "c"))
   )
 
   expect_s3_class(board, "board")
   expect_snapshot(print(board))
+
+  sorted <- sort(board)
+
+  expect_true(
+    match("a", board_block_ids(sorted)) < match("d", board_block_ids(sorted))
+  )
+
+  expect_true(
+    match("b", board_block_ids(sorted)) < match("d", board_block_ids(sorted))
+  )
+
+  expect_true(
+    match("b", board_block_ids(sorted)) < match("c", board_block_ids(sorted))
+  )
+
+  expect_true(
+    match("c", board_block_ids(sorted)) < match("d", board_block_ids(sorted))
+  )
 
   expect_error(
     new_board(
@@ -29,7 +48,7 @@ test_that("block constructor", {
       ),
       new_link("a", "b", "foo")
     ),
-    "expects inputs"
+    class = "board_block_link_input_mismatch"
   )
 
   expect_error(
@@ -40,8 +59,21 @@ test_that("block constructor", {
       ),
       data.frame(from = "a", to = "b", input = "foo")
     ),
-    "Block b expects .+ but received .+"
+    class = "board_block_link_input_mismatch"
   )
+
+  expect_error(
+    new_board(
+      list(
+        a = new_dataset_block(),
+        b = new_subset_block()
+      ),
+      stacks = "ab"
+    ),
+    class = "board_block_stack_name_mismatch"
+  )
+
+  expect_snapshot(print(rm_blocks(board, "c")))
 })
 
 test_that("board app", {
@@ -57,54 +89,62 @@ test_that("board app", {
   )
 
   app$click("my_board-manage_blocks-add_block")
-  app$set_inputs(`my_board-manage_blocks-registry_select` = "dataset_block")
+  app$wait_for_value(input = "my_board-manage_blocks-block_id")
   app$set_inputs(`my_board-manage_blocks-block_id` = "a")
+  app$set_inputs(`my_board-manage_blocks-registry_select` = "dataset_block")
   app$click("my_board-manage_blocks-confirm_add")
+  app$wait_for_value(input = "my_board-a-expr-dataset")
+  app$set_inputs(`my_board-a-expr-dataset` = "BOD")
 
-  app$wait_for_idle(duration = 500)
-
+  app$wait_for_idle()
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
   app$click("my_board-manage_blocks-add_block")
-  app$set_inputs(`my_board-manage_blocks-registry_select` = "dataset_block")
+  app$wait_for_value(input = "my_board-manage_blocks-block_id")
   app$set_inputs(`my_board-manage_blocks-block_id` = "b")
+  app$set_inputs(`my_board-manage_blocks-registry_select` = "dataset_block")
   app$click("my_board-manage_blocks-confirm_add")
-
-  app$wait_for_idle(duration = 500)
-
+  app$wait_for_value(input = "my_board-b-expr-dataset")
   app$set_inputs(`my_board-b-expr-dataset` = "ChickWeight")
 
+  app$wait_for_idle()
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
   app$click("my_board-manage_blocks-add_block")
-  app$set_inputs(`my_board-manage_blocks-registry_select` = "merge_block")
+  app$wait_for_value(input = "my_board-manage_blocks-block_id")
   app$set_inputs(`my_board-manage_blocks-block_id` = "c")
+  app$set_inputs(`my_board-manage_blocks-registry_select` = "merge_block")
   app$click("my_board-manage_blocks-confirm_add")
 
-  app$wait_for_idle(duration = 500)
-
+  app$wait_for_idle()
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
   app$click("my_board-manage_links-links_mod")
 
-  app$click("my_board-manage_links-add_link")
-  app$wait_for_value(input = "my_board-manage_links-edbxrcxwquzrffb_id")
-  app$set_inputs(`my_board-manage_links-edbxrcxwquzrffb_from` = "a")
-  app$set_inputs(`my_board-manage_links-edbxrcxwquzrffb_to` = "c")
-  app$set_inputs(`my_board-manage_links-edbxrcxwquzrffb_input` = "x")
+  app$wait_for_idle()
 
+  app$set_inputs(`my_board-manage_links-new_link_id` = "ac")
   app$click("my_board-manage_links-add_link")
-  app$wait_for_value(input = "my_board-manage_links-tcvubwfzjheaqgd_id")
-  app$set_inputs(`my_board-manage_links-tcvubwfzjheaqgd_from` = "b")
-  app$set_inputs(`my_board-manage_links-tcvubwfzjheaqgd_to` = "c")
-  app$set_inputs(`my_board-manage_links-tcvubwfzjheaqgd_input` = "y")
+  app$wait_for_idle()
+  app$set_inputs(`my_board-manage_links-ac_from` = "a")
+  app$set_inputs(`my_board-manage_links-ac_to` = "c")
+  app$set_inputs(`my_board-manage_links-ac_input` = "x")
 
-  app$wait_for_idle(duration = 500)
+  app$set_inputs(`my_board-manage_links-new_link_id` = "bc")
+  app$click("my_board-manage_links-add_link")
+  app$wait_for_idle()
+  app$set_inputs(`my_board-manage_links-bc_from` = "b")
+  app$set_inputs(`my_board-manage_links-bc_to` = "c")
+  app$set_inputs(`my_board-manage_links-bc_input` = "y")
 
   app$click("my_board-manage_links-modify_links")
 
+  app$wait_for_idle()
+  app$expect_values(export = TRUE, screenshot_args = FALSE)
+
   app$set_inputs(`my_board-c-expr-by` = "Time")
 
+  app$wait_for_idle()
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
   app$stop()

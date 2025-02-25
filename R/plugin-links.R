@@ -1,0 +1,603 @@
+#' Add/remove block links module
+#'
+#' Customizable logic for adding/removing links between blocks on the
+#' board.
+#'
+#' @param id Namespace ID
+#' @param rv Reactive values object
+#' @param ... Extra arguments passed from parent scope
+#'
+#' @return A reactive value that evaualtes to `NULL` or a list with components
+#' `add` and `rm`, where `add` is either `NULL` or a `data.frame` with columns
+#' `id`, `from`, `tp` and `input` and `rm` is either `NULL` or a character
+#' vector of link IDs.
+#'
+#' @rdname add_rm_link
+#' @export
+add_rm_link_server <- function(id, rv, ...) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+
+      observeEvent(
+        input$links_mod,
+        showModal(links_modal(session$ns))
+      )
+
+      upd <- reactiveValues(
+        add = links(),
+        rm = character(),
+        curr = isolate(board_links(rv$board)),
+        obs = list(),
+        edit = NULL
+      )
+
+      observeEvent(
+        board_links(rv$board),
+        {
+          upd$curr <- board_links(rv$board)
+        }
+      )
+
+      output$links_dt <- DT::renderDataTable(
+        link_dt(isolate(upd$curr), session$ns, isolate(rv$board)),
+        server = TRUE
+      )
+
+      links_proxy <- DT::dataTableProxy("links_dt", session)
+
+      create_link_obs_observer(input, rv, upd, session, links_proxy)
+
+      edit_link_observer(upd, rv)
+
+      add_link_observer(input, rv, upd, session)
+
+      rm_link_observer(input, rv, upd, session)
+
+      cancel_link_observer(input, rv, upd, session)
+
+      modify_link_observer(input, rv, upd, session, links_proxy)
+    }
+  )
+}
+
+#' @param board The initial `board` object
+#' @rdname add_rm_link
+#' @export
+add_rm_link_ui <- function(id, board) {
+  tagList(
+    actionButton(
+      NS(id, "links_mod"),
+      "Edit links",
+      icon = icon("link")
+    )
+  )
+}
+
+link_dt <- function(dat, ns, board) {
+  res <- DT::datatable(
+    dt_board_link(dat, ns, board),
+    options = list(
+      pageLength = 5,
+      preDrawCallback = DT::JS(
+        "function() { Shiny.unbindAll(this.api().table().node()); }"
+      ),
+      drawCallback = DT::JS(
+        "function() { Shiny.bindAll(this.api().table().node()); }"
+      ),
+      dom = "tp",
+      ordering = FALSE,
+      columnDefs = list(
+        list(targets = 0, width = "125px")
+      )
+    ),
+    rownames = FALSE,
+    escape = FALSE
+  )
+
+  DT::formatStyle(res, 1L, `vertical-align` = "middle")
+}
+
+dt_board_link <- function(lnk, ns, board) {
+
+  blks <- board_blocks(board)
+  arity <- int_ply(blks, block_arity, use_names = TRUE)
+
+  from_ids <- rep(list(names(blks)), length(lnk))
+
+  to_avail <- arity
+  cnt_to <- c(table(filter_empty(lnk$to)))
+
+  to_avail[names(cnt_to)] <- int_mply(`-`, to_avail[names(cnt_to)], cnt_to)
+  to_avail[is.na(to_avail)] <- 1L
+
+  to_avail <- lapply(
+    lapply(lnk$to, filter_empty),
+    union,
+    names(to_avail)[to_avail > 0L]
+  )
+
+  cnt_to <- table(lnk$to)[names(blks[is.na(arity)])]
+  cnt_to[is.na(cnt_to)] <- 0L
+
+  cur_inp <- split(lnk$input, lnk$to)
+
+  in_avail <- c(
+    lapply(blks[!is.na(arity)], block_inputs),
+    Map(
+      union,
+      lapply(lapply(cnt_to, seq_len), as.character),
+      cur_inp[names(cnt_to)]
+    )
+  )
+
+  rm_inp <- lapply(
+    seq_along(lnk),
+    function(i) split(lnk$input[-i], lnk$to[-i])[[lnk$to[i]]]
+  )
+
+  data.frame(
+    ID = lnk$id,
+    From = chr_mply(
+      dt_selectize,
+      lapply(paste0(lnk$id, "_from"), ns),
+      lnk$from,
+      Map(setdiff, from_ids, lnk$to)
+    ),
+    To = chr_mply(
+      dt_selectize,
+      lapply(paste0(lnk$id, "_to"), ns),
+      lnk$to,
+      Map(setdiff, to_avail, lnk$from)
+    ),
+    Input = chr_mply(
+      dt_selectize,
+      lapply(paste0(lnk$id, "_input"), ns),
+      lnk$input,
+      Map(setdiff, in_avail[lnk$to], rm_inp),
+      is.na(arity[lnk$to])
+    )
+  )
+}
+
+dt_selectize <- function(id, val, choices, create = FALSE) {
+
+  if (isTRUE(create)) {
+    opts <- list(create = TRUE)
+  } else {
+    opts <- NULL
+  }
+
+  res <- selectizeInput(id, label = NULL, choices = c("", choices),
+                        selected = val, options = opts)
+
+  res <- htmltools::tagQuery(
+    res
+  )$addAttrs(
+    style = "width: 175px; margin-bottom: 0;"
+  )$allTags()
+
+  as.character(res)
+}
+
+create_dt_link_obs <- function(ids, upd, ...) {
+
+  create_obs <- function(col, row, upd, input, blks, sess) {
+
+    inp <- paste0(row, "_", col)
+
+    log_debug("creating link DT observer ", inp)
+
+    observeEvent(
+      input[[inp]],
+      {
+        new <- input[[inp]]
+        cur <- upd$curr[[row]][[col]]
+
+        if (new == cur || new == "") {
+          return()
+        }
+
+        if (col == "from") {
+
+          to_avail <- int_ply(blks, block_arity, use_names = TRUE)
+
+          cnt <- c(table(filter_empty(upd$curr$to)))
+
+          to_avail[names(cnt)] <- int_mply(`-`, to_avail[names(cnt)], cnt)
+          to_avail[is.na(to_avail)] <- 1L
+
+          to_avail <- c(
+            upd$curr[[row]][["to"]],
+            names(to_avail)[to_avail > 0L]
+          )
+
+          updateSelectizeInput(
+            sess,
+            inputId = paste0(row, "_to"),
+            choices = c("", setdiff(to_avail, new)),
+            selected = upd$curr[[row]][["to"]]
+          )
+
+        } else if (col == "to") {
+
+          ids <- names(blks)
+
+          updateSelectizeInput(
+            sess,
+            inputId = paste0(row, "_from"),
+            choices = c("", setdiff(ids, new)),
+            selected = upd$curr[[row]][["from"]]
+          )
+
+          if (identical(new, "")) {
+
+            updateSelectizeInput(
+              sess,
+              inputId = paste0(row, "_input"),
+              choices = list()
+            )
+
+          } else {
+
+            blk <- blks[[which(ids == new)]]
+            ary <- block_arity(blk)
+            hit <- upd$curr$to == new
+
+            if (is.na(ary)) {
+              inp <- as.character(sum(hit) + 1L)
+              opt <- list(create = TRUE)
+            } else {
+              inp <- setdiff(block_inputs(blk), upd$curr$input[hit])
+              opt <-  NULL
+            }
+
+            updateSelectizeInput(
+              sess,
+              inputId = paste0(row, "_input"),
+              choices = c("", inp),
+              selected = upd$curr[[row]][["input"]],
+              options = opt
+            )
+          }
+
+        } else if (col != "input") {
+
+          stop("Unexpected input: column ", col)
+        }
+
+        upd$edit <- list(row = row, col = col, val = new)
+      },
+      ignoreInit = TRUE
+    )
+  }
+
+  create_obs_for_id <- function(id, ...) {
+    lapply(
+      set_names(nm = c("from", "to", "input")),
+      create_obs,
+      id,
+      ...
+    )
+  }
+
+  upd$obs[ids] <- lapply(ids, create_obs_for_id, upd, ...)
+
+  upd
+}
+
+destroy_dt_link_obs <- function(ids, update) {
+
+  for (row in ids) {
+    for (col in c("from", "to", "input")) {
+      log_debug("destroying link DT observer ", row, " ", col)
+      update$obs[[row]][[col]]$destroy()
+    }
+    update$obs[[row]] <- NULL
+  }
+
+  update
+}
+
+links_modal <- function(ns) {
+  modalDialog(
+    title = "Board links",
+    DT::dataTableOutput(ns("links_dt")),
+    footer = tagList(
+      htmltools::tagQuery(
+        textInput(ns("new_link_id"), NULL, placeholder = "Next ID")
+      )$addAttrs(
+        style = "width: 180px; margin: 0 8px;"
+      )$allTags(),
+      tags$style(
+        type = "text/css",
+        paste0("#", ns("new_link_id"), " {padding: 0.75em 2em; margin: 4px;}")
+      ),
+      tags$style(
+        type = "text/css",
+        paste0("#", ns("new_link_id"), "-label {text-align: left;}")
+      ),
+      actionButton(ns("add_link"), "Add", icon = icon("plus")),
+      actionButton(ns("rm_link"), "Remove", icon = icon("minus")),
+      actionButton(ns("cancel_links"), "Cancel", class = "btn-danger"),
+      actionButton(ns("modify_links"), "OK", class = "btn-success")
+    ),
+    size = "l"
+  )
+}
+
+create_link_obs_observer <- function(input, rv, upd, session, proxy) {
+
+  observeEvent(
+    names(upd$curr),
+    {
+      ids <- names(upd$curr)
+
+      DT::replaceData(
+        proxy,
+        dt_board_link(upd$curr, session$ns, rv$board),
+        rownames = FALSE
+      )
+
+      upd <- create_dt_link_obs(setdiff(ids, names(upd$obs)), upd, input,
+                                board_blocks(rv$board), session)
+      upd <- destroy_dt_link_obs(setdiff(names(upd$obs), ids), upd)
+    }
+  )
+}
+
+edit_link_observer <- function(upd, rv) {
+
+  observeEvent(
+    upd$edit,
+    {
+      row <- upd$edit$row
+      col <- upd$edit$col
+
+      if (!row %in% upd$rm && row %in% board_link_ids(rv$board)) {
+        upd$rm <- c(upd$rm, row)
+      }
+
+      new <- do.call(
+        `$<-`,
+        list(upd$curr[row], col, coal(upd$edit$val, ""))
+      )
+
+      upd$curr[row] <- new
+
+      if (row %in% names(upd$add)) {
+        upd$add[row] <- new
+      } else {
+        upd$add <- c(upd$add, new)
+      }
+    }
+  )
+}
+
+add_link_observer <- function(input, rv, upd, sess) {
+
+  observeEvent(
+    input$add_link,
+    {
+      total <- sum(block_arity(rv$board))
+
+      if (is.na(total) || length(upd$curr) < total) {
+
+        new <- new_link(from = "", to = "", input = "")
+
+        if (length(input$new_link_id) && nchar(input$new_link_id)) {
+
+          updateTextInput(
+            session = sess,
+            inputId = "new_link_id",
+            label = NULL,
+            value = "",
+            placeholder = "Next ID"
+          )
+
+          if (input$new_link_id %in% names(upd$curr)) {
+            showNotification(
+              "Please choose a unique link ID.",
+              type = "warning"
+            )
+            return()
+          }
+
+          new <- set_names(list(new), input$new_link_id)
+        }
+
+        upd$curr <- c(upd$curr, new)
+        upd$add <- c(upd$add, upd$curr[length(upd$curr)])
+
+      } else {
+
+        showNotification(
+          "No new links can be added. Remove a row first.",
+          type = "warning"
+        )
+      }
+    }
+  )
+}
+
+rm_link_observer <- function(input, rv, upd, sess) {
+
+  observeEvent(
+    input$rm_link,
+    {
+      sel <- input$links_dt_rows_selected
+
+      if (length(sel)) {
+
+        ids <- names(upd$curr[sel])
+
+        upd$rm <- c(upd$rm, ids[ids %in% board_link_ids(rv$board)])
+
+        upd$add <- upd$add[setdiff(names(upd$add), ids)]
+        upd$curr <- upd$curr[setdiff(names(upd$curr), ids)]
+
+      } else {
+
+        showNotification("No row selected", type = "warning", session = sess)
+      }
+    }
+  )
+}
+
+cancel_link_observer <- function(input, rv, upd, session) {
+
+  observeEvent(
+    input$cancel_links,
+    {
+      removeModal(session)
+
+      upd$add <- links()
+      upd$rm <- character()
+      upd$curr <- board_links(rv$board)
+    }
+  )
+}
+
+modify_link_observer <- function(input, rv, upd, session, proxy) {
+
+  res <- reactiveVal(
+    list(add = NULL, rm = NULL)
+  )
+
+  observeEvent(
+    input$modify_links,
+    {
+      if (!length(upd$add) && !length(upd$rm)) {
+
+        showNotification(
+          "No changes specified.",
+          type = "warning"
+        )
+
+        return()
+      }
+
+      new <- tryCatch(
+        modify_links(rv$board, upd$add, upd$rm),
+        warning = function(e) {
+          showNotification(conditionMessage(e), duration = NULL,
+                           type = "warning")
+        },
+        error = function(e) {
+          showNotification(conditionMessage(e), duration = NULL,
+                           type = "error")
+        }
+      )
+
+      res(
+        list(
+          add = if (length(upd$add)) upd$add else links(),
+          rm = if (length(upd$rm)) upd$rm else character()
+        )
+      )
+
+      upd$add <- links()
+      upd$rm <- character()
+      upd$curr <- board_links(new)
+
+      DT::replaceData(
+        proxy,
+        dt_board_link(upd$curr, session$ns, rv$board),
+        rownames = FALSE
+      )
+
+      removeModal()
+    }
+  )
+
+  res
+}
+
+check_add_rm_link_val <- function(val, rv) {
+
+  observeEvent(
+    TRUE,
+    {
+      if (!is.reactive(val)) {
+        abort(
+          "Expecting `manage_links` to return a reactive value.",
+          class = "manage_links_return_invalid"
+        )
+      }
+    },
+    once = TRUE,
+    priority = 4
+  )
+
+  observeEvent(
+    val(),
+    {
+      if (!is.list(val()) || !setequal(names(val()), c("add", "rm"))) {
+        abort(
+          paste(
+            "Expecting the `manage_links` return value to evaluate to a list",
+            "with components `add` and `rm`."
+          ),
+          class = "manage_links_return_invalid"
+        )
+      }
+    },
+    once = TRUE,
+    priority = 3
+  )
+
+  observeEvent(
+    val()$add,
+    {
+      if (!is_links(val()$add)) {
+        abort(
+          paste(
+            "Expecting the `add` component of the `manage_links` return",
+            "value to be `NULL` or a `links` object."
+          ),
+          class = "manage_links_return_invalid"
+        )
+      }
+    },
+    once = TRUE,
+    priority = 2
+  )
+
+  observeEvent(
+    val()$add,
+    validate_links(val()$add),
+    priority = 1
+  )
+
+  observeEvent(
+    val()$rm,
+    {
+      if (!is.character(val()$rm)) {
+        abort(
+          paste(
+            "Expecting the `rm` component of the `manage_links` return",
+            "value to be a character vector."
+          ),
+          class = "manage_links_return_invalid"
+        )
+      }
+    },
+    once = TRUE,
+    priority = 2
+  )
+
+  observeEvent(
+    val()$rm,
+    {
+      if (!all(val()$rm %in% board_link_ids(rv$board))) {
+        abort(
+          "Expecting all link IDs to be removed to be known.",
+          class = "manage_links_return_invalid"
+        )
+      }
+    },
+    priority = 1
+  )
+
+  val
+}

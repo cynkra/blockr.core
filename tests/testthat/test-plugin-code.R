@@ -30,6 +30,20 @@ test_that("generate code", {
   )
 })
 
+test_that("gen_code return validation", {
+  with_mock_session(
+    {
+      check_gen_code_val(list(a = 1))
+      sink_msg(
+        expect_warning(
+          session$flushReact(),
+          "Expecting `generate_code` to return `NULL`"
+        )
+      )
+    }
+  )
+})
+
 test_that("dummy add/rm block ui test", {
   expect_s3_class(gen_code_ui("gen", new_board()), "shiny.tag.list")
 })

@@ -21,7 +21,7 @@ add_rm_block_server <- function(id, rv, ...) {
 
       observeEvent(
         input$add_block,
-        add_block_modal(session$ns)
+        showModal(add_block_modal(session$ns))
       )
 
       observeEvent(
@@ -145,26 +145,24 @@ add_rm_block_ui <- function(id, board) {
 }
 
 add_block_modal <- function(ns) {
-  showModal(
-    modalDialog(
-      title = "Add block",
-      div(
-        selectInput(
-          ns("registry_select"),
-          "Select block from registry",
-          choices = list_blocks()
-        ),
-        textInput(
-          inputId = ns("block_id"),
-          label = "Block ID",
-          value = rand_names(),
-          placeholder = "Enter a block ID."
-        )
+  modalDialog(
+    title = "Add block",
+    div(
+      selectInput(
+        ns("registry_select"),
+        "Select block from registry",
+        choices = list_blocks()
       ),
-      footer = tagList(
-        actionButton(ns("cancel_add"), "Cancel", class = "btn-danger"),
-        actionButton(ns("confirm_add"), "OK", class = "btn-success")
+      textInput(
+        inputId = ns("block_id"),
+        label = "Block ID",
+        value = rand_names(),
+        placeholder = "Enter a block ID."
       )
+    ),
+    footer = tagList(
+      actionButton(ns("cancel_add"), "Cancel", class = "btn-danger"),
+      actionButton(ns("confirm_add"), "OK", class = "btn-success")
     )
   )
 }
@@ -192,13 +190,19 @@ check_add_rm_block_val <- function(val, rv) {
     TRUE,
     {
       if (!is.reactivevalues(val)) {
-        stop("Expecting `add_rm_block` to return a `reactivevalues` object.")
+        abort(
+          "Expecting `manage_blocks` to return a `reactivevalues` object.",
+          class = "manage_blocks_return_invalid"
+        )
       }
 
       if (!setequal(names(val), c("add", "rm"))) {
-        stop(
-          "Expecting the `add_rm_block` return value to contain ",
-          "components `add` and `rm`."
+        abort(
+          paste(
+            "Expecting the `manage_blocks` return value to contain",
+            "components `add` and `rm`."
+          ),
+          class = "manage_blocks_return_invalid"
         )
       }
     },
@@ -209,20 +213,27 @@ check_add_rm_block_val <- function(val, rv) {
     val$add,
     {
       if (!is_blocks(val$add)) {
-        stop(
-          "Expecting the `add` component of the `add_rm_block` return ",
-          "value to be `NULL` or a `blocks` object."
+        abort(
+          paste(
+            "Expecting the `add` component of the `manage_blocks` return",
+            "value to be `NULL` or a `blocks` object."
+          ),
+          class = "manage_blocks_return_invalid"
         )
       }
     },
-    once = TRUE
+    once = TRUE,
+    priority = 2
   )
 
   observeEvent(
     val$add,
     {
       if (any(names(val$add) %in% board_block_ids(rv$board))) {
-        stop("Expecting the newly added block to have a unique ID.")
+        abort(
+          "Expecting the newly added block to have a unique ID.",
+          class = "manage_blocks_return_invalid"
+        )
       }
     },
     priority = 1
@@ -232,20 +243,27 @@ check_add_rm_block_val <- function(val, rv) {
     val$rm,
     {
       if (!is.character(val$rm)) {
-        stop(
-          "Expecting the `rm` component of the `add_rm_block` return ",
-          "value to be `NULL` or a character vector."
+        abort(
+          paste(
+            "Expecting the `rm` component of the `manage_blocks` return",
+            "value to be `NULL` or a character vector."
+          ),
+          class = "manage_blocks_return_invalid"
         )
       }
     },
-    once = TRUE
+    once = TRUE,
+    priority = 2
   )
 
   observeEvent(
     val$rm,
     {
       if (all(!val$rm %in% board_block_ids(rv$board))) {
-        stop("Expecting the removed block to be specified by a known ID.")
+        abort(
+          "Expecting the removed block to be specified by a known ID.",
+          class = "manage_blocks_return_invalid"
+        )
       }
     },
     priority = 1

@@ -82,6 +82,36 @@ test_that("ser/deser board", {
   )
 })
 
+test_that("gen_code return validation", {
+
+  with_mock_session(
+    {
+      check_ser_deser_val(list(a = 1))
+      sink_msg(
+        expect_warning(
+          session$flushReact(),
+          "Expecting `preserve_board` to return a reactive value"
+        )
+      )
+    }
+  )
+
+  with_mock_session(
+    {
+      check_ser_deser_val(reactiveVal(1))
+      sink_msg(
+        expect_warning(
+          session$flushReact(),
+          paste(
+            "Expecting the `preserve_board` return value to evaluate to a",
+            "`board` object."
+          )
+        )
+      )
+    }
+  )
+})
+
 test_that("dummy ser/deser ui test", {
   expect_s3_class(ser_deser_ui("ser_deser", new_board()), "shiny.tag.list")
 })

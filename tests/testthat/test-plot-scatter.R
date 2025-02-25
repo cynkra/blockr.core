@@ -25,4 +25,19 @@ test_that("scetter plot block constructor", {
     },
     args = list(data = function() iris)
   )
+
+  testServer(
+    get_s3_method("block_server", blk),
+    {
+      expr <- session$makeScope("expr")
+      expr$setInputs(xcol = "Sepal.Length", ycol = "Sepal.Width")
+      session$flushReact()
+
+      expect_s3_class(
+        attr(session$returned$result(), "plot"),
+        "recordedplot"
+      )
+    },
+    args = list(x = blk, data = list(data = function() iris))
+  )
 })
