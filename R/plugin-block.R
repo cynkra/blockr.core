@@ -50,6 +50,94 @@ edit_block_server <- function(id, block_id, board, update, ...) {
         update(list(blocks = list(rm = block_id)))
       )
 
+      observeEvent(
+        input$opts,
+        {
+          if (is_leaf(block_id, board$board)) {
+            insertUI(
+              paste0(".popover.", session$ns(NULL), " > div.popover-body"),
+              "beforeEnd",
+              actionButton(
+                session$ns("append_block"),
+                "Append block",
+                icon = icon("circle-plus"),
+                class = "btn-success"
+              )
+            )
+          }
+        },
+        ignoreInit = TRUE
+      )
+
+      observeEvent(
+        input$append_block,
+        showModal(append_block_modal(session$ns))
+      )
+
+      observeEvent(
+        input$registry_select,
+        {
+          sel <- input$registry_select
+
+          if (!is_string(sel) || !sel %in% list_blocks()) {
+
+            showNotification(
+              "Please choose a valid block type.",
+              type = "warning"
+            )
+
+            return()
+          }
+
+          updateSelectInput(
+            session,
+            "input_select",
+            "Select data input",
+            available_block_inputs(sel)
+          )
+        }
+      )
+
+      observeEvent(
+        input$confirm_append,
+        {
+          sel <- input$registry_select
+          bid <- input$block_id
+          lid <- input$link_id
+          inp <- input$input_select
+
+          if (!validate_block_addition(sel, bid, board$board, session)) {
+            return()
+          }
+
+          blk <- create_block(sel)
+
+          if (!validate_link_addition(lid, inp, blk, board$board, session)) {
+            return()
+          }
+
+          update(
+            list(
+              blocks = list(
+                add = as_blocks(set_names(list(blk), bid))
+              ),
+              links = list(
+                add = as_links(
+                  set_names(list(new_link(block_id, bid, inp)), lid)
+                )
+              )
+            )
+          )
+
+          removeModal()
+        }
+      )
+
+      observeEvent(
+        input$cancel_append,
+        removeModal()
+      )
+
       list(
         name = curr_block_name
       )
@@ -62,26 +150,26 @@ edit_block_server <- function(id, block_id, board, update, ...) {
 #' @export
 edit_block_ui <- function(x, id, ...) {
 
-  opts <- bslib::popover(
-    title = "Block options",
-    bsicons::bs_icon("gear"),
-    textInput(
-      NS(id, "block_name_in"),
-      "Block name"
-    ),
-    actionButton(
-      NS(id, "rm_block"),
-      "Remove block",
-      icon = icon("circle-minus"),
-      class = "btn-danger"
-    )
-  )
-
   tagList(
     bslib::card_header(
       class = "d-flex justify-content-between",
       uiOutput(NS(id, "block_name_out"), inline = TRUE),
-      opts
+      bslib::popover(
+        bsicons::bs_icon("gear"),
+        textInput(
+          NS(id, "block_name_in"),
+          "Block name"
+        ),
+        actionButton(
+          NS(id, "rm_block"),
+          "Remove block",
+          icon = icon("circle-minus"),
+          class = "btn-danger"
+        ),
+        title = "Block options",
+        id = NS(id, "opts"),
+        options = list(customClass = id)
+      )
     ),
     ...,
     bslib::card_footer(
@@ -140,7 +228,7 @@ check_edit_block_val <- function(val) {
 }
 
 type_desc <- function(x) {
- if (is.object(x)) {
+  if (is.object(x)) {
     class(x)[[1]]
   } else if (rlang::is_vector(x)) {
     typeof(x)
@@ -168,4 +256,99 @@ big_mark <- function(x) {
   ret[is.na(x)] <- "??"
 
   ret
+}
+
+append_block_modal <- function(ns) {
+  modalDialog(
+    title = "Append block",
+    div(
+      selectInput(
+        ns("registry_select"),
+        "Select block from registry",
+        choices = list_suitable_blocks()
+      ),
+      textInput(
+        inputId = ns("block_id"),
+        label = "Block ID",
+        value = rand_names(),
+        placeholder = "Enter a block ID."
+      ),
+      selectInput(
+        ns("input_select"),
+        "Select data input",
+        choices = ""
+      ),
+      textInput(
+        inputId = ns("link_id"),
+        label = "Link ID",
+        value = rand_names(),
+        placeholder = "Enter a link ID."
+      )
+    ),
+    footer = tagList(
+      actionButton(ns("cancel_append"), "Cancel", class = "btn-danger"),
+      actionButton(ns("confirm_append"), "OK", class = "btn-success")
+    )
+  )
+}
+
+list_suitable_blocks <- function() {
+  opts <- list_blocks()
+  arity <- int_ply(lapply(opts, create_block), block_arity)
+  opts[is.na(arity) | arity >= 1L]
+}
+
+available_block_inputs <- function(block) {
+
+  blk <- create_block(block)
+  inp <- block_inputs(blk)
+
+  if (is.na(block_arity(blk))) {
+    inp <- c(inp, as.character(seq_len(length(inp + 1L))))
+  }
+
+  inp
+}
+
+validate_link_addition <- function(id, input, block, board, session) {
+
+  if (nchar(id) == 0L || !is_string(id)) {
+
+    showNotification(
+      "Please choose a valid link ID.",
+      type = "warning",
+      session = session
+    )
+
+    return(FALSE)
+  }
+
+  if (id %in% board_link_ids(board)) {
+
+    showNotification(
+      "Please choose a unique link ID.",
+      type = "warning",
+      session = session
+    )
+
+    return(FALSE)
+  }
+
+  inps <- block_inputs(block)
+
+  if (is.na(block_arity(block))) {
+    inps <- c(inps, as.character(seq_len(length(inps + 1L))))
+  }
+
+  if (!is_string(input) || !input %in% inps) {
+
+    showNotification(
+      "Please choose a valid block data input.",
+      type = "warning"
+    )
+
+    return(FALSE)
+  }
+
+  TRUE
 }

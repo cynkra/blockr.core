@@ -91,3 +91,18 @@ is_acyclic.matrix <- function(x) {
     graph_has_cycle = function(e) FALSE
   )
 }
+
+is_leaf <- function(block, links) {
+
+  if (is_blocks(block)) {
+    block <- names(block)
+  }
+
+  if (is_board(links)) {
+    links <- board_links(links)
+  }
+
+  stopifnot(is.character(block), is_links(links))
+
+  !block %in% links$from
+}
