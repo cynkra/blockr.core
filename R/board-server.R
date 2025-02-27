@@ -99,13 +99,6 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
             }
           }
 
-          if (length(upd$blocks$rm)) {
-
-            remove_block_ui(ns(NULL), rv$board, upd$blocks$rm)
-
-            rv <- destroy_rm_blocks(upd$blocks$rm, rv)
-          }
-
           if (length(upd$links$add) || length(upd$links$rm)) {
 
             rm <- board_links(rv$board)[upd$links$rm]
@@ -116,6 +109,13 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
 
           if (length(upd$stacks$add) || length(upd$stacks$rm)) {
             rv$board <- modify_stacks(rv$board, upd$stacks$add, upd$stacks$rm)
+          }
+
+          if (length(upd$blocks$rm)) {
+
+            remove_block_ui(ns(NULL), rv$board, upd$blocks$rm)
+
+            rv <- destroy_rm_blocks(upd$blocks$rm, rv)
           }
 
           board_update(NULL)
@@ -452,7 +452,13 @@ validate_board_update_links <- function(x, rv) {
       )
     }
 
-    if (any(names(x$add) %in% board_link_ids(rv$board))) {
+    curr_ids <- board_link_ids(rv$board)
+
+    if ("rm" %in% names(x) && is.character(x$rm)) {
+      curr_ids <- setdiff(curr_ids, x$rm)
+    }
+
+    if (any(names(x$add) %in% curr_ids)) {
       abort(
         "Expecting the newly added links to have a unique ID.",
         class = "board_update_links_add_invalid"
@@ -500,7 +506,13 @@ validate_board_update_stacks <- function(x, rv) {
       )
     }
 
-    if (any(names(x$add) %in% board_stack_ids(rv$board))) {
+    curr_ids <- board_stack_ids(rv$board)
+
+    if ("rm" %in% names(x) && is.character(x$rm)) {
+      curr_ids <- setdiff(curr_ids, x$rm)
+    }
+
+    if (any(names(x$add) %in% curr_ids)) {
       abort(
         "Expecting the newly added stacks to have a unique ID.",
         class = "board_update_stacks_add_invalid"

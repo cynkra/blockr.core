@@ -71,7 +71,12 @@ edit_block_server <- function(id, block_id, board, update, ...) {
 
       observeEvent(
         input$append_block,
-        showModal(append_block_modal(session$ns))
+        showModal(
+          append_block_modal(
+            session$ns,
+            is_block_in_stack(block_id, board$board)
+          )
+        )
       )
 
       observeEvent(
@@ -112,15 +117,19 @@ edit_block_server <- function(id, block_id, board, update, ...) {
 
           blk <- create_block(sel)
 
+          add <- list(
+            blocks = list(
+              add = as_blocks(set_names(list(blk), bid))
+            )
+          )
+
           if (!validate_link_addition(lid, inp, blk, board$board, session)) {
             return()
           }
 
-          update(
+          add <- c(
+            add,
             list(
-              blocks = list(
-                add = as_blocks(set_names(list(blk), bid))
-              ),
               links = list(
                 add = as_links(
                   set_names(list(new_link(block_id, bid, inp)), lid)
@@ -128,6 +137,26 @@ edit_block_server <- function(id, block_id, board, update, ...) {
               )
             )
           )
+
+          if (isTRUE(input$add_to_stack)) {
+
+            stacks <- board_stacks(board$board)
+
+            stk <- is_block_in_stack(block_id, stacks)
+            stk <- names(stk)[stk]
+
+            add <- c(
+              add,
+              list(
+                stacks = list(
+                  add = as_stacks(lapply(stacks[stk], union, bid)),
+                  rm = stk
+                )
+              )
+            )
+          }
+
+          update(add)
 
           removeModal()
         }
@@ -258,7 +287,7 @@ big_mark <- function(x) {
   ret
 }
 
-append_block_modal <- function(ns) {
+append_block_modal <- function(ns, stack_checkbox = FALSE) {
   modalDialog(
     title = "Append block",
     div(
@@ -283,7 +312,14 @@ append_block_modal <- function(ns) {
         label = "Link ID",
         value = rand_names(),
         placeholder = "Enter a link ID."
-      )
+      ),
+      if (stack_checkbox) {
+        bslib::input_switch(
+          id = ns("add_to_stack"),
+          label = "Add to stack",
+          value = TRUE
+        )
+      }
     ),
     footer = tagList(
       actionButton(ns("cancel_append"), "Cancel", class = "btn-danger"),
@@ -351,4 +387,19 @@ validate_link_addition <- function(id, input, block, board, session) {
   }
 
   TRUE
+}
+
+is_block_in_stack <- function(block, stacks) {
+
+  is_el <- function(stk, el) is.element(el, stk)
+
+  if (is_board(stacks)) {
+    stacks <- board_stacks(stacks)
+  }
+
+  lgl_ply(stacks, is_el, block, use_names = TRUE)
+}
+
+is_block_in_stacks <- function(block, stacks) {
+  any(is_block_in_stack(block, stacks))
 }
