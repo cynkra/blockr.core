@@ -225,14 +225,14 @@ edit_block_ui <- function(x, id, ...) {
           NS(id, "rm_block"),
           "Remove block",
           icon = icon("circle-minus"),
-          class = "btn-danger"
+          class = c("btn-danger", "mb-2")
         ),
         if (block_has_inputs(x)) {
           actionButton(
             NS(id, "add_block_before"),
             "Add block before",
             icon = icon("circle-plus"),
-            class = "btn-success"
+            class = c("btn-success", "mb-2")
           )
         },
         actionButton(
