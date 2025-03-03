@@ -22,7 +22,7 @@ test_that("add/rm blocks", {
       expect_null(session$returned)
     },
     args = list(
-      rv = reactiveValues(board = new_board()),
+      board = reactiveValues(board = new_board()),
       update = reactiveVal()
     )
   )
@@ -52,7 +52,7 @@ test_that("add/rm blocks", {
 
       expect_null(session$returned)
     },
-    args = list(rv = reactiveValues(board = board), update = reactiveVal())
+    args = list(board = reactiveValues(board = board), update = reactiveVal())
   )
 
   testServer(
@@ -78,7 +78,7 @@ test_that("add/rm blocks", {
 
       expect_null(session$returned)
     },
-    args = list(rv = reactiveValues(board = board), update = reactiveVal())
+    args = list(board = reactiveValues(board = board), update = reactiveVal())
   )
 })
 

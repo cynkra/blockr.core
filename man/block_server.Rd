@@ -17,6 +17,7 @@ block_server(id, x, data = list(), ...)
   x,
   data = list(),
   edit_block = NULL,
+  board = reactiveValues(),
   update = reactiveVal(),
   ...
 )
@@ -41,6 +42,8 @@ block_eval(x, expr, data, ...)
 \item{...}{Generic consistency}
 
 \item{edit_block}{Block edit plugin}
+
+\item{board}{Reactive values object containing board information}
 
 \item{update}{Reactive value object to initiate board updates}
 

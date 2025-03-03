@@ -64,7 +64,7 @@ test_that("add/rm links", {
 
       expect_null(session$returned)
     },
-    args = list(rv = reactiveValues(board = board), update = reactiveVal())
+    args = list(board = reactiveValues(board = board), update = reactiveVal())
   )
 
   testServer(
@@ -100,7 +100,7 @@ test_that("add/rm links", {
       expect_length(upd$add, 1L)
     },
     args = list(
-      rv = list(
+      board = list(
         board = new_board(
           blocks = c(
             a = new_dataset_block("iris"),
@@ -152,7 +152,7 @@ test_that("add/rm links", {
 
       expect_null(session$returned)
     },
-    args = list(rv = reactiveValues(board = board), update = reactiveVal())
+    args = list(board = reactiveValues(board = board), update = reactiveVal())
   )
 })
 

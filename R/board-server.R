@@ -46,11 +46,11 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         msgs = list()
       )
 
-      rv_lst <- list(make_read_only(rv))
+      rv_lst <- list(board = make_read_only(rv))
 
       board_update <- reactiveVal()
 
-      plugin_args <- c(list(update = board_update), dot_args)
+      plugin_args <- c(rv_lst, list(update = board_update), dot_args)
 
       edit_block <- get_plugin("edit_block", plugins)
 
@@ -64,19 +64,19 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
 
       call_plugin_server(
         "manage_blocks",
-        server_args = c(rv_lst, plugin_args),
+        server_args = plugin_args,
         plugins = plugins
       )
 
       call_plugin_server(
         "manage_links",
-        server_args = c(rv_lst, plugin_args),
+        server_args = plugin_args,
         plugins = plugins
       )
 
       call_plugin_server(
         "manage_stacks",
-        server_args = c(rv_lst, plugin_args),
+        server_args = plugin_args,
         plugins = plugins
       )
 
@@ -99,13 +99,6 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
             }
           }
 
-          if (length(upd$blocks$rm)) {
-
-            remove_block_ui(ns(NULL), rv$board, upd$blocks$rm)
-
-            rv <- destroy_rm_blocks(upd$blocks$rm, rv)
-          }
-
           if (length(upd$links$add) || length(upd$links$rm)) {
 
             rm <- board_links(rv$board)[upd$links$rm]
@@ -118,13 +111,20 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
             rv$board <- modify_stacks(rv$board, upd$stacks$add, upd$stacks$rm)
           }
 
+          if (length(upd$blocks$rm)) {
+
+            remove_block_ui(ns(NULL), rv$board, upd$blocks$rm)
+
+            rv <- destroy_rm_blocks(upd$blocks$rm, rv)
+          }
+
           board_update(NULL)
         }
       )
 
       board_refresh <- call_plugin_server(
         "preserve_board",
-        server_args = c(rv_lst, plugin_args),
+        server_args = plugin_args,
         plugins = plugins
       )
 
@@ -156,7 +156,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
       rv$msgs <- coal(
         call_plugin_server(
           "notify_user",
-          server_args = c(rv_lst, plugin_args),
+          server_args = plugin_args,
           plugins = plugins
         ),
         reactive(
@@ -166,14 +166,14 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
 
       call_plugin_server(
         "generate_code",
-        server_args = c(rv_lst, plugin_args),
+        server_args = plugin_args,
         plugins = plugins
       )
 
       cb_res <- vector("list", length(callbacks))
 
       for (i in seq_along(callbacks)) {
-        cb_res[[i]] <- do.call(callbacks[[i]], c(rv_lst, plugin_args))
+        cb_res[[i]] <- do.call(callbacks[[i]], plugin_args)
       }
 
       c(rv_lst, dot_args)
@@ -452,7 +452,13 @@ validate_board_update_links <- function(x, rv) {
       )
     }
 
-    if (any(names(x$add) %in% board_link_ids(rv$board))) {
+    curr_ids <- board_link_ids(rv$board)
+
+    if ("rm" %in% names(x) && is.character(x$rm)) {
+      curr_ids <- setdiff(curr_ids, x$rm)
+    }
+
+    if (any(names(x$add) %in% curr_ids)) {
       abort(
         "Expecting the newly added links to have a unique ID.",
         class = "board_update_links_add_invalid"
@@ -500,7 +506,13 @@ validate_board_update_stacks <- function(x, rv) {
       )
     }
 
-    if (any(names(x$add) %in% board_stack_ids(rv$board))) {
+    curr_ids <- board_stack_ids(rv$board)
+
+    if ("rm" %in% names(x) && is.character(x$rm)) {
+      curr_ids <- setdiff(curr_ids, x$rm)
+    }
+
+    if (any(names(x$add) %in% curr_ids)) {
       abort(
         "Expecting the newly added stacks to have a unique ID.",
         class = "board_update_stacks_add_invalid"

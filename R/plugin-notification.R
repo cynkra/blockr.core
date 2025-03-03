@@ -3,7 +3,7 @@
 #' Object (de)serialization in a board server context.
 #'
 #' @param id Namespace ID
-#' @param rv Reactive values object
+#' @param board Reactive values object
 #' @param ... Extra arguments passed from parent scope
 #'
 #' @return A [shiny::reactiveVal()] object that evaluates to `NULL` or a
@@ -11,7 +11,7 @@
 #'
 #' @rdname block_notifications
 #' @export
-block_notification_server <- function(id, rv, ...) {
+block_notification_server <- function(id, board, ...) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -27,7 +27,7 @@ block_notification_server <- function(id, rv, ...) {
       set_globals(list(), session = session)
 
       cnd <- reactive(
-        lst_xtr_reval(rv$blocks, "server", "cond")
+        lst_xtr_reval(board$blocks, "server", "cond")
       )
 
       observeEvent(
