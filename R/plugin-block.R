@@ -50,33 +50,45 @@ edit_block_server <- function(id, block_id, board, update, ...) {
         update(list(blocks = list(rm = block_id)))
       )
 
-      observeEvent(
-        input$opts,
-        {
-          if (is_leaf(block_id, board$board)) {
-            insertUI(
-              paste0(".popover.", session$ns(NULL), " > div.popover-body"),
-              "beforeEnd",
-              actionButton(
-                session$ns("append_block"),
-                "Append block",
-                icon = icon("circle-plus"),
-                class = "btn-success"
-              )
+      position <- NULL
+
+      if (block_has_inputs(initial_block)) {
+        observeEvent(
+          input$add_block_before,
+          {
+            inps <- setdiff(
+              available_block_inputs(initial_block),
+              occupied_block_inputs(block_id, board$board)
             )
+            if (length(inps)) {
+              position <<- "before"
+              insert_block_modal(
+                session,
+                position,
+                inputs = inps,
+                stack_checkbox = is_block_in_stacks(block_id, board$board)
+              )
+            } else {
+              showNotification(
+                "All block inputs are used. Remove incoming link first.",
+                type = "warning",
+                session = session
+              )
+            }
           }
-        },
-        ignoreInit = TRUE
-      )
+        )
+      }
 
       observeEvent(
-        input$append_block,
-        showModal(
-          append_block_modal(
-            session$ns,
-            is_block_in_stack(block_id, board$board)
+        input$add_block_after,
+        {
+          position <<- "after"
+          insert_block_modal(
+            session,
+            position,
+            stack_checkbox = is_block_in_stacks(block_id, board$board)
           )
-        )
+        }
       )
 
       observeEvent(
@@ -94,22 +106,22 @@ edit_block_server <- function(id, block_id, board, update, ...) {
             return()
           }
 
-          updateSelectInput(
-            session,
-            "input_select",
-            "Select data input",
-            available_block_inputs(sel)
-          )
+          if (identical(position, "after")) {
+            updateSelectInput(
+              session,
+              "input_select",
+              "Select input",
+              available_block_inputs(sel)
+            )
+          }
         }
       )
 
       observeEvent(
-        input$confirm_append,
+        input$confirm_insert,
         {
           sel <- input$registry_select
           bid <- input$block_id
-          lid <- input$link_id
-          inp <- input$input_select
 
           if (!validate_block_addition(sel, bid, board$board, session)) {
             return()
@@ -117,26 +129,45 @@ edit_block_server <- function(id, block_id, board, update, ...) {
 
           blk <- create_block(sel)
 
-          add <- list(
+          res <- list(
             blocks = list(
               add = as_blocks(set_names(list(blk), bid))
             )
           )
 
-          if (!validate_link_addition(lid, inp, blk, board$board, session)) {
-            return()
+          if (identical(position, "before")) {
+
+            if (!validate_link_addition(input$link_id, input$input_select,
+                                        initial_block, board$board, session)) {
+              return()
+            }
+
+            lnk <- set_names(
+              list(new_link(bid, block_id, input$input_select)),
+              input$link_id
+            )
+
+          } else if (identical(position, "after")) {
+
+            if (!validate_link_addition(input$link_id, input$input_select,
+                                        blk, board$board, session)) {
+              return()
+            }
+
+            lnk <- set_names(
+              list(new_link(block_id, bid, input$input_select)),
+              input$link_id
+            )
+
+          } else {
+
+            abort(
+              paste0("Unexpected postion `", position, "`."),
+              class = "unexpected_position_value"
+            )
           }
 
-          add <- c(
-            add,
-            list(
-              links = list(
-                add = as_links(
-                  set_names(list(new_link(block_id, bid, inp)), lid)
-                )
-              )
-            )
-          )
+          res <- c(res, list(links = list(add = as_links(lnk))))
 
           if (isTRUE(input$add_to_stack)) {
 
@@ -145,8 +176,8 @@ edit_block_server <- function(id, block_id, board, update, ...) {
             stk <- is_block_in_stack(block_id, stacks)
             stk <- names(stk)[stk]
 
-            add <- c(
-              add,
+            res <- c(
+              res,
               list(
                 stacks = list(
                   add = as_stacks(lapply(stacks[stk], union, bid)),
@@ -156,14 +187,16 @@ edit_block_server <- function(id, block_id, board, update, ...) {
             )
           }
 
-          update(add)
+          update(res)
 
           removeModal()
+
+          position <<- NULL
         }
       )
 
       observeEvent(
-        input$cancel_append,
+        input$cancel_insert,
         removeModal()
       )
 
@@ -178,7 +211,6 @@ edit_block_server <- function(id, block_id, board, update, ...) {
 #' @rdname edit_block
 #' @export
 edit_block_ui <- function(x, id, ...) {
-
   tagList(
     bslib::card_header(
       class = "d-flex justify-content-between",
@@ -194,6 +226,20 @@ edit_block_ui <- function(x, id, ...) {
           "Remove block",
           icon = icon("circle-minus"),
           class = "btn-danger"
+        ),
+        if (block_has_inputs(x)) {
+          actionButton(
+            NS(id, "add_block_before"),
+            "Add block before",
+            icon = icon("circle-plus"),
+            class = "btn-success"
+          )
+        },
+        actionButton(
+          NS(id, "add_block_after"),
+          "Add block after",
+          icon = icon("circle-plus"),
+          class = "btn-success"
         ),
         title = "Block options",
         id = NS(id, "opts"),
@@ -287,14 +333,22 @@ big_mark <- function(x) {
   ret
 }
 
-append_block_modal <- function(ns, stack_checkbox = FALSE) {
-  modalDialog(
-    title = "Append block",
+insert_block_modal <- function(session, pos, inputs = "",
+                               stack_checkbox = FALSE) {
+
+  ns <- session$ns
+
+  ui <- modalDialog(
+    title = switch(
+      match.arg(pos, c("before", "after")),
+      before = "Add block before",
+      after = "Add block after"
+    ),
     div(
       selectInput(
         ns("registry_select"),
         "Select block from registry",
-        choices = list_suitable_blocks()
+        choices = list_suitable_blocks(pos)
       ),
       textInput(
         inputId = ns("block_id"),
@@ -304,8 +358,8 @@ append_block_modal <- function(ns, stack_checkbox = FALSE) {
       ),
       selectInput(
         ns("input_select"),
-        "Select data input",
-        choices = ""
+        "Select input",
+        choices = inputs
       ),
       textInput(
         inputId = ns("link_id"),
@@ -322,28 +376,56 @@ append_block_modal <- function(ns, stack_checkbox = FALSE) {
       }
     ),
     footer = tagList(
-      actionButton(ns("cancel_append"), "Cancel", class = "btn-danger"),
-      actionButton(ns("confirm_append"), "OK", class = "btn-success")
+      actionButton(ns("cancel_insert"), "Cancel", class = "btn-danger"),
+      actionButton(ns("confirm_insert"), "OK", class = "btn-success")
     )
   )
+
+  showModal(ui, session)
+
+  invisible()
 }
 
-list_suitable_blocks <- function() {
+list_suitable_blocks <- function(pos) {
+
   opts <- list_blocks()
+
+  if (identical(pos, "before")) {
+    return(opts)
+  }
+
+  stopifnot(identical(pos, "after"))
+
   arity <- int_ply(lapply(opts, create_block), block_arity)
   opts[is.na(arity) | arity >= 1L]
 }
 
 available_block_inputs <- function(block) {
 
-  blk <- create_block(block)
-  inp <- block_inputs(blk)
+  if (is.character(block)) {
+    block <- create_block(block)
+  }
 
-  if (is.na(block_arity(blk))) {
+  stopifnot(is_block(block))
+
+  inp <- block_inputs(block)
+
+  if (is.na(block_arity(block))) {
     inp <- c(inp, as.character(seq_len(length(inp + 1L))))
   }
 
   inp
+}
+
+occupied_block_inputs <- function(block, links) {
+
+  if (is_board(links)) {
+    links <- board_links(links)
+  }
+
+  stopifnot(is_string(block), is_links(links))
+
+  links[links$to == block]$input
 }
 
 validate_link_addition <- function(id, input, block, board, session) {
@@ -402,4 +484,8 @@ is_block_in_stack <- function(block, stacks) {
 
 is_block_in_stacks <- function(block, stacks) {
   any(is_block_in_stack(block, stacks))
+}
+
+block_has_inputs <- function(x) {
+  is.na(block_arity(x)) || block_arity(x) >= 1L
 }
