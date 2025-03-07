@@ -37,6 +37,12 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
     block_plugin <- NULL
   }
 
+  if ("edit_stack" %in% names(plugins)) {
+    stack_plugin <- plugins[["edit_stack"]]
+  } else {
+    stack_plugin <- NULL
+  }
+
   tagList(
     do.call(
       div,
@@ -54,13 +60,8 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
     },
     div(
       id = paste0(id, "_board"),
-      do.call(
-        div,
-        c(
-          id = paste0(id, "_blocks"),
-          block_ui(id, x, edit_ui = block_plugin)
-        )
-      )
+      stack_ui(id, x, edit_ui = stack_plugin),
+      block_ui(id, x, edit_ui = block_plugin)
     )
   )
 }
@@ -118,8 +119,12 @@ block_ui.board <- function(id, x, blocks = NULL, edit_ui = NULL, ...) {
     card_elems = edit_ui
   )
 
-  tagList(
-    map(block_card, blocks, names(blocks), MoreArgs = args)
+  do.call(
+    div,
+    c(
+      id = paste0(id, "_blocks"),
+      map(block_card, blocks, names(blocks), MoreArgs = args)
+    )
   )
 }
 

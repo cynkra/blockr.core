@@ -29,7 +29,7 @@ is_plugin <- function(x) {
 
 known_plugins <- function() {
   c("preserve_board", "manage_blocks", "manage_links", "manage_stacks",
-    "notify_user", "generate_code", "edit_block")
+    "notify_user", "generate_code", "edit_block", "edit_stack")
 }
 
 #' @rdname new_plugin
@@ -178,6 +178,12 @@ edit_block <- function(server, ui) {
              class = "edit_block")
 }
 
+#' @rdname new_plugin
+#' @export
+edit_stack <- function(server, ui) {
+  new_plugin(server, ui, validator = expect_null, class = "edit_stack")
+}
+
 #' @export
 format.plugin <- function(x, ...) {
 
@@ -247,7 +253,7 @@ get_plugin <- function(plugin, plugins = NULL, component = NULL) {
   switch(
     match.arg(component, c("server", "ui")),
     ui = plugin_ui(res),
-    server = function(server_args, validator_args) {
+    server = function(server_args, validator_args = NULL) {
       do.call(
         plugin_validator(res),
         c(
@@ -314,7 +320,8 @@ borad_plugins <- function(which = NULL) {
     manage_stacks(server = add_rm_stack_server, ui = add_rm_stack_ui),
     notify_user(server = block_notification_server),
     generate_code(server = gen_code_server, ui = gen_code_ui),
-    edit_block(server = edit_block_server, ui = edit_block_ui)
+    edit_block(server = edit_block_server, ui = edit_block_ui),
+    edit_stack(server = edit_stack_server, ui = edit_stack_ui)
   )
 
   if (is.null(which)) {

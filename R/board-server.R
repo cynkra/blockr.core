@@ -3,7 +3,7 @@
 #' Shiny server function for `board` objects.
 #'
 #' @param x Board
-#' @param id (Optional) parent namespace
+#' @param id Parent namespace
 #' @param ... Generic consistency
 #'
 #' @export
@@ -43,7 +43,8 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
         board = x,
         board_id = id,
         links = list(),
-        msgs = list()
+        msgs = list(),
+        stacks = list()
       )
 
       rv_lst <- list(board = make_read_only(rv))
@@ -53,11 +54,12 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
       plugin_args <- c(rv_lst, list(update = board_update), dot_args)
 
       edit_block <- get_plugin("edit_block", plugins)
+      edit_stack <- get_plugin("edit_stack", plugins)
 
       observeEvent(
         TRUE,
         {
-          rv <- setup_blocks(rv, edit_block, plugin_args)
+          rv <- setup_board(rv, edit_block, edit_stack, plugin_args, session)
         },
         once = TRUE
       )
@@ -107,6 +109,17 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
             rv$board <- modify_links(rv$board, upd$links$add, upd$links$rm)
           }
 
+          if (length(upd$stacks$rm)) {
+            rv <- rm_blocks_from_stacks(rv, upd$stacks$rm, session)
+            remove_stack_ui(upd$stacks$rm, rv$board)
+          }
+
+          if (length(upd$stacks$add)) {
+            rv <- setup_stacks(rv, edit_stack, plugin_args, upd$stacks$add)
+            insert_stack_ui(rv$board_id, upd$stacks$add, rv$board, edit_stack)
+            rv <- add_blocks_to_stacks(rv, upd$stacks$add, session)
+          }
+
           if (length(upd$stacks$add) || length(upd$stacks$rm)) {
             rv$board <- modify_stacks(rv$board, upd$stacks$add, upd$stacks$rm)
           }
@@ -146,7 +159,7 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
             insert_block_ui(ns(NULL), rv$board, edit_ui = edit_block)
 
             log_trace("setting up block observers")
-            rv <- setup_blocks(rv, edit_block, plugin_args)
+            rv <- setup_board(rv, edit_block, edit_stack, plugin_args, session)
 
             log_trace("completed board refresh")
           }
@@ -181,11 +194,11 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
   )
 }
 
-setup_blocks <- function(rv, edit_mod, args) {
+setup_board <- function(rv, blk_mod, stk_mod, args, sess) {
 
   stopifnot(
     is.reactivevalues(rv),
-    all(c("blocks", "inputs", "board", "links") %in% names(rv)),
+    all(c("blocks", "inputs", "board", "links", "stacks") %in% names(rv)),
     is_board(rv$board)
   )
 
@@ -196,12 +209,16 @@ setup_blocks <- function(rv, edit_mod, args) {
   rv$blocks <- list()
   rv$inputs <- list()
   rv$links <- list()
+  rv$stacks <- list()
 
   blks <- board_blocks(rv$board)
 
   for (i in names(blks)) {
-    rv <- setup_block(blks[[i]], i, rv, edit_mod, args)
+    rv <- setup_block(blks[[i]], i, rv, blk_mod, args)
   }
+
+  rv <- setup_stacks(rv, stk_mod, args)
+  rv <- add_blocks_to_stacks(rv, board_stacks(rv$board), sess)
 
   rv
 }
@@ -224,14 +241,7 @@ setup_block <- function(blk, id, rv, mod, args) {
 
   links <- board_links(rv$board)
 
-  todo <- as.list(links[links$to == id])
-
-  for (i in names(todo)) {
-    rv <- do.call(
-      setup_link,
-      c(list(rv, i), todo[[i]])
-    )
-  }
+  rv <- update_block_links(rv, links[links$to == id])
 
   rv$blocks[[id]] <- list(
     block = blk,
@@ -316,6 +326,53 @@ update_block_links <- function(rv, add = NULL, rm = NULL) {
 
   for (i in names(todo)) {
     rv <- do.call(setup_link, c(list(rv, i), todo[[i]]))
+  }
+
+  rv
+}
+
+setup_stacks <- function(rv, mod, args, stacks = board_stacks(rv$board)) {
+
+  serv <- get_plugin_server(mod)
+
+  for (i in names(stacks)) {
+    serv(c(list(i, stacks[[i]]), args))
+    rv$stacks[[i]] <- character()
+  }
+
+  rv
+}
+
+rm_blocks_from_stacks <- function(rv, rm, session) {
+
+  stopifnot(is.character(rm), all(rm %in% names(rv$stacks)))
+
+  for (i in unlst(rv$stacks[rm])) {
+    remove_block_from_stack(rv$board, i, rv$board_id, session)
+  }
+
+  rv$stacks[rm] <- NULL
+
+  rv
+}
+
+add_blocks_to_stacks <- function(rv, add, session) {
+
+  stopifnot(
+    is_stacks(add),
+    all(names(add) %in% names(rv$stacks)),
+    all(lengths(rv$stacks[names(add)]) == 0)
+  )
+
+  for (i in names(add)) {
+
+    blks <- stack_blocks(add[[i]])
+
+    for (j in stack_blocks(add[[i]])) {
+      add_block_to_stack(rv$board, j, i, session)
+    }
+
+    rv$stacks[[i]] <- blks
   }
 
   rv
