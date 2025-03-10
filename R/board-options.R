@@ -19,6 +19,18 @@ new_board_options <- function(board_name = "Board",
                               ...,
                               class = character()) {
 
+  if (isTRUE(dark_mode)) {
+    dark_mode <- "dark"
+  }
+
+  if (isFALSE(dark_mode)) {
+    dark_mode <- "light"
+  }
+
+  if (is.na(dark_mode)) {
+    dark_mode <- NULL
+  }
+
   res <- structure(
     list(
       board_name = board_name,
