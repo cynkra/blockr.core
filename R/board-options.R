@@ -27,7 +27,7 @@ new_board_options <- function(board_name = "Board",
     dark_mode <- "light"
   }
 
-  if (is.na(dark_mode)) {
+  if (length(dark_mode) && is.na(dark_mode)) {
     dark_mode <- NULL
   }
 
