@@ -109,6 +109,20 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
             rv$board <- modify_links(rv$board, upd$links$add, upd$links$rm)
           }
 
+          mod <- intersect(upd$stacks$rm, names(upd$stacks$add))
+
+          if (length(mod)) {
+
+            mod <- upd$stacks$add[mod]
+
+            upd$stacks$add[names(mod)] <- NULL
+            upd$stacks$rm <- setdiff(upd$stacks$rm, names(mod))
+
+            for (i in names(mod)) {
+              rv <- update_stack(i, rv, mod[[i]], session)
+            }
+          }
+
           if (length(upd$stacks$rm)) {
             rv <- rm_blocks_from_stacks(rv, upd$stacks$rm, session)
             remove_stack_ui(upd$stacks$rm, rv$board)
@@ -205,6 +219,8 @@ setup_board <- function(rv, blk_mod, stk_mod, args, sess) {
   for (link in rv$links) {
     link$destroy()
   }
+
+  destroy_stacks(rv)
 
   rv$blocks <- list()
   rv$inputs <- list()
@@ -336,9 +352,58 @@ setup_stacks <- function(rv, mod, args, stacks = board_stacks(rv$board)) {
   serv <- get_plugin_server(mod)
 
   for (i in names(stacks)) {
-    serv(c(list(i, stacks[[i]]), args))
-    rv$stacks[[i]] <- character()
+    rv$stacks[[i]] <- setup_stack(i, stacks[[i]], rv, serv, args)
   }
+
+  rv
+}
+
+setup_stack <- function(stack_id, stack, rv, srv, args) {
+
+  stopifnot(is_stack(stack))
+
+  stk <- reactiveVal(stack)
+
+  srv(c(list(id = stack_id, stack = stk), args))
+
+  list(
+    value = stk,
+    rendered = character(),
+    observer = observeEvent(stk(), replace_stack(rv, stack_id, stk))
+  )
+}
+
+update_stack <- function(id, rv, val, sess) {
+
+  stopifnot(id %in% names(rv$stacks))
+
+  for (i in setdiff(rv$stacks[[id]][["rendered"]], stack_blocks(val))) {
+    remove_block_from_stack(rv$board, i, rv$board_id, sess)
+  }
+
+  for (i in setdiff(stack_blocks(val), rv$stacks[[id]][["rendered"]])) {
+    add_block_to_stack(rv$board, i, id, sess)
+  }
+
+  rv$stacks[[id]][["value"]](val)
+
+  rv
+}
+
+replace_stack <- function(rv, id, val) {
+  stks <- board_stacks(rv$board)
+  stks[[id]] <- val()
+  board_stacks(rv$board) <- stks
+  rv
+}
+
+destroy_stacks <- function(rv, stack_id = names(rv$stacks)) {
+
+  for (i in stack_id) {
+    rv$stacks[[i]][["observer"]]$destroy()
+  }
+
+  rv$stacks[stack_id] <- NULL
 
   rv
 }
@@ -347,13 +412,11 @@ rm_blocks_from_stacks <- function(rv, rm, session) {
 
   stopifnot(is.character(rm), all(rm %in% names(rv$stacks)))
 
-  for (i in unlst(rv$stacks[rm])) {
+  for (i in unlst(lst_xtr(rv$stacks[rm], "rendered"))) {
     remove_block_from_stack(rv$board, i, rv$board_id, session)
   }
 
-  rv$stacks[rm] <- NULL
-
-  rv
+  destroy_stacks(rv, rm)
 }
 
 add_blocks_to_stacks <- function(rv, add, session) {
@@ -361,7 +424,7 @@ add_blocks_to_stacks <- function(rv, add, session) {
   stopifnot(
     is_stacks(add),
     all(names(add) %in% names(rv$stacks)),
-    all(lengths(rv$stacks[names(add)]) == 0)
+    all(lengths(lst_xtr(rv$stacks[names(add)], "rendered")) == 0)
   )
 
   for (i in names(add)) {
@@ -372,7 +435,7 @@ add_blocks_to_stacks <- function(rv, add, session) {
       add_block_to_stack(rv$board, j, i, session)
     }
 
-    rv$stacks[[i]] <- blks
+    rv$stacks[[i]][["rendered"]] <- blks
   }
 
   rv

@@ -10,9 +10,9 @@ edit_stack_server(id, stack, board, update, ...)
 edit_stack_ui(id, x, ...)
 }
 \arguments{
-\item{id}{Namespace/stack ID}
+\item{id}{Namespace ID}
 
-\item{stack}{(initial) stack object}
+\item{stack}{Stack (reactive)}
 
 \item{board}{Reactive values object containing board information}
 

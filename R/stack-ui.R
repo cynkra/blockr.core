@@ -76,10 +76,7 @@ stack_ui.stack <- function(id, x, edit_ui = NULL, ...) {
     `data-bs-target` = paste0("#", accordion_id),
     `aria-expanded` = "false",
     `aria-controls` = accordion_id,
-    div(
-      class = "accordion-title",
-      title
-    )
+    do.call(div, c(list(class = "accordion-title"), title))
   )
 
   div(
