@@ -68,9 +68,7 @@ as_board_options.board_options <- function(x) {
 #' @rdname new_board_options
 #' @export
 as_board_options.default <- function(x) {
-  validate_board_options(
-    structure(as.list(x), class = "board_options")
-  )
+  do.call(new_board_options, as.list(x))
 }
 
 #' @rdname new_board_options
