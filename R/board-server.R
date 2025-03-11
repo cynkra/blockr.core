@@ -355,7 +355,7 @@ update_stack_blocks <- function(rv, upd, mod, args, session) {
 
   if (length(upd$add)) {
     rv <- setup_stacks(rv, mod, args, upd$add)
-    insert_stack_ui(rv$board_id, upd$add, rv$board, edit_stack)
+    insert_stack_ui(rv$board_id, upd$add, rv$board, mod)
     rv <- add_blocks_to_stacks(rv, upd$add, session)
   }
 

@@ -80,7 +80,7 @@ test_that("board app", {
 
   skip_on_cran()
 
-  app_path <- pkg_file("examples", "board", "app.R")
+  app_path <- pkg_file("examples", "board", "empty", "app.R")
 
   app <- shinytest2::AppDriver$new(
     app_path,
@@ -143,6 +143,48 @@ test_that("board app", {
   app$expect_values(export = TRUE, screenshot_args = FALSE)
 
   app$set_inputs(`my_board-c-expr-by` = "Time")
+
+  app$wait_for_idle()
+  app$expect_values(export = TRUE, screenshot_args = FALSE)
+
+  app$stop()
+})
+
+test_that("board stacks", {
+
+  skip_on_cran()
+
+  app_path <- pkg_file("examples", "board", "stack", "app.R")
+
+  app <- shinytest2::AppDriver$new(
+    app_path,
+    name = "stack",
+    seed = 42
+  )
+
+  app$click("my_board-manage_stacks-stacks_mod")
+  app$wait_for_value(input = "my_board-manage_stacks-ac_blocks")
+  app$set_inputs(`my_board-manage_stacks-ac_blocks` = c("a", "c", "b"))
+  app$click("my_board-manage_stacks-modify_stacks")
+
+  app$wait_for_idle()
+  app$expect_values(export = TRUE, screenshot_args = FALSE)
+
+  app$set_inputs(`my_board-ac-stack_name_in` = "abc")
+  app$wait_for_idle()
+  app$expect_values(export = TRUE, screenshot_args = FALSE)
+
+  app$click("my_board-ac-rm_stack")
+  app$wait_for_idle()
+  app$expect_values(export = TRUE, screenshot_args = FALSE)
+
+  app$click("my_board-manage_stacks-stacks_mod")
+  app$set_inputs(`my_board-manage_stacks-new_stack_id` = "abc")
+  app$click("my_board-manage_stacks-add_stack")
+  app$wait_for_value(input = "my_board-manage_stacks-abc_name")
+  app$set_inputs(`my_board-manage_stacks-abc_name` = "ABC")
+  app$set_inputs(`my_board-manage_stacks-abc_blocks` = c("a", "b", "c"))
+  app$click("my_board-manage_stacks-modify_stacks")
 
   app$wait_for_idle()
   app$expect_values(export = TRUE, screenshot_args = FALSE)
