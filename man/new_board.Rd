@@ -59,9 +59,9 @@ available_stack_blocks(
   blocks = board_stack_ids(x)
 )
 
-modify_links(x, add = NULL, rm = NULL)
+modify_links(x, add = NULL, rm = NULL, mod = NULL)
 
-modify_stacks(x, add = NULL, rm = NULL)
+modify_stacks(x, add = NULL, rm = NULL, mod = NULL)
 
 rm_blocks(x, rm)
 }
@@ -85,6 +85,8 @@ rm_blocks(x, rm)
 \item{add}{Links/stacks to add}
 
 \item{rm}{Link/stack IDs to remove}
+
+\item{mod}{Link/stack IDs to modify}
 }
 \description{
 Blocks are placed on a board.

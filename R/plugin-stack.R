@@ -43,7 +43,6 @@ edit_stack_server <- function(id, stack, board, update, ...) {
 #' @rdname edit_stack
 #' @export
 edit_stack_ui <- function(id, x, ...) {
-  browser()
   tagList(
     uiOutput(NS(id, "stack_name_out"), inline = TRUE),
     span(

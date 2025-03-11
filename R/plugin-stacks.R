@@ -27,6 +27,7 @@ add_rm_stack_server <- function(id, board, update, ...) {
       upd <- reactiveValues(
         add = stacks(),
         rm = character(),
+        mod = stacks(),
         curr = isolate(board_stacks(board$board)),
         obs = list(),
         edit = NULL
@@ -300,20 +301,27 @@ edit_stack_observer <- function(upd, rv) {
       col <- upd$edit$col
       val <- upd$edit$val
 
-      if (!row %in% upd$rm && row %in% board_stack_ids(rv$board)) {
-        upd$rm <- c(upd$rm, row)
-      }
-
       if (col == "name") {
         stack_name(upd$curr[[row]]) <- val
       } else if (col == "blocks") {
         stack_blocks(upd$curr[[row]]) <- val
       }
 
-      if (row %in% names(upd$add)) {
-        upd$add[row] <- upd$curr[row]
+      if (row %in% board_stack_ids(rv$board)) {
+
+        if (row %in% names(upd$mod)) {
+          upd$mod[row] <- upd$curr[row]
+        } else {
+          upd$mod <- c(upd$mod, upd$curr[row])
+        }
+
       } else {
-        upd$add <- c(upd$add, upd$curr[row])
+
+        if (row %in% names(upd$add)) {
+          upd$add[row] <- upd$curr[row]
+        } else {
+          upd$add <- c(upd$add, upd$curr[row])
+        }
       }
     }
   )
@@ -382,6 +390,7 @@ rm_stack_observer <- function(input, rv, upd, sess) {
         upd$rm <- c(upd$rm, ids[ids %in% board_stack_ids(rv$board)])
 
         upd$add <- upd$add[setdiff(names(upd$add), ids)]
+        upd$mod <- upd$mod[setdiff(names(upd$mod), ids)]
         upd$curr <- upd$curr[setdiff(names(upd$curr), ids)]
 
       } else {
@@ -401,6 +410,7 @@ cancel_stack_observer <- function(input, rv, upd, session) {
 
       upd$add <- stacks()
       upd$rm <- character()
+      upd$mod <- stacks()
       upd$curr <- board_stacks(rv$board)
     }
   )
@@ -411,7 +421,7 @@ modify_stack_observer <- function(input, rv, upd, sess, proxy, res) {
   observeEvent(
     input$modify_stacks,
     {
-      if (!length(upd$add) && !length(upd$rm)) {
+      if (!length(upd$add) && !length(upd$rm) && !length(upd$mod)) {
 
         showNotification(
           "No changes specified.",
@@ -422,7 +432,7 @@ modify_stack_observer <- function(input, rv, upd, sess, proxy, res) {
       }
 
       new <- tryCatch(
-        modify_stacks(rv$board, upd$add, upd$rm),
+        modify_stacks(rv$board, upd$add, upd$rm, upd$mod),
         warning = function(e) {
           showNotification(conditionMessage(e), duration = NULL,
                            type = "warning")
@@ -437,13 +447,15 @@ modify_stack_observer <- function(input, rv, upd, sess, proxy, res) {
         list(
           stacks = list(
             add = if (length(upd$add)) upd$add,
-            rm = if (length(upd$rm)) upd$rm
+            rm = if (length(upd$rm)) upd$rm,
+            mod = if (length(upd$mod)) upd$mod
           )
         )
       )
 
       upd$add <- stacks()
       upd$rm <- character()
+      upd$mod <- stacks()
       upd$curr <- board_stacks(new)
 
       DT::replaceData(
@@ -451,6 +463,7 @@ modify_stack_observer <- function(input, rv, upd, sess, proxy, res) {
         dt_board_stack(upd$curr, sess$ns, rv$board),
         rownames = FALSE
       )
+
       removeModal(sess)
     }
   )
