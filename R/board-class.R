@@ -348,7 +348,11 @@ available_stack_blocks <- function(x, stacks = board_stacks(x),
 #' @param mod Link/stack IDs to modify
 #' @rdname new_board
 #' @export
-modify_links <- function(x, add = NULL, rm = NULL, mod = NULL) {
+modify_board_links <- function(x, add = NULL, rm = NULL, mod = NULL) {
+
+  if (!length(add) && !length(rm) && !length(mod)) {
+    return(x)
+  }
 
   links <- board_links(x)
 
@@ -372,7 +376,11 @@ modify_links <- function(x, add = NULL, rm = NULL, mod = NULL) {
 
 #' @rdname new_board
 #' @export
-modify_stacks <- function(x, add = NULL, rm = NULL, mod = NULL) {
+modify_board_stacks <- function(x, add = NULL, rm = NULL, mod = NULL) {
+
+  if (!length(add) && !length(rm) && !length(mod)) {
+    return(x)
+  }
 
   stacks <- board_stacks(x)
 

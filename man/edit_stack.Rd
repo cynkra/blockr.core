@@ -5,14 +5,14 @@
 \alias{edit_stack_ui}
 \title{Edit stack module}
 \usage{
-edit_stack_server(id, stack, board, update, ...)
+edit_stack_server(id, stack_id, board, update, ...)
 
 edit_stack_ui(id, x, ...)
 }
 \arguments{
 \item{id}{Namespace ID}
 
-\item{stack}{Stack (reactive)}
+\item{stack_id}{Stack ID}
 
 \item{board}{Reactive values object containing board information}
 

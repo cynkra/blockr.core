@@ -477,7 +477,7 @@ modify_link_observer <- function(input, rv, upd, session, proxy, res) {
       }
 
       new <- tryCatch(
-        modify_links(rv$board, upd$add, upd$rm),
+        modify_board_links(rv$board, upd$add, upd$rm),
         warning = function(e) {
           showNotification(conditionMessage(e), duration = NULL,
                            type = "warning")

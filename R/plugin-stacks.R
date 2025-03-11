@@ -432,7 +432,7 @@ modify_stack_observer <- function(input, rv, upd, sess, proxy, res) {
       }
 
       new <- tryCatch(
-        modify_stacks(rv$board, upd$add, upd$rm, upd$mod),
+        modify_board_stacks(rv$board, upd$add, upd$rm, upd$mod),
         warning = function(e) {
           showNotification(conditionMessage(e), duration = NULL,
                            type = "warning")
