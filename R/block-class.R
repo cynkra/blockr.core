@@ -329,7 +329,7 @@ as.list.block <- function(x, state = NULL, ...) {
     attrs[
       setdiff(
         names(attrs),
-        c("name", "names", "ctor", "ctor_pkg", "class", "allow_empty_state")
+        c("names", "ctor", "ctor_pkg", "class", "allow_empty_state")
       )
     ]
   )
@@ -359,6 +359,15 @@ c.block <- function(...) {
 block_name <- function(x) {
   stopifnot(is_block(x))
   attr(x, "name")
+}
+
+#' @param value New value
+#' @rdname new_block
+#' @export
+`block_name<-` <- function(x, value) {
+  stopifnot(is_block(x), is_string(value))
+  attr(x, "name") <- value
+  x
 }
 
 #' @rdname new_block

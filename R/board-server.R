@@ -101,6 +101,12 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
             }
           }
 
+          if (length(upd$blocks$mod)) {
+            blks <- board_blocks(rv$board)
+            blks[names(upd$blocks$mod)] <- upd$blocks$mod
+            board_blocks(rv$board) <- blks
+          }
+
           if (length(upd$links$mod)) {
             upd$links$add <- c(upd$links$add, upd$links$mod)
             upd$links$rm <- c(upd$links$rm, names(upd$links$mod))
@@ -497,6 +503,12 @@ validate_board_update_blocks <- function(x, rv) {
 
   all_ids <- board_block_ids(rv$board)
 
+  if ("rm" %in% names(x) && is.character(x$rm)) {
+    cur_ids <- setdiff(all_ids, x$rm)
+  } else {
+    cur_ids <- all_ids
+  }
+
   if ("add" %in% names(x) && !is.null(x$add)) {
 
     if (!is_blocks(x$add)) {
@@ -509,12 +521,6 @@ validate_board_update_blocks <- function(x, rv) {
       )
     }
 
-    if ("rm" %in% names(x) && is.character(x$rm)) {
-      cur_ids <- setdiff(all_ids, x$rm)
-    } else {
-      cur_ids <- all_ids
-    }
-
     if (any(names(x$add) %in% cur_ids)) {
       abort(
         "Expecting the newly added block to have a unique ID.",
@@ -523,6 +529,15 @@ validate_board_update_blocks <- function(x, rv) {
     }
 
     validate_blocks(x$add)
+
+    if ("mod" %in% names(x) && !is.null(x$mod)) {
+      if (length(intersect(names(x$add), names(x$mod)))) {
+        abort(
+          "Cannot add and modify the same IDs simulatneously.",
+          class = "board_update_blocks_add_mod_clash"
+        )
+      }
+    }
   }
 
   if ("rm" %in% names(x) && !is.null(x$rm)) {
@@ -546,10 +561,25 @@ validate_board_update_blocks <- function(x, rv) {
   }
 
   if ("mod" %in% names(x)) {
-    abort(
-      "Cannot modify blocks via the \"mod\" component of a board update.",
-      class = "board_update_blocks_mod_invalid"
-    )
+
+    if (!is_blocks(x$mod)) {
+      abort(
+        paste(
+          "Expecting the \"mod\" block component of a board update",
+          "value to be `NULL` or a `blocks` object."
+        ),
+        class = "board_update_blocks_mod_invalid"
+      )
+    }
+
+    if (!all(names(x$mod) %in% cur_ids)) {
+      abort(
+        "Expecting the modified blocks to be specified by known IDs.",
+        class = "board_update_blocks_mod_invalid"
+      )
+    }
+
+    validate_blocks(x$mod)
   }
 
   invisible()

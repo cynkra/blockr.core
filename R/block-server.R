@@ -79,7 +79,7 @@ block_server.block <- function(id, x, data = list(), edit_block = NULL,
       data_eval_observer(id, x, dat, res, exp, lang, rv, session)
       output_result_observer(x, res, output, session)
 
-      edit_block_state <- call_plugin_server(
+      call_plugin_server(
         edit_block,
         server_args = c(
           list(block_id = id, board = board, update = update),
@@ -90,10 +90,7 @@ block_server.block <- function(id, x, data = list(), edit_block = NULL,
       list(
         result = res,
         expr = lang,
-        state = c(
-          exp$state,
-          edit_block_state
-        ),
+        state = exp$state,
         cond = reactive(
           list(
             data = rv$data_cond,

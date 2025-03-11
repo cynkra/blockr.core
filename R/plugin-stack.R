@@ -8,8 +8,7 @@
 #' @param update Reactive value object to initiate board updates
 #' @param ... Extra arguments passed from parent scope
 #'
-#' @return A list of [shiny::reactiveVal()] objects interpreted as block state
-#' components.
+#' @return `NULL`
 #'
 #' @rdname edit_stack
 #' @export
@@ -39,13 +38,14 @@ edit_stack_server <- function(id, stack_id, board, update, ...) {
       observeEvent(
         input$stack_name_in,
         {
+          req(input$stack_name_in)
           if (!identical(cur_name(), input$stack_name_in)) {
             new_val <- board_stacks(board$board)[[stack_id]]
             stack_name(new_val) <- input$stack_name_in
+            new_val <- as_stacks(set_names(list(new_val), stack_id))
             update(list(stacks = list(mod = new_val)))
           }
-        },
-        ignoreInit = TRUE
+        }
       )
 
       observeEvent(

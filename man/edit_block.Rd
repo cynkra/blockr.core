@@ -31,8 +31,7 @@ block_summary(x, data)
 \item{data}{Result data}
 }
 \value{
-A list of \code{\link[shiny:reactiveVal]{shiny::reactiveVal()}} objects interpreted as block state
-components.
+\code{NULL}
 }
 \description{
 Customizable logic for editing block attributes such as block title.

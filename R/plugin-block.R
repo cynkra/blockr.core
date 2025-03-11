@@ -8,8 +8,7 @@
 #' @param update Reactive value object to initiate board updates
 #' @param ... Extra arguments passed from parent scope
 #'
-#' @return A list of [shiny::reactiveVal()] objects interpreted as block state
-#' components.
+#' @return `NULL`
 #'
 #' @rdname edit_block
 #' @export
@@ -22,20 +21,35 @@ edit_block_server <- function(id, block_id, board, update, ...) {
         board_blocks(board$board)[[block_id]]
       )
 
-      curr_block_name <- reactiveVal(
-        block_name(initial_block)
+      cur_name <- reactive(
+        block_name(board_blocks(board$board)[[block_id]])
+      )
+
+      output$block_name_out <- renderUI(
+        bslib::tooltip(cur_name(), paste("Block ID: ", block_id))
+      )
+
+      observeEvent(
+        cur_name(),
+        updateTextInput(
+          session,
+          "block_name_in",
+          "Block name",
+          cur_name()
+        )
       )
 
       observeEvent(
         input$block_name_in,
         {
           req(input$block_name_in)
-          curr_block_name(input$block_name_in)
+          if (!identical(cur_name(), input$block_name_in)) {
+            new_val <- board_blocks(board$board)[[block_id]]
+            block_name(new_val) <- input$block_name_in
+            new_val <- as_blocks(set_names(list(new_val), block_id))
+            update(list(blocks = list(mod = new_val)))
+          }
         }
-      )
-
-      output$block_name_out <- renderUI(
-        bslib::tooltip(curr_block_name(), paste("Block ID: ", block_id))
       )
 
       output$block_summary <- renderText(
@@ -200,9 +214,7 @@ edit_block_server <- function(id, block_id, board, update, ...) {
         removeModal()
       )
 
-      list(
-        name = curr_block_name
-      )
+      NULL
     }
   )
 }

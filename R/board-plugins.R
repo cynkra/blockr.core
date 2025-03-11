@@ -174,8 +174,7 @@ generate_code <- function(server, ui) {
 #' @rdname new_plugin
 #' @export
 edit_block <- function(server, ui) {
-  new_plugin(server, ui, validator = check_edit_block_val,
-             class = "edit_block")
+  new_plugin(server, ui, validator = expect_null, class = "edit_block")
 }
 
 #' @rdname new_plugin

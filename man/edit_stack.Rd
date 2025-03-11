@@ -23,8 +23,7 @@ edit_stack_ui(id, x, ...)
 \item{x}{Stack}
 }
 \value{
-A list of \code{\link[shiny:reactiveVal]{shiny::reactiveVal()}} objects interpreted as block state
-components.
+\code{NULL}
 }
 \description{
 Customizable logic for editing stack attributes such as stack title.
