@@ -510,7 +510,7 @@ validate_board_update <- function(x, rv) {
 
 validate_board_update_blocks <- function(x, rv) {
 
-  all_ids <- board_link_ids(rv$board)
+  all_ids <- board_block_ids(rv$board)
 
   if ("add" %in% names(x) && !is.null(x$add)) {
 
@@ -526,6 +526,8 @@ validate_board_update_blocks <- function(x, rv) {
 
     if ("rm" %in% names(x) && is.character(x$rm)) {
       cur_ids <- setdiff(all_ids, x$rm)
+    } else {
+      cur_ids <- all_ids
     }
 
     if (any(names(x$add) %in% cur_ids)) {
@@ -550,7 +552,7 @@ validate_board_update_blocks <- function(x, rv) {
       )
     }
 
-    if (all(!x$rm %in% all_ids)) {
+    if (!all(x$rm %in% all_ids)) {
       abort(
         "Expecting the removed block to be specified by a known ID.",
         class = "board_update_blocks_rm_invalid"

@@ -49,11 +49,12 @@ test_that("add/rm stacks", {
 
       expect_identical(
         update()$stacks,
-        list(add = new, rm = NULL)
+        list(add = new, rm = NULL, mod = NULL)
       )
 
       expect_identical(upd$add, stacks())
       expect_identical(upd$rm, character())
+      expect_identical(upd$mod, stacks())
 
       expect_null(session$returned)
     },
@@ -65,6 +66,7 @@ test_that("add/rm stacks", {
     {
       expect_null(upd$edit)
       expect_length(upd$add, 0L)
+      expect_length(upd$mod, 0L)
 
       session$flushReact()
 
@@ -85,14 +87,16 @@ test_that("add/rm stacks", {
         upd$edit,
         list(row = "ac", col = "name", val = "some stack")
       )
-      expect_length(upd$add, 1L)
+      expect_length(upd$add, 0L)
+      expect_length(upd$mod, 1L)
 
       session$setInputs(ac_blocks = c("a", "b"))
       expect_identical(
         upd$edit,
         list(row = "ac", col = "blocks", val = c("a", "b"))
       )
-      expect_length(upd$add, 1L)
+      expect_length(upd$add, 0L)
+      expect_length(upd$mod, 1L)
     },
     args = list(
       board = list(
@@ -138,11 +142,12 @@ test_that("add/rm stacks", {
 
       expect_identical(
         update()$stacks,
-        list(add = NULL, rm = "ab")
+        list(add = NULL, rm = "ab", mod = NULL)
       )
 
       expect_identical(upd$add, stacks())
       expect_identical(upd$rm, character())
+      expect_identical(upd$mod, stacks())
       expect_identical(upd$curr, stacks())
 
       expect_null(session$returned)
@@ -200,7 +205,7 @@ test_that("add/rm stacks return validation", {
       expect_error(
         validate_board_update(
           reactiveVal(list(stacks = list(add = "a"))),
-          list()
+          list(board = new_board())
         ),
         class = "board_update_stacks_add_invalid"
       )
