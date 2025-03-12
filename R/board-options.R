@@ -19,6 +19,18 @@ new_board_options <- function(board_name = "Board",
                               ...,
                               class = character()) {
 
+  if (isTRUE(dark_mode)) {
+    dark_mode <- "dark"
+  }
+
+  if (isFALSE(dark_mode)) {
+    dark_mode <- "light"
+  }
+
+  if (length(dark_mode) && is.na(dark_mode)) {
+    dark_mode <- NULL
+  }
+
   res <- structure(
     list(
       board_name = board_name,
@@ -56,9 +68,7 @@ as_board_options.board_options <- function(x) {
 #' @rdname new_board_options
 #' @export
 as_board_options.default <- function(x) {
-  validate_board_options(
-    structure(as.list(x), class = "board_options")
-  )
+  do.call(new_board_options, as.list(x))
 }
 
 #' @rdname new_board_options
