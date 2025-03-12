@@ -18,7 +18,7 @@ test_that("dummy stack ui tests", {
     "shiny.tag.list"
   )
 
-  plugins <- borad_plugins()
+  plugins <- board_plugins()
 
   expect_s3_class(
     stack_ui("stacks", x, "ac", plugins[["edit_stack"]]),
