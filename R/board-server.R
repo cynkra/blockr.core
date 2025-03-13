@@ -344,12 +344,12 @@ setup_stacks <- function(rv, mod, args, stacks = board_stacks(rv$board)) {
 
   serv <- get_plugin_server(mod)
 
-  if (is.null(serv)) {
-    return(rv)
-  }
-
   for (i in names(stacks)) {
-    serv(c(list(id = paste0("stack_", i), stack_id = i), args))
+
+    if (not_null(serv)) {
+      serv(c(list(id = paste0("stack_", i), stack_id = i), args))
+    }
+
     rv$stacks[[i]] <- character()
   }
 
