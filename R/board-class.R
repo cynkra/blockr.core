@@ -211,52 +211,6 @@ is_acyclic.board <- function(x) {
   is_acyclic(as.matrix(x))
 }
 
-#' @param id Board namespace ID
-#' @param plugins Board plugins
-#' @rdname serve
-#' @export
-serve.board <- function(x, id = rand_names(), plugins = board_plugins(), ...) {
-
-  ui <- bslib::page_fluid(
-    theme = bslib::bs_theme(version = 5),
-    title = board_option("board_name", x),
-    board_ui(id, x, plugins),
-    htmltools::htmlDependency(
-      "change-board-title",
-      pkg_version(),
-      src = pkg_file("assets", "js"),
-      script = "changeBoardTitle.js"
-    )
-  )
-
-  server <- function(input, output, session) {
-
-    observeEvent(
-      board_option_from_userdata("board_name", session),
-      session$sendCustomMessage(
-        "change-board-title",
-        board_option_from_userdata("board_name", session)
-      )
-    )
-
-    res <- board_server(id, x, plugins)
-
-    exportTestValues(
-      result = lapply(
-        lapply(
-          lapply(lst_xtr(res[[1L]]$blocks, "server", "result"), safely_export),
-          reval
-        ),
-        reval
-      )
-    )
-
-    invisible()
-  }
-
-  shinyApp(ui, server)
-}
-
 #' @rdname new_board
 #' @export
 board_blocks <- function(x) {

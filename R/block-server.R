@@ -2,7 +2,7 @@
 #'
 #' Calls shiny modules for the given element (block, fields).
 #'
-#' @param id Block ID
+#' @param id Namespace ID
 #' @param x Object for which to generate a [moduleServer()]
 #' @param data Input data (list of reactives)
 #' @param ... Generic consistency
@@ -12,23 +12,17 @@ block_server <- function(id, x, data = list(), ...) {
   UseMethod("block_server", x)
 }
 
+#' @param block_id Block ID
 #' @param edit_block Block edit plugin
 #' @param board Reactive values object containing board information
 #' @param update Reactive value object to initiate board updates
 #' @rdname block_server
 #' @export
-block_server.block <- function(id, x, data = list(), edit_block = NULL,
-                               board = reactiveValues(),
+block_server.block <- function(id, x, data = list(), block_id = id,
+                               edit_block = NULL, board = reactiveValues(),
                                update = reactiveVal(), ...) {
 
   dot_args <- list(...)
-
-  if (is.null(edit_block) && length(dot_args)) {
-    warn(
-      paste0("Arguments ", paste_enum(names(dot_args)), " will not be used."),
-      class = "no_edit_block_module"
-    )
-  }
 
   moduleServer(
     id,
@@ -74,15 +68,15 @@ block_server.block <- function(id, x, data = list(), edit_block = NULL,
         }
       )
 
-      validate_block_observer(id, x, dat, res, rv, session)
-      state_check_observer(id, x, dat, res, exp, rv, session)
-      data_eval_observer(id, x, dat, res, exp, lang, rv, session)
+      validate_block_observer(block_id, x, dat, res, rv, session)
+      state_check_observer(block_id, x, dat, res, exp, rv, session)
+      data_eval_observer(block_id, x, dat, res, exp, lang, rv, session)
       output_result_observer(x, res, output, session)
 
       call_plugin_server(
         edit_block,
         server_args = c(
-          list(block_id = id, board = board, update = update),
+          list(block_id = block_id, board = board, update = update),
           dot_args
         )
       )

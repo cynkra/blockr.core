@@ -40,7 +40,7 @@ stack_ui.board <- function(id, x, stacks = NULL, edit_ui = NULL, ...) {
         list(id = cont_id),
         map(
           stack_ui,
-          chr_ply(names(stacks), ns),
+          chr_ply(paste0("stack_", names(stacks)), ns),
           as.list(stacks),
           MoreArgs = list(edit_ui = edit_ui)
         )
@@ -114,7 +114,7 @@ insert_stack_ui.board <- function(id, x, board, edit_ui = NULL,
     "beforeEnd",
     map(
       stack_ui,
-      chr_ply(names(x), session$ns),
+      chr_ply(paste0("stack_", names(x)), session$ns),
       x,
       MoreArgs = list(edit_ui = edit_ui)
     ),
@@ -140,12 +140,13 @@ remove_stack_ui.board <- function(id, board,
 
   for (x in id) {
 
-    stack_id <- session$ns(x)
-
-    log_debug("removing stack item: ", stack_id)
+    log_debug("removing stack item: ", x)
 
     removeUI(
-      paste0("#stack-accordion-item-", stack_id),
+      paste0(
+        "#stack-accordion-item-stack_",
+        session$ns(paste0("stack_", x))
+      ),
       immediate = TRUE,
       session = session
     )
@@ -169,8 +170,6 @@ add_block_to_stack.board <- function(board, block_id, stack_id,
                                      session = getDefaultReactiveDomain(),
                                      ...) {
 
-  stack_id <- session$ns(stack_id)
-
   log_debug("adding block ", block_id, " to stack ", stack_id)
 
   session$sendCustomMessage(
@@ -178,7 +177,9 @@ add_block_to_stack.board <- function(board, block_id, stack_id,
     list(
       sel = paste0("#", block_id, "_block"),
       dest = paste0(
-        "#stack-accordion-panel-", stack_id, " > div.accordion-body"
+        "#stack-accordion-panel-",
+        session$ns(paste0("stack_", stack_id)),
+        " > div.accordion-body"
       )
     )
   )

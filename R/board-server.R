@@ -250,7 +250,7 @@ setup_block <- function(blk, id, rv, mod, args) {
     block = blk,
     server = do.call(
       block_server,
-      c(list(id, blk, rv$inputs[[id]], mod), args)
+      c(list(paste0("block_", id), blk, rv$inputs[[id]], id, mod), args)
     )
   )
 
@@ -345,7 +345,7 @@ setup_stacks <- function(rv, mod, args, stacks = board_stacks(rv$board)) {
   serv <- get_plugin_server(mod)
 
   for (i in names(stacks)) {
-    serv(c(list(id = i, stack_id = i), args))
+    serv(c(list(id = paste0("stack_", i), stack_id = i), args))
     rv$stacks[[i]] <- character()
   }
 

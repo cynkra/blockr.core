@@ -78,7 +78,7 @@ block_ui.board <- function(id, x, blocks = NULL, edit_ui = NULL, ...) {
 
   block_card <- function(x, block_id, board_ns, card_elems) {
 
-    blk_id <- board_ns(block_id)
+    blk_id <- board_ns(paste0("block_", block_id))
 
     bslib::card(
       id = paste0(block_id, "_block"),

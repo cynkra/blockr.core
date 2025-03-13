@@ -427,51 +427,6 @@ validate_data_inputs <- function(x, data) {
   NULL
 }
 
-#' @param id Block ID
-#' @param data Data inputs
-#' @rdname serve
-#' @export
-serve.block <- function(x, id = "block", ..., data = list()) {
-
-  init_data <- function(x, is_variadic) {
-    if (is_variadic) do.call(reactiveValues, x) else reactiveVal(x)
-  }
-
-  if (...length() && !length(data)) {
-    data <- list(...)
-  }
-
-  dot_args <- !names(data) %in% block_inputs(x)
-
-  if (!is.na(block_arity(x)) && any(dot_args)) {
-    stop("Unexpected arguments.")
-  }
-
-  if (any(dot_args)) {
-    data <- c(data[!dot_args], list(...args = data[dot_args]))
-  }
-
-  ui <- bslib::page_fluid(
-    theme = bslib::bs_theme(version = 5),
-    title = id,
-    expr_ui(id, x),
-    block_ui(id, x)
-  )
-
-  server <- function(input, output, session) {
-
-    res <- block_server(id, x, Map(init_data, data, names(data) == "...args"))
-
-    exportTestValues(
-      result = safely_export(res$result())()
-    )
-
-    invisible()
-  }
-
-  shinyApp(ui, server)
-}
-
 #' @rdname new_block
 #' @export
 block_inputs <- function(x, ...) {

@@ -16,6 +16,7 @@ block_server(id, x, data = list(), ...)
   id,
   x,
   data = list(),
+  block_id = id,
   edit_block = NULL,
   board = reactiveValues(),
   update = reactiveVal(),
@@ -33,13 +34,15 @@ block_eval(x, expr, data, ...)
 \method{block_eval}{plot_block}(x, expr, data, ...)
 }
 \arguments{
-\item{id}{Block ID}
+\item{id}{Namespace ID}
 
 \item{x}{Object for which to generate a \code{\link[=moduleServer]{moduleServer()}}}
 
 \item{data}{Input data (list of reactives)}
 
 \item{...}{Generic consistency}
+
+\item{block_id}{Block ID}
 
 \item{edit_block}{Block edit plugin}
 
