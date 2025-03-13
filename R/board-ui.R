@@ -160,6 +160,7 @@ remove_block_ui <- function(id, x, blocks = NULL, ...) {
 remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
 
   if (is.null(blocks)) {
+
     stopifnot(is_string(id))
 
     removeUI(
@@ -170,7 +171,7 @@ remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
 
   } else {
 
-    stopifnot(is.character(blocks), all(blocks %in% board_block_ids(x)))
+    stopifnot(is.character(blocks))
 
     for (block in blocks) {
       removeUI(

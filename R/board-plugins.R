@@ -174,13 +174,15 @@ generate_code <- function(server, ui) {
 #' @rdname new_plugin
 #' @export
 edit_block <- function(server, ui) {
-  new_plugin(server, ui, validator = expect_null, class = "edit_block")
+  new_plugin(server, ui, validator = expect_list_of_observers,
+             class = "edit_block")
 }
 
 #' @rdname new_plugin
 #' @export
 edit_stack <- function(server, ui) {
-  new_plugin(server, ui, validator = expect_null, class = "edit_stack")
+  new_plugin(server, ui, validator = expect_list_of_observers,
+             class = "edit_stack")
 }
 
 #' @export

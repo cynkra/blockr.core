@@ -187,3 +187,7 @@ exprs_to_lang <- function(exprs) {
 
   exprs
 }
+
+starts_with <- function(x, prefix) {
+  x[startsWith(x, prefix)]
+}

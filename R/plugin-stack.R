@@ -17,6 +17,8 @@ edit_stack_server <- function(id, stack_id, board, update, ...) {
     id,
     function(input, output, session) {
 
+      obs <- vector("list", 3)
+
       cur_name <- reactive(
         stack_name(board_stacks(board$board)[[stack_id]])
       )
@@ -25,7 +27,7 @@ edit_stack_server <- function(id, stack_id, board, update, ...) {
         bslib::tooltip(cur_name(), paste("Stack ID: ", stack_id))
       )
 
-      observeEvent(
+      obs[[1]] <- observeEvent(
         cur_name(),
         updateTextInput(
           session,
@@ -35,7 +37,7 @@ edit_stack_server <- function(id, stack_id, board, update, ...) {
         )
       )
 
-      observeEvent(
+      obs[[2]] <- observeEvent(
         input$stack_name_in,
         {
           req(input$stack_name_in)
@@ -48,12 +50,12 @@ edit_stack_server <- function(id, stack_id, board, update, ...) {
         }
       )
 
-      observeEvent(
+      obs[[3]] <- observeEvent(
         input$rm_stack,
         update(list(stacks = list(rm = stack_id)))
       )
 
-      NULL
+      obs
     }
   )
 }

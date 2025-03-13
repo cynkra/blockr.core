@@ -18,7 +18,7 @@ test_that("edit blocks", {
       expect_named(res$mod, "a")
       expect_identical(stack_name(res$mod[["a"]]), "data")
 
-      expect_null(session$returned)
+      expect_type(session$returned, "list")
     },
     args = list(
       stack_id = "a",
@@ -48,7 +48,7 @@ test_that("edit blocks", {
 
       expect_identical(res$rm, "a")
 
-      expect_null(session$returned)
+      expect_type(session$returned, "list")
     },
     args = list(
       stack_id = "a",

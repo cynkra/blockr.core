@@ -32,7 +32,7 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
 
           dat <- reactiveVal(dataset)
 
-          observeEvent(input$dataset, dat(input$dataset))
+          obs <- observeEvent(input$dataset, dat(input$dataset))
 
           list(
             expr = reactive({
@@ -46,7 +46,8 @@ new_dataset_block <- function(dataset = character(), package = "datasets",
             state = list(
               dataset = dat,
               package = package
-            )
+            ),
+            obs = list(obs)
           )
         }
       )
