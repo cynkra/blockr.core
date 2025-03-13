@@ -266,8 +266,14 @@ destroy_rm_blocks <- function(ids, rv) {
     rm = links[links$from %in% ids | links$to %in% ids]
   )
 
+  for (id in ids) {
+    # TODO rm block inputs/outputs
+  }
+
   rv$inputs <- rv$inputs[!names(rv$inputs) %in% ids]
   rv$blocks <- rv$blocks[!names(rv$blocks) %in% ids]
+
+  # TODO stacks?
 
   rv$board <- rm_blocks(rv$board, ids)
 

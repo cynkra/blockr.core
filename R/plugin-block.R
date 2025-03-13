@@ -423,7 +423,7 @@ available_block_inputs <- function(block) {
   inp <- block_inputs(block)
 
   if (is.na(block_arity(block))) {
-    inp <- c(inp, as.character(seq_len(length(inp + 1L))))
+    inp <- c(inp, as.character(seq_len(length(inp) + 1L)))
   }
 
   inp
@@ -467,7 +467,7 @@ validate_link_addition <- function(id, input, block, board, session) {
   inps <- block_inputs(block)
 
   if (is.na(block_arity(block))) {
-    inps <- c(inps, as.character(seq_len(length(inps + 1L))))
+    inps <- c(inps, as.character(seq_len(length(inps) + 1L)))
   }
 
   if (!is_string(input) || !input %in% inps) {
