@@ -83,22 +83,20 @@ invalidate_inputs <- function(session = getDefaultReactiveDomain()) {
   invisible()
 }
 
-destroy_observers <- function(x) {
+destroy_observers <- function(ns_prefix, session = getDefaultReactiveDomain()) {
 
-  for (y in x) {
-    destroy_observer(y)
+  obs <- get("observers", envir = session$userData)
+
+  for (i in starts_with(names(obs), ns_prefix)) {
+
+    for (x in obs[[i]]) {
+      x$destroy()
+    }
+
+    obs[[i]] <- NULL
   }
 
-  invisible()
-}
-
-destroy_observer <- function(x) {
-
-  if (is.null(x)) {
-    return(invisible())
-  }
-
-  x$destroy()
+  assign("observers", obs, envir = session$userData)
 
   invisible()
 }

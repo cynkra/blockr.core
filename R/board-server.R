@@ -266,9 +266,12 @@ destroy_rm_blocks <- function(ids, rv, sess) {
 
   for (id in ids) {
 
-    destroy_inputs(paste0("block_", id), sess)
-    destroy_outputs(sess$ns(paste0("block_", id)), sess)
-    destroy_observers(rv$blocks[[id]]$server$obs)
+    blk_id <- paste0("block_", id)
+    blk_ns <- sess$ns(blk_id)
+
+    destroy_inputs(blk_id, sess)
+    destroy_outputs(blk_ns, sess)
+    destroy_observers(blk_ns, sess)
 
     remove_block_from_stack(rv$board, id, rv$board_id, sess)
   }
@@ -368,11 +371,13 @@ destroy_stacks <- function(ids, rv, sess) {
   )
 
   for (id in ids) {
-    destroy_inputs(paste0("stack_", id), sess)
-    destroy_outputs(sess$ns(paste0("stack_", id)), sess)
-    if ("obs" %in% names(rv$stacks[[id]])) {
-      destroy_observers(rv$stacks[[id]][["obs"]])
-    }
+
+    stk_id <- paste0("stack_", id)
+    stk_ns <- sess$ns(stk_id)
+
+    destroy_inputs(stk_id, sess)
+    destroy_outputs(stk_ns, sess)
+    destroy_observers(stk_ns, sess)
   }
 
   rv$stacks[ids] <- NULL
