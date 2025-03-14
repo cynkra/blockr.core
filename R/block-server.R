@@ -69,10 +69,8 @@ block_server.block <- function(id, x, data = list(), block_id = id,
       )
 
       validate_block_observer(block_id, x, dat, res, rv, session)
-      state_check_observer(block_id, x, dat, res, exp, rv,
-                                       session)
-      data_eval_observer(block_id, x, dat, res, exp, lang, rv,
-                                     session)
+      state_check_observer(block_id, x, dat, res, exp, rv, session)
+      data_eval_observer(block_id, x, dat, res, exp, lang, rv, session)
       output_result_observer(x, res, output, session)
 
       call_plugin_server(
