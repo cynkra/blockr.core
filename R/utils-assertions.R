@@ -74,25 +74,3 @@ expect_null <- function(x) {
 
   invisible(x)
 }
-
-expect_list_of_observers <- function(x) {
-
-  if (!is.list(x)) {
-    abort("Expecting a list of observers.", class = "not_list_of_obs")
-  }
-
-  for (y in x) {
-
-    if (!is.null(y) && !inherits(y, "Observer")) {
-      abort(
-        paste(
-          "Expecting a list where each component is either `NULL` or",
-          "inherits from `Observer`."
-        ),
-        class = "not_list_of_obs"
-      )
-    }
-  }
-
-  invisible(x)
-}

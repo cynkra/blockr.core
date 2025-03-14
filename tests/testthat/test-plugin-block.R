@@ -18,7 +18,7 @@ test_that("edit blocks", {
       expect_named(res$mod, "a")
       expect_identical(block_name(res$mod[["a"]]), "iris")
 
-      expect_type(session$returned, "list")
+      expect_null(session$returned)
     },
     args = list(
       block_id = "a",
@@ -57,7 +57,7 @@ test_that("edit blocks", {
       expect_length(lnk$mod, 0L)
       expect_length(lnk$rm, 0L)
 
-      expect_type(session$returned, "list")
+      expect_null(session$returned)
     },
     args = list(
       block_id = "b",
@@ -103,7 +103,7 @@ test_that("edit blocks", {
       expect_length(lnk$mod, 0L)
       expect_length(lnk$rm, 0L)
 
-      expect_type(session$returned, "list")
+      expect_null(session$returned)
     },
     args = list(
       block_id = "b",

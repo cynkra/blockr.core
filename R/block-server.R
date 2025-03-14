@@ -42,9 +42,7 @@ block_server.block <- function(id, x, data = list(), block_id = id,
         eval_cond = empty_block_condition
       )
 
-      obs <- vector("list", 5)
-
-      obs[[1]] <- reorder_dots_observer(data, session)
+      reorder_dots_observer(data, session)
 
       res <- reactiveVal()
 
@@ -70,21 +68,18 @@ block_server.block <- function(id, x, data = list(), block_id = id,
         }
       )
 
-      obs[[2]] <- validate_block_observer(block_id, x, dat, res, rv, session)
-      obs[[3]] <- state_check_observer(block_id, x, dat, res, exp, rv,
+      validate_block_observer(block_id, x, dat, res, rv, session)
+      state_check_observer(block_id, x, dat, res, exp, rv,
                                        session)
-      obs[[4]] <- data_eval_observer(block_id, x, dat, res, exp, lang, rv,
+      data_eval_observer(block_id, x, dat, res, exp, lang, rv,
                                      session)
-      obs[[5]] <- output_result_observer(x, res, output, session)
+      output_result_observer(x, res, output, session)
 
-      obs <- c(
-        obs,
-        call_plugin_server(
-          edit_block,
-          server_args = c(
-            list(block_id = block_id, board = board, update = update),
-            dot_args
-          )
+      call_plugin_server(
+        edit_block,
+        server_args = c(
+          list(block_id = block_id, board = board, update = update),
+          dot_args
         )
       )
 
@@ -98,8 +93,7 @@ block_server.block <- function(id, x, data = list(), block_id = id,
             state = rv$state_cond,
             eval = rv$eval_cond
           )
-        ),
-        obs = c(obs, exp$obs)
+        )
       )
     }
   )
@@ -359,25 +353,13 @@ check_expr_val <- function(val, x) {
         )
       }
 
-      expected <- c("expr", "state")
+      required <- c("expr", "state")
 
-      if (!all(expected %in% names(val))) {
+      if (!setequal(required, names(val))) {
         abort(
           paste0(
             "The block server for ", cls, " is expected to ",
-            "return values ", paste_enum(expected), "."
-          ),
-          class = "expr_server_return_component_missing"
-        )
-      }
-
-      known <- c("expr", "state", "obs")
-
-      if (any(!names(val) %in% known)) {
-        warn(
-          paste0(
-            "The block server for ", cls, " is not expected to ",
-            "return values other than ", paste_enum(known), "."
+            "return values ", paste_enum(required), "."
           ),
           class = "expr_server_return_component_missing"
         )
@@ -415,10 +397,6 @@ check_expr_val <- function(val, x) {
           ),
           class = "expr_server_return_state_invalid"
         )
-      }
-
-      if ("obs" %in% names(val)) {
-        expect_list_of_observers(val[["obs"]])
       }
     },
     once = TRUE

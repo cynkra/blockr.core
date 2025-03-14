@@ -17,8 +17,6 @@ edit_block_server <- function(id, block_id, board, update, ...) {
     id,
     function(input, output, session) {
 
-      obs <- vector("list", 8)
-
       initial_block <- isolate(
         board_blocks(board$board)[[block_id]]
       )
@@ -31,7 +29,7 @@ edit_block_server <- function(id, block_id, board, update, ...) {
         bslib::tooltip(cur_name(), paste("Block ID: ", block_id))
       )
 
-      obs[[1]] <- observeEvent(
+      observeEvent(
         cur_name(),
         updateTextInput(
           session,
@@ -41,7 +39,7 @@ edit_block_server <- function(id, block_id, board, update, ...) {
         )
       )
 
-      obs[[2]] <- observeEvent(
+      observeEvent(
         input$block_name_in,
         {
           req(input$block_name_in)
@@ -61,14 +59,14 @@ edit_block_server <- function(id, block_id, board, update, ...) {
         )
       )
 
-      obs[[3]] <- observeEvent(
+      observeEvent(
         input$rm_block,
         update(list(blocks = list(rm = block_id)))
       )
 
       position <- NULL
 
-      obs[[4]] <- if (block_has_inputs(initial_block)) {
+      if (block_has_inputs(initial_block)) {
         observeEvent(
           input$add_block_before,
           {
@@ -95,7 +93,7 @@ edit_block_server <- function(id, block_id, board, update, ...) {
         )
       }
 
-      obs[[5]] <- observeEvent(
+      observeEvent(
         input$add_block_after,
         {
           position <<- "after"
@@ -107,7 +105,7 @@ edit_block_server <- function(id, block_id, board, update, ...) {
         }
       )
 
-      obs[[6]] <- observeEvent(
+      observeEvent(
         input$registry_select,
         {
           sel <- input$registry_select
@@ -133,7 +131,7 @@ edit_block_server <- function(id, block_id, board, update, ...) {
         }
       )
 
-      obs[[7]] <- observeEvent(
+      observeEvent(
         input$confirm_insert,
         {
           sel <- input$registry_select
@@ -211,12 +209,12 @@ edit_block_server <- function(id, block_id, board, update, ...) {
         }
       )
 
-      obs[[8]] <- observeEvent(
+      observeEvent(
         input$cancel_insert,
         removeModal()
       )
 
-      obs
+      NULL
     }
   )
 }

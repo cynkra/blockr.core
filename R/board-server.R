@@ -350,15 +350,11 @@ setup_stacks <- function(rv, mod, args, stacks = board_stacks(rv$board)) {
 
   for (i in names(stacks)) {
 
-    res <- list(rend = character())
-
     if (not_null(serv)) {
-      res[["obs"]] <- serv(
-        c(list(id = paste0("stack_", i), stack_id = i), args)
-      )
+      serv(c(list(id = paste0("stack_", i), stack_id = i), args))
     }
 
-    rv$stacks[[i]] <- res
+    rv$stacks[[i]] <- character()
   }
 
   rv
@@ -366,9 +362,7 @@ setup_stacks <- function(rv, mod, args, stacks = board_stacks(rv$board)) {
 
 destroy_stacks <- function(ids, rv, sess) {
 
-  stopifnot(
-    all(lengths(lst_xtr(rv$stacks[ids], "rend")) == 0L)
-  )
+  stopifnot(all(lengths(rv$stacks[ids]) == 0L))
 
   for (id in ids) {
 
@@ -421,15 +415,15 @@ update_blocks_in_stack <- function(id, rv, val, sess) {
 
   targ <- stack_blocks(val)
 
-  for (i in setdiff(rv$stacks[[id]][["rend"]], targ)) {
+  for (i in setdiff(rv$stacks[[id]], targ)) {
     remove_block_from_stack(rv$board, i, rv$board_id, sess)
   }
 
-  for (i in setdiff(targ, rv$stacks[[id]][["rend"]])) {
+  for (i in setdiff(targ, rv$stacks[[id]])) {
     add_block_to_stack(rv$board, i, id, sess)
   }
 
-  rv$stacks[[id]][["rend"]] <- targ
+  rv$stacks[[id]] <- targ
 
   rv
 }
@@ -440,11 +434,11 @@ rm_blocks_from_stacks <- function(rv, rm, session) {
 
   for (i in rm) {
 
-    for (j in rv$stacks[[i]][["rend"]]) {
+    for (j in rv$stacks[[i]]) {
       remove_block_from_stack(rv$board, j, rv$board_id, session)
     }
 
-    rv$stacks[[i]][["rend"]] <- character()
+    rv$stacks[[i]] <- character()
   }
 
   rv
@@ -455,7 +449,7 @@ add_blocks_to_stacks <- function(rv, add, session) {
   stopifnot(
     is_stacks(add),
     all(names(add) %in% names(rv$stacks)),
-    all(lengths(lst_xtr(rv$stacks[names(add)], "rend")) == 0L)
+    all(lengths(rv$stacks[names(add)]) == 0L)
   )
 
   for (i in names(add)) {
@@ -466,7 +460,7 @@ add_blocks_to_stacks <- function(rv, add, session) {
       add_block_to_stack(rv$board, j, i, session)
     }
 
-    rv$stacks[[i]][["rend"]] <- blks
+    rv$stacks[[i]] <- blks
   }
 
   rv
