@@ -41,7 +41,7 @@ ser_deser_ui <- function(id, board) {
   tagList(
     downloadButton(
       NS(id, "serialize"),
-      "Save",
+      "Save"
     ),
     htmltools::tagQuery(
       fileInput(

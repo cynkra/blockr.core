@@ -42,8 +42,8 @@ new_scatter_block <- function(x = character(), y = character(), ...) {
           list(
             expr = reactive(
               bquote(
-                plot(data[[.(x)]], data[[.(y)]],
-                     xlab = .(xcol), ylab = .(ycol)),
+                plot(data[[.(x)]], data[[.(y)]], xlab = .(xcol),
+                     ylab = .(ycol)),
                 list(x = x_col(), y = y_col(), xcol = x_col(), ycol = y_col())
               )
             ),
@@ -57,12 +57,14 @@ new_scatter_block <- function(x = character(), y = character(), ...) {
         selectInput(
           inputId = NS(id, "xcol"),
           label = "X-axis",
-          choices = list()
+          choices = x,
+          selected = x
         ),
         selectInput(
           inputId = NS(id, "ycol"),
           label = "Y-axis",
-          choices = list()
+          choices = y,
+          selected = y
         )
       )
     },
