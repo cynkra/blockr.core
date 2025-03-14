@@ -5,20 +5,18 @@
 \alias{add_rm_stack_ui}
 \title{Add/remove block stacks module}
 \usage{
-add_rm_stack_server(id, rv, update, ...)
+add_rm_stack_server(id, board, update, ...)
 
 add_rm_stack_ui(id, board)
 }
 \arguments{
 \item{id}{Namespace ID}
 
-\item{rv}{Reactive values object}
+\item{board}{The initial \code{board} object}
 
 \item{update}{Reactive value object to initiate board updates}
 
 \item{...}{Extra arguments passed from parent scope}
-
-\item{board}{The initial \code{board} object}
 }
 \value{
 A reactive value that evaualtes to \code{NULL} or a list with components

@@ -4,12 +4,12 @@
 \alias{block_notification_server}
 \title{Block notification module}
 \usage{
-block_notification_server(id, rv, ...)
+block_notification_server(id, board, ...)
 }
 \arguments{
 \item{id}{Namespace ID}
 
-\item{rv}{Reactive values object}
+\item{board}{Reactive values object}
 
 \item{...}{Extra arguments passed from parent scope}
 }

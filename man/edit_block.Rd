@@ -3,24 +3,35 @@
 \name{edit_block_server}
 \alias{edit_block_server}
 \alias{edit_block_ui}
+\alias{block_summary}
+\alias{block_summary.block}
 \title{Edit block module}
 \usage{
-edit_block_server(id, x, res, ...)
+edit_block_server(id, block_id, board, update, ...)
 
 edit_block_ui(x, id, ...)
+
+block_summary(x, data)
+
+\method{block_summary}{block}(x, data)
 }
 \arguments{
 \item{id}{Namespace ID}
 
-\item{x}{Static block}
+\item{block_id}{Block ID}
 
-\item{res}{Reactive result}
+\item{board}{Reactive values object containing board information}
+
+\item{update}{Reactive value object to initiate board updates}
 
 \item{...}{Extra arguments passed from parent scope}
+
+\item{x}{Block}
+
+\item{data}{Result data}
 }
 \value{
-A list of \code{\link[shiny:reactiveVal]{shiny::reactiveVal()}} objects interpreted as block state
-components.
+\code{NULL}
 }
 \description{
 Customizable logic for editing block attributes such as block title.

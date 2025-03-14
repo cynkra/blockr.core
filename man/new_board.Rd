@@ -15,8 +15,8 @@
 \alias{board_link_ids}
 \alias{board_stack_ids}
 \alias{available_stack_blocks}
-\alias{modify_links}
-\alias{modify_stacks}
+\alias{modify_board_links}
+\alias{modify_board_stacks}
 \alias{rm_blocks}
 \title{Board}
 \usage{
@@ -59,9 +59,9 @@ available_stack_blocks(
   blocks = board_stack_ids(x)
 )
 
-modify_links(x, add = NULL, rm = NULL)
+modify_board_links(x, add = NULL, rm = NULL, mod = NULL)
 
-modify_stacks(x, add = NULL, rm = NULL)
+modify_board_stacks(x, add = NULL, rm = NULL, mod = NULL)
 
 rm_blocks(x, rm)
 }
@@ -85,6 +85,8 @@ rm_blocks(x, rm)
 \item{add}{Links/stacks to add}
 
 \item{rm}{Link/stack IDs to remove}
+
+\item{mod}{Link/stack IDs to modify}
 }
 \description{
 Blocks are placed on a board.

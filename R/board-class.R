@@ -211,52 +211,6 @@ is_acyclic.board <- function(x) {
   is_acyclic(as.matrix(x))
 }
 
-#' @param id Board namespace ID
-#' @param plugins Board plugins
-#' @rdname serve
-#' @export
-serve.board <- function(x, id = rand_names(), plugins = board_plugins(), ...) {
-
-  ui <- bslib::page_fluid(
-    theme = bslib::bs_theme(version = 5),
-    title = board_option("board_name", x),
-    board_ui(id, x, plugins),
-    htmltools::htmlDependency(
-      "change-board-title",
-      pkg_version(),
-      src = pkg_file("assets", "js"),
-      script = "changeBoardTitle.js"
-    )
-  )
-
-  server <- function(input, output, session) {
-
-    observeEvent(
-      board_option_from_userdata("board_name", session),
-      session$sendCustomMessage(
-        "change-board-title",
-        board_option_from_userdata("board_name", session)
-      )
-    )
-
-    res <- board_server(id, x, plugins)
-
-    exportTestValues(
-      result = lapply(
-        lapply(
-          lapply(lst_xtr(res[[1L]]$blocks, "server", "result"), safely_export),
-          reval
-        ),
-        reval
-      )
-    )
-
-    invisible()
-  }
-
-  shinyApp(ui, server)
-}
-
 #' @rdname new_board
 #' @export
 board_blocks <- function(x) {
@@ -345,9 +299,14 @@ available_stack_blocks <- function(x, stacks = board_stacks(x),
 
 #' @param add Links/stacks to add
 #' @param rm Link/stack IDs to remove
+#' @param mod Link/stack IDs to modify
 #' @rdname new_board
 #' @export
-modify_links <- function(x, add = NULL, rm = NULL) {
+modify_board_links <- function(x, add = NULL, rm = NULL, mod = NULL) {
+
+  if (!length(add) && !length(rm) && !length(mod)) {
+    return(x)
+  }
 
   links <- board_links(x)
 
@@ -360,6 +319,10 @@ modify_links <- function(x, add = NULL, rm = NULL) {
     links <- links[!names(links) %in% rm]
   }
 
+  if (length(mod)) {
+    links[names(mod)] <- mod
+  }
+
   board_links(x) <- c(links, add)
 
   x
@@ -367,7 +330,11 @@ modify_links <- function(x, add = NULL, rm = NULL) {
 
 #' @rdname new_board
 #' @export
-modify_stacks <- function(x, add = NULL, rm = NULL) {
+modify_board_stacks <- function(x, add = NULL, rm = NULL, mod = NULL) {
+
+  if (!length(add) && !length(rm) && !length(mod)) {
+    return(x)
+  }
 
   stacks <- board_stacks(x)
 
@@ -378,6 +345,10 @@ modify_stacks <- function(x, add = NULL, rm = NULL) {
   if (length(rm)) {
     stopifnot(is.character(rm), all(rm %in% names(stacks)))
     stacks <- stacks[!names(stacks) %in% rm]
+  }
+
+  if (length(mod)) {
+    stacks[names(mod)] <- mod
   }
 
   board_stacks(x) <- c(stacks, add)

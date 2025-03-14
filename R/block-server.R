@@ -2,7 +2,7 @@
 #'
 #' Calls shiny modules for the given element (block, fields).
 #'
-#' @param id Block ID
+#' @param id Namespace ID
 #' @param x Object for which to generate a [moduleServer()]
 #' @param data Input data (list of reactives)
 #' @param ... Generic consistency
@@ -12,21 +12,17 @@ block_server <- function(id, x, data = list(), ...) {
   UseMethod("block_server", x)
 }
 
+#' @param block_id Block ID
 #' @param edit_block Block edit plugin
+#' @param board Reactive values object containing board information
 #' @param update Reactive value object to initiate board updates
 #' @rdname block_server
 #' @export
-block_server.block <- function(id, x, data = list(), edit_block = NULL,
+block_server.block <- function(id, x, data = list(), block_id = id,
+                               edit_block = NULL, board = reactiveValues(),
                                update = reactiveVal(), ...) {
 
   dot_args <- list(...)
-
-  if (is.null(edit_block) && length(dot_args)) {
-    warn(
-      paste0("Arguments ", paste_enum(names(dot_args)), " will not be used."),
-      class = "no_edit_block_module"
-    )
-  }
 
   moduleServer(
     id,
@@ -72,23 +68,23 @@ block_server.block <- function(id, x, data = list(), edit_block = NULL,
         }
       )
 
-      validate_block_observer(id, x, dat, res, rv, session)
-      state_check_observer(id, x, dat, res, exp, rv, session)
-      data_eval_observer(id, x, dat, res, exp, lang, rv, session)
+      validate_block_observer(block_id, x, dat, res, rv, session)
+      state_check_observer(block_id, x, dat, res, exp, rv, session)
+      data_eval_observer(block_id, x, dat, res, exp, lang, rv, session)
       output_result_observer(x, res, output, session)
 
-      edit_block_state <- call_plugin_server(
+      call_plugin_server(
         edit_block,
-        server_args = c(list(x, res), dot_args)
+        server_args = c(
+          list(block_id = block_id, board = board, update = update),
+          dot_args
+        )
       )
 
       list(
         result = res,
         expr = lang,
-        state = c(
-          exp$state,
-          edit_block_state
-        ),
+        state = exp$state,
         cond = reactive(
           list(
             data = rv$data_cond,
@@ -343,21 +339,25 @@ check_expr_val <- function(val, x) {
   observeEvent(
     val,
     {
+      cls <- class(x)[1L]
+
       if (!is.list(val)) {
         abort(
           paste(
-            "The block server for", class(x)[1L],
+            "The block server for", cls,
             "is expected to return a list."
           ),
           class = "expr_server_return_type_invalid"
         )
       }
 
-      if (!setequal(names(val), c("expr", "state"))) {
+      required <- c("expr", "state")
+
+      if (!setequal(required, names(val))) {
         abort(
-          paste(
-            "The block server for", class(x)[1L],
-            "is expected to return values `expr` and `state`."
+          paste0(
+            "The block server for ", cls, " is expected to ",
+            "return values ", paste_enum(required), "."
           ),
           class = "expr_server_return_component_missing"
         )
@@ -366,7 +366,7 @@ check_expr_val <- function(val, x) {
       if (!is.reactive(val[["expr"]])) {
         abort(
           paste(
-            "The `expr` component of the return value for", class(x)[1L],
+            "The `expr` component of the return value for", cls,
             "is expected to be a reactive."
           ),
           class = "expr_server_return_type_invalid"
@@ -376,7 +376,7 @@ check_expr_val <- function(val, x) {
       if (!is.list(val[["state"]])) {
         abort(
           paste(
-            "The `state` component of the return value for", class(x)[1L],
+            "The `state` component of the return value for", cls,
             "is expected to be a list."
           ),
           class = "expr_server_return_type_invalid"
@@ -389,7 +389,7 @@ check_expr_val <- function(val, x) {
       if (!setequal(current, expected)) {
         abort(
           paste0(
-            "The `state` component of the return value for ", class(x)[1L],
+            "The `state` component of the return value for ", cls,
             " is expected to additionally return ",
             paste_enum(setdiff(expected, current))
           ),

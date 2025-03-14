@@ -9,6 +9,7 @@
 \alias{as_block.block}
 \alias{as_block.list}
 \alias{block_name}
+\alias{block_name<-}
 \alias{block_ctor}
 \alias{block_expr_server}
 \alias{block_expr_ui}
@@ -53,6 +54,8 @@ as_block(x, ...)
 \method{as_block}{list}(x, ...)
 
 block_name(x)
+
+block_name(x) <- value
 
 block_ctor(x)
 
@@ -117,6 +120,8 @@ new_transform_block(server, ui, class, ctor = sys.parent(), ...)
 \item{...}{Further (metadata) attributes}
 
 \item{x}{An object inheriting from \code{"block"}}
+
+\item{value}{New value}
 
 \item{data}{Data inputs}
 }

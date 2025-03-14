@@ -5,18 +5,16 @@
 \alias{gen_code_ui}
 \title{Code generation module}
 \usage{
-gen_code_server(id, rv, ...)
+gen_code_server(id, board, ...)
 
 gen_code_ui(id, board)
 }
 \arguments{
 \item{id}{Namespace ID}
 
-\item{rv}{Reactive values object}
+\item{board}{The initial \code{board} object}
 
 \item{...}{Extra arguments passed from parent scope}
-
-\item{board}{The initial \code{board} object}
 }
 \value{
 NULL (invisibly)

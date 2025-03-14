@@ -63,12 +63,14 @@ filter_all_zero_len <- function(x) {
 
 filter_empty <- function(x) Filter(Negate(is_empty), x)
 
-expect_null <- function(val) {
+expect_null <- function(x) {
 
-  if (!is.null(val)) {
+  if (!is.null(x)) {
     abort(
-      paste("Expected `NULL`, but got", paste_enum(class(val)), "instead."),
+      paste("Expected `NULL`, but got", paste_enum(class(x)), "instead."),
       class = "not_null"
     )
   }
+
+  invisible(x)
 }

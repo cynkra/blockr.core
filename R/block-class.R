@@ -329,7 +329,7 @@ as.list.block <- function(x, state = NULL, ...) {
     attrs[
       setdiff(
         names(attrs),
-        c("name", "names", "ctor", "ctor_pkg", "class", "allow_empty_state")
+        c("names", "ctor", "ctor_pkg", "class", "allow_empty_state")
       )
     ]
   )
@@ -359,6 +359,15 @@ c.block <- function(...) {
 block_name <- function(x) {
   stopifnot(is_block(x))
   attr(x, "name")
+}
+
+#' @param value New value
+#' @rdname new_block
+#' @export
+`block_name<-` <- function(x, value) {
+  stopifnot(is_block(x), is_string(value))
+  attr(x, "name") <- value
+  x
 }
 
 #' @rdname new_block
@@ -416,51 +425,6 @@ validate_data_inputs <- function(x, data) {
   }
 
   NULL
-}
-
-#' @param id Block ID
-#' @param data Data inputs
-#' @rdname serve
-#' @export
-serve.block <- function(x, id = "block", ..., data = list()) {
-
-  init_data <- function(x, is_variadic) {
-    if (is_variadic) do.call(reactiveValues, x) else reactiveVal(x)
-  }
-
-  if (...length() && !length(data)) {
-    data <- list(...)
-  }
-
-  dot_args <- !names(data) %in% block_inputs(x)
-
-  if (!is.na(block_arity(x)) && any(dot_args)) {
-    stop("Unexpected arguments.")
-  }
-
-  if (any(dot_args)) {
-    data <- c(data[!dot_args], list(...args = data[dot_args]))
-  }
-
-  ui <- bslib::page_fluid(
-    theme = bslib::bs_theme(version = 5),
-    title = id,
-    expr_ui(id, x),
-    block_ui(id, x)
-  )
-
-  server <- function(input, output, session) {
-
-    res <- block_server(id, x, Map(init_data, data, names(data) == "...args"))
-
-    exportTestValues(
-      result = safely_export(res$result())()
-    )
-
-    invisible()
-  }
-
-  shinyApp(ui, server)
 }
 
 #' @rdname new_block

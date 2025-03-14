@@ -4,7 +4,7 @@
 #' board.
 #'
 #' @param id Namespace ID
-#' @param rv Reactive values object
+#' @param board Reactive values object
 #' @param update Reactive value object to initiate board updates
 #' @param ... Extra arguments passed from parent scope
 #'
@@ -15,7 +15,7 @@
 #'
 #' @rdname add_rm_link
 #' @export
-add_rm_link_server <- function(id, rv, update, ...) {
+add_rm_link_server <- function(id, board, update, ...) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -28,36 +28,36 @@ add_rm_link_server <- function(id, rv, update, ...) {
       upd <- reactiveValues(
         add = links(),
         rm = character(),
-        curr = isolate(board_links(rv$board)),
+        curr = isolate(board_links(board$board)),
         obs = list(),
         edit = NULL
       )
 
       observeEvent(
-        board_links(rv$board),
+        board_links(board$board),
         {
-          upd$curr <- board_links(rv$board)
+          upd$curr <- board_links(board$board)
         }
       )
 
       output$links_dt <- DT::renderDataTable(
-        link_dt(isolate(upd$curr), session$ns, isolate(rv$board)),
+        link_dt(isolate(upd$curr), session$ns, isolate(board$board)),
         server = TRUE
       )
 
       links_proxy <- DT::dataTableProxy("links_dt", session)
 
-      create_link_obs_observer(input, rv, upd, session, links_proxy)
+      create_link_obs_observer(input, board, upd, session, links_proxy)
 
-      edit_link_observer(upd, rv)
+      edit_link_observer(upd, board)
 
-      add_link_observer(input, rv, upd, session)
+      add_link_observer(input, board, upd, session)
 
-      rm_link_observer(input, rv, upd, session)
+      rm_link_observer(input, board, upd, session)
 
-      cancel_link_observer(input, rv, upd, session)
+      cancel_link_observer(input, board, upd, session)
 
-      modify_link_observer(input, rv, upd, session, links_proxy, update)
+      modify_link_observer(input, board, upd, session, links_proxy, update)
 
       NULL
     }
@@ -477,7 +477,7 @@ modify_link_observer <- function(input, rv, upd, session, proxy, res) {
       }
 
       new <- tryCatch(
-        modify_links(rv$board, upd$add, upd$rm),
+        modify_board_links(rv$board, upd$add, upd$rm),
         warning = function(e) {
           showNotification(conditionMessage(e), duration = NULL,
                            type = "warning")

@@ -14,6 +14,7 @@
 \alias{notify_user}
 \alias{generate_code}
 \alias{edit_block}
+\alias{edit_stack}
 \alias{plugins}
 \alias{is_plugins}
 \alias{as_plugins}
@@ -53,6 +54,8 @@ notify_user(server, ui = NULL)
 generate_code(server, ui)
 
 edit_block(server, ui)
+
+edit_stack(server, ui)
 
 plugins(...)
 

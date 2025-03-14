@@ -37,6 +37,12 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
     block_plugin <- NULL
   }
 
+  if ("edit_stack" %in% names(plugins)) {
+    stack_plugin <- plugins[["edit_stack"]]
+  } else {
+    stack_plugin <- NULL
+  }
+
   tagList(
     do.call(
       div,
@@ -54,13 +60,8 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
     },
     div(
       id = paste0(id, "_board"),
-      do.call(
-        div,
-        c(
-          id = paste0(id, "_blocks"),
-          block_ui(id, x, edit_ui = block_plugin)
-        )
-      )
+      stack_ui(id, x, edit_ui = stack_plugin),
+      block_ui(id, x, edit_ui = block_plugin)
     )
   )
 }
@@ -77,7 +78,7 @@ block_ui.board <- function(id, x, blocks = NULL, edit_ui = NULL, ...) {
 
   block_card <- function(x, block_id, board_ns, card_elems) {
 
-    blk_id <- board_ns(block_id)
+    blk_id <- board_ns(paste0("block_", block_id))
 
     bslib::card(
       id = paste0(block_id, "_block"),
@@ -85,9 +86,7 @@ block_ui.board <- function(id, x, blocks = NULL, edit_ui = NULL, ...) {
         x,
         NS(blk_id, "edit_block"),
         bslib::card_body(
-          expr_ui(blk_id, x)
-        ),
-        bslib::card_body(
+          expr_ui(blk_id, x),
           block_ui(blk_id, x)
         )
       )
@@ -120,8 +119,12 @@ block_ui.board <- function(id, x, blocks = NULL, edit_ui = NULL, ...) {
     card_elems = edit_ui
   )
 
-  tagList(
-    map(block_card, blocks, names(blocks), MoreArgs = args)
+  do.call(
+    div,
+    c(
+      id = paste0(id, "_blocks"),
+      map(block_card, blocks, names(blocks), MoreArgs = args)
+    )
   )
 }
 
@@ -157,6 +160,7 @@ remove_block_ui <- function(id, x, blocks = NULL, ...) {
 remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
 
   if (is.null(blocks)) {
+
     stopifnot(is_string(id))
 
     removeUI(
@@ -167,7 +171,7 @@ remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
 
   } else {
 
-    stopifnot(is.character(blocks), all(blocks %in% board_block_ids(x)))
+    stopifnot(is.character(blocks))
 
     for (block in blocks) {
       removeUI(

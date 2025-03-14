@@ -4,7 +4,7 @@
 #' the board.
 #'
 #' @param id Namespace ID
-#' @param rv Reactive values object
+#' @param board Reactive values object
 #' @param update Reactive value object to initiate board updates
 #' @param ... Extra arguments passed from parent scope
 #'
@@ -14,31 +14,10 @@
 #'
 #' @rdname add_rm_stack
 #' @export
-add_rm_stack_server <- function(id, rv, update, ...) {
+add_rm_stack_server <- function(id, board, update, ...) {
   moduleServer(
     id,
     function(input, output, session) {
-
-      observeEvent(
-        TRUE,
-        setup_stack_div(rv$board_id),
-        once = TRUE
-      )
-
-      observeEvent(
-        chr_ply(board_stacks(rv$board), stack_name),
-        {
-          stcks <- board_stacks(rv$board)
-          map(
-            assign_output,
-            paste0(names(stcks), "_name_out"),
-            chr_ply(stcks, stack_name),
-            MoreArgs = list(out = output)
-          )
-        }
-      )
-
-      move_blocks_observer(rv, session)
 
       observeEvent(
         input$stacks_mod,
@@ -48,36 +27,37 @@ add_rm_stack_server <- function(id, rv, update, ...) {
       upd <- reactiveValues(
         add = stacks(),
         rm = character(),
-        curr = isolate(board_stacks(rv$board)),
+        mod = stacks(),
+        curr = isolate(board_stacks(board$board)),
         obs = list(),
         edit = NULL
       )
 
       observeEvent(
-        board_stacks(rv$board),
+        board_stacks(board$board),
         {
-          upd$curr <- board_stacks(rv$board)
+          upd$curr <- board_stacks(board$board)
         }
       )
 
       output$stacks_dt <- DT::renderDataTable(
-        stack_dt(isolate(upd$curr), session$ns, isolate(rv$board)),
+        stack_dt(isolate(upd$curr), session$ns, isolate(board$board)),
         server = TRUE
       )
 
       stacks_proxy <- DT::dataTableProxy("stacks_dt", session)
 
-      create_stack_obs_observer(input, rv, upd, session, stacks_proxy)
+      create_stack_obs_observer(input, board, upd, session, stacks_proxy)
 
-      edit_stack_observer(upd, rv)
+      edit_stack_observer(upd, board)
 
-      add_stack_observer(input, rv, upd, session)
+      add_stack_observer(input, board, upd, session)
 
-      rm_stack_observer(input, rv, upd, session)
+      rm_stack_observer(input, board, upd, session)
 
-      cancel_stack_observer(input, rv, upd, session)
+      cancel_stack_observer(input, board, upd, session)
 
-      modify_stack_observer(input, rv, upd, session, stacks_proxy, update)
+      modify_stack_observer(input, board, upd, session, stacks_proxy, update)
 
       NULL
     }
@@ -93,209 +73,6 @@ add_rm_stack_ui <- function(id, board) {
       NS(id, "stacks_mod"),
       "Edit stacks",
       icon = icon("stack-overflow")
-    )
-  )
-}
-
-assign_output <- function(key, val, out) {
-  out[[key]] <- renderText(val)
-  invisible()
-}
-
-setup_stack_div <- function(id) {
-
-  deps <- htmltools::htmlDependency(
-    "move-block-ui",
-    pkg_version(),
-    src = pkg_file("assets", "js"),
-    script = "moveBlockUi.js"
-  )
-
-  insertUI(
-    paste0("#", id, "_board"),
-    "afterBegin",
-    tagList(
-      htmltools::tagQuery(
-        bslib::accordion(id = paste0(id, "_stacks"))
-      )$addAttrs(
-        style = "margin-bottom: 10px;"
-      )$allTags(),
-      deps
-    ),
-    immediate = TRUE
-  )
-}
-
-move_blocks_observer <- function(rv, session) {
-
-  rend_stacks <- reactiveVal(list())
-
-  observeEvent(
-    board_stacks(rv$board),
-    {
-      stks <- board_stacks(rv$board)
-
-      to_add <- setdiff(names(stks), names(rend_stacks()))
-      to_rm <- setdiff(names(rend_stacks()), names(stks))
-
-      to_mod <- intersect(names(stks), names(rend_stacks()))
-      to_mod <- lgl_mply(
-        Negate(identical),
-        lapply(stks[to_mod], stack_blocks),
-        rend_stacks()[to_mod]
-      )
-
-      add_stack_and_add_blocks(to_add, rv, stks, rend_stacks, session)
-      rm_stack_and_rm_blocks(to_rm, rv, stks, rend_stacks, session)
-      modify_stack_blocks(to_mod, rv, stks, rend_stacks, session)
-    }
-  )
-}
-
-add_stack_and_add_blocks <- function(to_add, rv, stks, rend_stacks, session) {
-
-  if (length(to_add)) {
-
-    insert_stack_ui(rv$board_id, stks[to_add], session)
-
-    for (i in to_add) {
-      for (j in stack_blocks(stks[[i]])) {
-        add_block_to_stack(j, i, session)
-      }
-    }
-
-    rend_stacks(
-      c(rend_stacks(), lapply(stks[to_add], stack_blocks))
-    )
-  }
-
-  invisible()
-}
-
-rm_stack_and_rm_blocks <- function(to_rm, rv, stks, rend_stacks, session) {
-
-  if (length(to_rm)) {
-
-    for (i in unlst(rend_stacks()[to_rm])) {
-      rm_block_from_stack(i, rv$board_id, session)
-    }
-
-    for (i in to_rm) {
-      rm_stack_ui(i, session)
-    }
-
-    rend_stacks(
-      rend_stacks()[setdiff(names(rend_stacks()), to_rm)]
-    )
-  }
-
-  invisible()
-}
-
-modify_stack_blocks <- function(to_mod, rv, stks, rend_stacks, session) {
-
-  if (any(to_mod)) {
-
-    to_mod <- names(stks)[to_mod]
-
-    for (i in unlst(rend_stacks()[to_mod])) {
-      rm_block_from_stack(i, rv$board_id, session)
-    }
-
-    for (i in to_mod) {
-      for (j in stack_blocks(stks[[i]])) {
-        add_block_to_stack(j, i, session)
-      }
-    }
-
-    rend_stacks(
-      c(
-        rend_stacks()[setdiff(names(rend_stacks()), to_mod)],
-        lapply(stks[to_mod], stack_blocks)
-      )
-    )
-  }
-
-  invisible()
-}
-
-insert_stack_ui <- function(id, stacks, sess) {
-  insertUI(
-    paste0("#", id, "_stacks"),
-    "beforeEnd",
-    map(empty_stack_card, stacks, names(stacks), MoreArgs = list(sess = sess)),
-    immediate = TRUE,
-    session = sess
-  )
-}
-
-empty_stack_card <- function(x, id, sess) {
-
-  accordion_id <- paste0("stack-accordion-panel-", id)
-
-  log_trace("setting up stack ui: ", accordion_id)
-
-  btn <- tags$button(
-    class = "accordion-button collapsed",
-    type = "button",
-    `data-bs-toggle` = "collapse",
-    `data-bs-target` = paste0("#", accordion_id),
-    `aria-expanded` = "false",
-    `aria-controls` = accordion_id,
-    div(
-      class = "accordion-title",
-      bslib::tooltip(
-        textOutput(sess$ns(paste0(id, "_name_out")), inline = TRUE),
-        paste("Stack ID: ", id)
-      )
-    )
-  )
-
-  div(
-    id = paste0("stack-accordion-item-", id),
-    class = "accordion-item",
-    `data-value` = id,
-    div(class = "accordion-header", btn),
-    div(
-      id = accordion_id,
-      class = "accordion-collapse collapse",
-      div(class = "accordion-body")
-    )
-  )
-}
-
-rm_stack_ui <- function(id, sess) {
-  removeUI(
-    paste0("#stack-accordion-item-", id),
-    immediate = TRUE,
-    session = sess
-  )
-}
-
-add_block_to_stack <- function(block_id, stack_id, sess) {
-
-  log_debug("adding block ", block_id, " to stack ", stack_id)
-
-  sess$sendCustomMessage(
-    "move-block-ui",
-    list(
-      sel = paste0("#", block_id, "_block"),
-      dest = paste0(
-        "#stack-accordion-panel-", stack_id, " > div.accordion-body"
-      )
-    )
-  )
-}
-
-rm_block_from_stack <- function(block_id, blocks_id, sess) {
-
-  log_debug("removing block ", block_id, " from stacks")
-
-  sess$sendCustomMessage(
-    "move-block-ui",
-    list(
-      sel = paste0("#", block_id, "_block"),
-      dest = paste0("#", blocks_id, "_blocks")
     )
   )
 }
@@ -524,20 +301,27 @@ edit_stack_observer <- function(upd, rv) {
       col <- upd$edit$col
       val <- upd$edit$val
 
-      if (!row %in% upd$rm && row %in% board_stack_ids(rv$board)) {
-        upd$rm <- c(upd$rm, row)
-      }
-
       if (col == "name") {
         stack_name(upd$curr[[row]]) <- val
       } else if (col == "blocks") {
         stack_blocks(upd$curr[[row]]) <- val
       }
 
-      if (row %in% names(upd$add)) {
-        upd$add[row] <- upd$curr[row]
+      if (row %in% board_stack_ids(rv$board)) {
+
+        if (row %in% names(upd$mod)) {
+          upd$mod[row] <- upd$curr[row]
+        } else {
+          upd$mod <- c(upd$mod, upd$curr[row])
+        }
+
       } else {
-        upd$add <- c(upd$add, upd$curr[row])
+
+        if (row %in% names(upd$add)) {
+          upd$add[row] <- upd$curr[row]
+        } else {
+          upd$add <- c(upd$add, upd$curr[row])
+        }
       }
     }
   )
@@ -606,6 +390,7 @@ rm_stack_observer <- function(input, rv, upd, sess) {
         upd$rm <- c(upd$rm, ids[ids %in% board_stack_ids(rv$board)])
 
         upd$add <- upd$add[setdiff(names(upd$add), ids)]
+        upd$mod <- upd$mod[setdiff(names(upd$mod), ids)]
         upd$curr <- upd$curr[setdiff(names(upd$curr), ids)]
 
       } else {
@@ -625,6 +410,7 @@ cancel_stack_observer <- function(input, rv, upd, session) {
 
       upd$add <- stacks()
       upd$rm <- character()
+      upd$mod <- stacks()
       upd$curr <- board_stacks(rv$board)
     }
   )
@@ -635,7 +421,7 @@ modify_stack_observer <- function(input, rv, upd, sess, proxy, res) {
   observeEvent(
     input$modify_stacks,
     {
-      if (!length(upd$add) && !length(upd$rm)) {
+      if (!length(upd$add) && !length(upd$rm) && !length(upd$mod)) {
 
         showNotification(
           "No changes specified.",
@@ -646,7 +432,7 @@ modify_stack_observer <- function(input, rv, upd, sess, proxy, res) {
       }
 
       new <- tryCatch(
-        modify_stacks(rv$board, upd$add, upd$rm),
+        modify_board_stacks(rv$board, upd$add, upd$rm, upd$mod),
         warning = function(e) {
           showNotification(conditionMessage(e), duration = NULL,
                            type = "warning")
@@ -661,13 +447,15 @@ modify_stack_observer <- function(input, rv, upd, sess, proxy, res) {
         list(
           stacks = list(
             add = if (length(upd$add)) upd$add,
-            rm = if (length(upd$rm)) upd$rm
+            rm = if (length(upd$rm)) upd$rm,
+            mod = if (length(upd$mod)) upd$mod
           )
         )
       )
 
       upd$add <- stacks()
       upd$rm <- character()
+      upd$mod <- stacks()
       upd$curr <- board_stacks(new)
 
       DT::replaceData(
@@ -675,6 +463,7 @@ modify_stack_observer <- function(input, rv, upd, sess, proxy, res) {
         dt_board_stack(upd$curr, sess$ns, rv$board),
         rownames = FALSE
       )
+
       removeModal(sess)
     }
   )

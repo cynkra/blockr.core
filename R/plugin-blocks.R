@@ -3,7 +3,7 @@
 #' Customizable logic for adding/removing blocks to the board.
 #'
 #' @param id Namespace ID
-#' @param rv Reactive values object
+#' @param board Reactive values object
 #' @param update Reactive value object to initiate board updates
 #' @param ... Extra arguments passed from parent scope
 #'
@@ -13,7 +13,7 @@
 #'
 #' @rdname add_rm_block
 #' @export
-add_rm_block_server <- function(id, rv, update, ...) {
+add_rm_block_server <- function(id, board, update, ...) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -29,33 +29,7 @@ add_rm_block_server <- function(id, rv, update, ...) {
           sel <- input$registry_select
           bid <- input$block_id
 
-          if (nchar(bid) == 0L || !is_string(bid)) {
-
-            showNotification(
-              "Please choose a valid block ID.",
-              type = "warning"
-            )
-
-            return()
-          }
-
-          if (bid %in% board_block_ids(rv$board)) {
-
-            showNotification(
-              "Please choose a unique block ID.",
-              type = "warning"
-            )
-
-            return()
-          }
-
-          if (!is_string(sel) || !sel %in% list_blocks()) {
-
-            showNotification(
-              "Please choose a valid block type.",
-              type = "warning"
-            )
-
+          if (!validate_block_addition(sel, bid, board$board, session)) {
             return()
           }
 
@@ -78,7 +52,7 @@ add_rm_block_server <- function(id, rv, update, ...) {
 
       observeEvent(
         input$rm_block,
-        rm_block_modal(session$ns, rv$board)
+        rm_block_modal(session$ns, board$board)
       )
 
       observeEvent(
@@ -96,7 +70,7 @@ add_rm_block_server <- function(id, rv, update, ...) {
             return()
           }
 
-          if (!all(sel %in% board_block_ids(rv$board))) {
+          if (!all(sel %in% board_block_ids(board$board))) {
 
             showNotification(
               "Please choose valid block IDs.",
@@ -183,4 +157,42 @@ rm_block_modal <- function(ns, board) {
       )
     )
   )
+}
+
+validate_block_addition <- function(block, id, board, session) {
+
+  if (nchar(id) == 0L || !is_string(id)) {
+
+    showNotification(
+      "Please choose a valid block ID.",
+      type = "warning",
+      session = session
+    )
+
+    return(FALSE)
+  }
+
+  if (id %in% board_block_ids(board)) {
+
+    showNotification(
+      "Please choose a unique block ID.",
+      type = "warning",
+      session = session
+    )
+
+    return(FALSE)
+  }
+
+  if (!is_string(block) || !block %in% list_blocks()) {
+
+    showNotification(
+      "Please choose a valid block type.",
+      type = "warning",
+      session = session
+    )
+
+    return(FALSE)
+  }
+
+  TRUE
 }
