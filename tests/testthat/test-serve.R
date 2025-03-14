@@ -7,7 +7,8 @@ test_that("merge app", {
   app <- shinytest2::AppDriver$new(
     app_path,
     name = "merge",
-    seed = 42
+    seed = 42,
+    new_window = TRUE
   )
 
   app$expect_values(export = TRUE, screenshot_args = FALSE)
@@ -39,7 +40,8 @@ test_that("rbind app", {
   app <- shinytest2::AppDriver$new(
     app_path,
     name = "rbind",
-    seed = 42
+    seed = 42,
+    new_window = TRUE
   )
 
   app$expect_values(export = TRUE, screenshot_args = FALSE)
@@ -56,7 +58,8 @@ test_that("board app", {
   app <- shinytest2::AppDriver$new(
     app_path,
     name = "board",
-    seed = 42
+    seed = 42,
+    new_window = TRUE
   )
 
   app$click("my_board-manage_blocks-add_block")
@@ -130,7 +133,8 @@ test_that("board stacks", {
   app <- shinytest2::AppDriver$new(
     app_path,
     name = "stack",
-    seed = 42
+    seed = 42,
+    new_window = TRUE
   )
 
   app$click("my_board-manage_stacks-stacks_mod")
