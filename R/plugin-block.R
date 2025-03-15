@@ -276,7 +276,22 @@ block_summary <- function(x, data) {
 #' @rdname edit_block
 #' @export
 block_summary.block <- function(x, data) {
-  paste0("&lt;", type_desc(data), "[", dim_desc(data), "]&gt;")
+
+  type <- try(type_desc(data), silent = TRUE)
+
+  if (inherits(type, "try-error")) {
+    type <- "??"
+  }
+
+  dims <- try(dim_desc(data), silent = TRUE)
+
+  if (inherits(dims, "try-error")) {
+    dims <- ""
+  } else {
+    dims <- paste0("[", dims, "]")
+  }
+
+  paste0("&lt;", type, dims, "&gt;")
 }
 
 check_edit_block_val <- function(val) {
