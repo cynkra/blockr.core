@@ -14,6 +14,7 @@
 <url><loc>/reference/board_server.html</loc></url>
 <url><loc>/reference/board_ui.html</loc></url>
 <url><loc>/reference/edit_block.html</loc></url>
+<url><loc>/reference/edit_stack.html</loc></url>
 <url><loc>/reference/gen_code.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/new_block.html</loc></url>
@@ -35,6 +36,7 @@
 <url><loc>/reference/register_block.html</loc></url>
 <url><loc>/reference/ser_deser.html</loc></url>
 <url><loc>/reference/serve.html</loc></url>
+<url><loc>/reference/stack_ui.html</loc></url>
 <url><loc>/reference/topo_sort.html</loc></url>
 <url><loc>/reference/write_log.html</loc></url>
 </urlset>

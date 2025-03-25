@@ -44,9 +44,14 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">edit_block_server</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, <span class="va">res</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">edit_block_server</span><span class="op">(</span><span class="va">id</span>, <span class="va">block_id</span>, <span class="va">board</span>, <span class="va">update</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">edit_block_ui</span><span class="op">(</span><span class="va">x</span>, <span class="va">id</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">edit_block_ui</span><span class="op">(</span><span class="va">x</span>, <span class="va">id</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">block_summary</span><span class="op">(</span><span class="va">x</span>, <span class="va">data</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'block'</span></span>
+<span><span class="fu">block_summary</span><span class="op">(</span><span class="va">x</span>, <span class="va">data</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -57,22 +62,33 @@
 <dd><p>Namespace ID</p></dd>
 
 
-<dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>Static block</p></dd>
+<dt id="arg-block-id">block_id<a class="anchor" aria-label="anchor" href="#arg-block-id"></a></dt>
+<dd><p>Block ID</p></dd>
 
 
-<dt id="arg-res">res<a class="anchor" aria-label="anchor" href="#arg-res"></a></dt>
-<dd><p>Reactive result</p></dd>
+<dt id="arg-board">board<a class="anchor" aria-label="anchor" href="#arg-board"></a></dt>
+<dd><p>Reactive values object containing board information</p></dd>
+
+
+<dt id="arg-update">update<a class="anchor" aria-label="anchor" href="#arg-update"></a></dt>
+<dd><p>Reactive value object to initiate board updates</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Extra arguments passed from parent scope</p></dd>
 
+
+<dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>Block</p></dd>
+
+
+<dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
+<dd><p>Result data</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list of <code><a href="https://rdrr.io/pkg/shiny/man/reactiveVal.html" class="external-link">shiny::reactiveVal()</a></code> objects interpreted as block state
-components.</p>
+    <p><code>NULL</code></p>
     </div>
 
   </div>

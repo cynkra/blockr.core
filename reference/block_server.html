@@ -51,7 +51,9 @@
 <span>  <span class="va">id</span>,</span>
 <span>  <span class="va">x</span>,</span>
 <span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  block_id <span class="op">=</span> <span class="va">id</span>,</span>
 <span>  edit_block <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  board <span class="op">=</span> <span class="fu">reactiveValues</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  update <span class="op">=</span> <span class="fu">reactiveVal</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
@@ -75,7 +77,7 @@
 
 
 <dl><dt id="arg-id">id<a class="anchor" aria-label="anchor" href="#arg-id"></a></dt>
-<dd><p>Block ID</p></dd>
+<dd><p>Namespace ID</p></dd>
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
@@ -90,8 +92,16 @@
 <dd><p>Generic consistency</p></dd>
 
 
+<dt id="arg-block-id">block_id<a class="anchor" aria-label="anchor" href="#arg-block-id"></a></dt>
+<dd><p>Block ID</p></dd>
+
+
 <dt id="arg-edit-block">edit_block<a class="anchor" aria-label="anchor" href="#arg-edit-block"></a></dt>
 <dd><p>Block edit plugin</p></dd>
+
+
+<dt id="arg-board">board<a class="anchor" aria-label="anchor" href="#arg-board"></a></dt>
+<dd><p>Reactive values object containing board information</p></dd>
 
 
 <dt id="arg-update">update<a class="anchor" aria-label="anchor" href="#arg-update"></a></dt>
