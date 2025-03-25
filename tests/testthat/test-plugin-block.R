@@ -23,7 +23,7 @@ test_that("edit blocks", {
     args = list(
       block_id = "a",
       board = reactiveValues(
-        board = new_board(blocks = blocks(a = new_dataset_block("iris")))
+        board = new_board(blocks = list(a = new_dataset_block("iris")))
       ),
       update = reactiveVal()
     )
@@ -67,8 +67,8 @@ test_that("edit blocks", {
             a = new_dataset_block("iris"),
             b = new_merge_block()
           ),
-          links = links(from = "a", to = "b", input = "x"),
-          stacks = stacks(ab = c("a", "b"))
+          links = list(from = "a", to = "b", input = "x"),
+          stacks = list(ab = c("a", "b"))
         )
       ),
       update = reactiveVal()
@@ -113,8 +113,8 @@ test_that("edit blocks", {
             a = new_dataset_block("iris"),
             b = new_merge_block()
           ),
-          links = links(from = "a", to = "b", input = "x"),
-          stacks = stacks(ab = c("a", "b"))
+          links = list(from = "a", to = "b", input = "x"),
+          stacks = list(ab = c("a", "b"))
         )
       ),
       update = reactiveVal()
