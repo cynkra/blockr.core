@@ -15,6 +15,7 @@ test_that("merge block constructor", {
       expect_identical(session$returned$state$all_x(), FALSE)
       expect_identical(session$returned$state$all_y(), FALSE)
 
+      session$flushReact()
       session$setInputs(by = "name", type = "all.y")
 
       expect_identical(sels(), "name")
