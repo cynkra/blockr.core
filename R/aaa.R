@@ -1,15 +1,51 @@
-blockr_globals_env <- list2env(
-  list(
-    stack_counter = 1L,
-    notification_ids = list()
-  )
-)
+blockr_globals_env <- new.env()
 
-get_globals <- function(name) {
-  get(name, envir = blockr_globals_env, inherits = FALSE)
+reset_gobals_env <- function(stack_counter = 1L) {
+
+  rm(list = ls(envir = blockr_globals_env), envir = blockr_globals_env)
+
+  vals <- list(
+    stack_counter = stack_counter
+  )
+
+  Map(
+    assign,
+    names(vals),
+    vals,
+    MoreArgs = list(envir = blockr_globals_env, inherits = FALSE)
+  )
+
+  invisible()
 }
 
-set_globals <- function(name, value) {
-  assign(name, value, envir = blockr_globals_env, inherits = FALSE)
+reset_gobals_env()
+
+get_globals <- function(...) {
+
+  get0(
+    session_to_id(...),
+    envir = blockr_globals_env,
+    inherits = FALSE
+  )
+}
+
+set_globals <- function(value, ...) {
+
+  assign(
+    session_to_id(...),
+    value,
+    envir = blockr_globals_env,
+    inherits = FALSE
+  )
+
   invisible()
+}
+
+session_to_id <- function(name = NULL, session = getDefaultReactiveDomain()) {
+
+  if (is.null(session)) {
+    return(name)
+  }
+
+  session$ns(name)
 }

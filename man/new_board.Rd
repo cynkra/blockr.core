@@ -8,12 +8,26 @@
 \alias{board_blocks<-}
 \alias{board_links}
 \alias{board_links<-}
+\alias{board_stacks}
+\alias{board_stacks<-}
+\alias{board_options}
 \alias{board_block_ids}
 \alias{board_link_ids}
-\alias{modify_links}
+\alias{board_stack_ids}
+\alias{available_stack_blocks}
+\alias{modify_board_links}
+\alias{modify_board_stacks}
+\alias{rm_blocks}
 \title{Board}
 \usage{
-new_board(blocks = list(), links = NULL, ..., class = character())
+new_board(
+  blocks = list(),
+  links = list(),
+  stacks = list(),
+  options = new_board_options(),
+  ...,
+  class = character()
+)
 
 validate_board(x)
 
@@ -27,16 +41,38 @@ board_links(x)
 
 board_links(x) <- value
 
+board_stacks(x)
+
+board_stacks(x) <- value
+
+board_options(x)
+
 board_block_ids(x)
 
 board_link_ids(x)
 
-modify_links(x, add = NULL, rm = NULL)
+board_stack_ids(x)
+
+available_stack_blocks(
+  x,
+  stacks = board_stacks(x),
+  blocks = board_stack_ids(x)
+)
+
+modify_board_links(x, add = NULL, rm = NULL, mod = NULL)
+
+modify_board_stacks(x, add = NULL, rm = NULL, mod = NULL)
+
+rm_blocks(x, rm)
 }
 \arguments{
-\item{blocks}{List of blocks}
+\item{blocks}{Set of blocks}
 
-\item{links}{Data frame with columns \code{from} and \code{to}}
+\item{links}{Set of links}
+
+\item{stacks}{Set of stacks}
+
+\item{options}{Board-level user settings}
 
 \item{...}{Further (metadata) attributes}
 
@@ -46,9 +82,11 @@ modify_links(x, add = NULL, rm = NULL)
 
 \item{value}{Replacement value}
 
-\item{add}{Links to add}
+\item{add}{Links/stacks to add}
 
-\item{rm}{Link IDs to remove}
+\item{rm}{Link/stack IDs to remove}
+
+\item{mod}{Link/stack IDs to modify}
 }
 \description{
 Blocks are placed on a board.

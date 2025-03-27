@@ -3,20 +3,20 @@
 #' Generate reproducible code from a board.
 #'
 #' @param id Namespace ID
-#' @param rv Reactive values object
+#' @param board Reactive values object
 #' @param ... Extra arguments passed from parent scope
 #'
 #' @return NULL (invisibly)
 #'
 #' @rdname gen_code
 #' @export
-gen_code_server <- function(id, rv, ...) {
+gen_code_server <- function(id, board, ...) {
   moduleServer(
     id,
     function(input, output, session) {
 
       code <- reactive(
-        generate_code(rv)
+        gen_code(board)
       )
 
       observeEvent(
@@ -31,7 +31,7 @@ gen_code_server <- function(id, rv, ...) {
               title = "Generated code",
               div(
                 class = "text-decoration-none position-relative",
-                copy_to_clipboard(session, id),
+                if (nchar(code())) copy_to_clipboard(session, id),
                 verbatimTextOutput(session$ns(id))
               ),
               easyClose = TRUE,
@@ -86,9 +86,18 @@ copy_to_clipboard <- function(session, id) {
 
 check_gen_code_val <- function(val) {
 
-  if (!is.null(val)) {
-    stop("Expecting a `gen_code` server to return `NULL`.")
-  }
+  observeEvent(
+    TRUE,
+    {
+      if (!is.null(val)) {
+        abort(
+          "Expecting `generate_code` to return `NULL`.",
+          class = "generate_code_return_invalid"
+        )
+      }
+    },
+    once = TRUE
+  )
 
   invisible(val)
 }

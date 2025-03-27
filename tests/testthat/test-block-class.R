@@ -154,35 +154,3 @@ test_that("block utils", {
   expect_s3_class(c(blk, blk), "blocks")
   expect_s3_class(c(blk, lst), "blocks")
 })
-
-test_that("block app", {
-
-  skip_on_cran()
-
-  app_path <- pkg_file("examples", "block", "app.R")
-
-  app <- shinytest2::AppDriver$new(
-    app_path,
-    name = "block",
-    seed = 42
-  )
-
-  app$expect_values(export = TRUE, screenshot_args = FALSE)
-
-  app$set_inputs(`block-expr-by` = "Time")
-  app$expect_values(export = TRUE, screenshot_args = FALSE)
-
-  app$set_inputs(`block-expr-type` = "all.x")
-  app$expect_values(export = TRUE, screenshot_args = FALSE)
-
-  app$set_inputs(`block-expr-type` = c("all.x", "all.y"))
-  app$expect_values(export = TRUE, screenshot_args = FALSE)
-
-  app$set_inputs(`block-expr-type` = "all.y")
-  app$expect_values(export = TRUE, screenshot_args = FALSE)
-
-  app$set_inputs(`block-expr-type` = character(0))
-  app$expect_values(export = TRUE, screenshot_args = FALSE)
-
-  app$stop()
-})

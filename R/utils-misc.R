@@ -39,18 +39,6 @@ rand_names <- function(old_names = character(0L), n = 1L, length = 15L,
   res
 }
 
-#' Serve object
-#'
-#' Start up shiny app.
-#'
-#' @param x Object
-#' @param ... Generic consistency
-#'
-#' @export
-serve <- function(x, ...) {
-  UseMethod("serve")
-}
-
 reval <- function(x) x()
 
 reval_if <- function(x) if (is.function(x)) x() else x
@@ -179,4 +167,27 @@ safely_export <- function(r) {
       tryCatch(!!r_quo, error = function(e) e)
     })
   })
+}
+
+exprs_to_lang <- function(exprs) {
+
+  if (rlang::is_syntactic_literal(exprs)) {
+    return(exprs)
+  }
+
+  if (is.expression(exprs)) {
+    exprs <- as.list(exprs)
+  }
+
+  if (is.list(exprs)) {
+    exprs <- as.call(c(quote(`{`), exprs))
+  }
+
+  stopifnot(typeof(exprs) == "language")
+
+  exprs
+}
+
+starts_with <- function(x, prefix) {
+  x[startsWith(x, prefix)]
 }

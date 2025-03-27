@@ -17,7 +17,7 @@
 #'
 #' @export
 new_block <- function(server, ui, class, ctor, ctor_pkg, dat_valid = NULL,
-                      name = NULL, allow_empty_state = FALSE, ...) {
+                      allow_empty_state = FALSE, name = NULL, ...) {
 
   stopifnot(is.character(class), length(class) > 0L)
 
@@ -25,6 +25,10 @@ new_block <- function(server, ui, class, ctor, ctor_pkg, dat_valid = NULL,
     ui <- function(id) {
       tagList()
     }
+  }
+
+  if (missing(ctor)) {
+    ctor <- sys.parent()
   }
 
   if (is.numeric(ctor)) {
@@ -322,7 +326,12 @@ as.list.block <- function(x, state = NULL, ...) {
 
   state <- c(
     state,
-    attrs[setdiff(names(attrs), c("names", "ctor", "ctor_pkg", "class"))]
+    attrs[
+      setdiff(
+        names(attrs),
+        c("names", "ctor", "ctor_pkg", "class", "allow_empty_state")
+      )
+    ]
   )
 
   list(
@@ -336,7 +345,13 @@ as.list.block <- function(x, state = NULL, ...) {
 
 #' @export
 c.block <- function(...) {
-  as_blocks(lapply(list(...), as_block))
+
+  res <- unlist(
+    lapply(list(...), harmonize_list_of_blocks),
+    recursive = FALSE
+  )
+
+  as_blocks(res)
 }
 
 #' @rdname new_block
@@ -344,6 +359,15 @@ c.block <- function(...) {
 block_name <- function(x) {
   stopifnot(is_block(x))
   attr(x, "name")
+}
+
+#' @param value New value
+#' @rdname new_block
+#' @export
+`block_name<-` <- function(x, value) {
+  stopifnot(is_block(x), is_string(value))
+  attr(x, "name") <- value
+  x
 }
 
 #' @rdname new_block
@@ -403,28 +427,6 @@ validate_data_inputs <- function(x, data) {
   NULL
 }
 
-#' @param data Data inputs
-#' @param id Block ID
-#' @rdname serve
-#' @export
-serve.block <- function(x, data = list(), id = "block", ...) {
-
-  ui <- bslib::page_fluid(block_ui(id, x))
-
-  server <- function(input, output, session) {
-
-    res <- block_server(id, x, lapply(data, reactiveVal))
-
-    exportTestValues(
-      result = safely_export(res$result())()
-    )
-
-    invisible()
-  }
-
-  shinyApp(ui, server)
-}
-
 #' @rdname new_block
 #' @export
 block_inputs <- function(x, ...) {
@@ -450,6 +452,14 @@ initial_block_state <- function(x) {
     set_names(nm = block_ctor_inputs(x)),
     get,
     envir = environment(block_expr_server(x))
+  )
+}
+
+block_base_attrs <- function() {
+  setdiff(
+    names(formals(new_block)),
+    c("server", "ui", "class", "ctor", "ctor_pkg", "dat_valid",
+      "allow_empty_state")
   )
 }
 

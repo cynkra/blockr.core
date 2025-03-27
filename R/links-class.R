@@ -34,13 +34,25 @@ links <- function(...) {
   )
 }
 
+harmonize_list_of_links <- function(x) {
+  if (is_link(x)) {
+    list(x)
+  } else if (is_links(x)) {
+    as.list(x)
+  } else if (is.list(x) && all(lgl_ply(x, is_link))) {
+    x
+  } else {
+    list(as_link(x))
+  }
+}
+
 list_to_list_of_links <- function(x) {
 
   if (length(x) == 1L && is.character(x[[1L]])) {
     x <- list(as.list(x))
   }
 
-  if (any(lgl_ply(x, is.atomic))) {
+  if (length(x) && all(lgl_ply(x, is.atomic))) {
 
     stopifnot(
       all(length(x[[1L]]) == lengths(x[-1L]))
@@ -60,10 +72,12 @@ list_to_list_of_links <- function(x) {
       names(res) <- NULL
     }
 
-    return(res)
-  }
+    res
 
-  lapply(x, as_link)
+  } else {
+
+    unlist(lapply(x, harmonize_list_of_links), recursive = FALSE)
+  }
 }
 
 #' @rdname new_link
@@ -83,7 +97,10 @@ names.links <- function(x) {
   if (is.null(value)) {
     value <- rep("", length(x))
   } else if (anyDuplicated(value) != 0L) {
-    stop("IDs are required to be unique.")
+    abort(
+      "IDs are required to be unique.",
+      class = "links_names_unique_invalid"
+    )
   }
 
   field(x, "id") <- value
@@ -103,52 +120,8 @@ vec_restore.links <- function(x, to, ...) {
 }
 
 #' @export
-vec_ptype2.links.links <- function(x, y, ...) x
-
-#' @export
-vec_ptype2.list.links <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.links.list <- function(x, y, ...) x
-
-#' @export
-vec_ptype2.data.frame.links <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.links.data.frame <- function(x, y, ...) x
-
-#' @export
-vec_ptype2.link.links <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.links.link <- function(x, y, ...) x
-
-#' @export
-vec_cast.links.links <- function(x, to, ...) x
-
-#' @export
-vec_cast.links.list <- function(x, to, ...) as_links(x)
-
-#' @export
-vec_cast.list.links <- function(x, to, ...) as.list(x)
-
-#' @export
-vec_cast.links.data.frame <- function(x, to, ...) as_links(x)
-
-#' @export
-vec_cast.data.frame.links <- function(x, to, ...) as.data.frame(x)
-
-#' @export
-vec_cast.links.link <- function(x, to, ...) as_links(x)
-
-#' @export
 c.links <- function(...) {
-
-  args <- lapply(list(...), as_links)
-
-  validate_links(
-    do.call(vec_c, c(args, list(.ptype = args[[1L]])))
-  )
+  as_links(list_to_list_of_links(list(...)))
 }
 
 #' @export
@@ -183,13 +156,16 @@ c.links <- function(...) {
   new_ids <- names(value)
 
   if (!setequal(new_ids, trg_ids)) {
-    stop(
-      "Replacing IDs ", paste_enum(trg_ids), " with ", paste_enum(new_ids),
-      " is not allowed."
+    abort(
+      paste(
+        "Replacing IDs", paste_enum(trg_ids), "with", paste_enum(new_ids),
+        "is not allowed."
+      ),
+      class = "links_assignment_name_invalid"
     )
   }
 
-  links_assign(x, i, value[trg_ids])
+  links_assign(x, i, as_links(value[trg_ids]))
 }
 
 #' @export
@@ -208,7 +184,7 @@ c.links <- function(...) {
   i <- vec_as_location2(i, length(x), names(x))
   val <- set_names(list(as_link(value)), x$id[i])
 
-  links_assign(x, i, val)
+  links_assign(x, i, as_links(val))
 }
 
 #' @export
@@ -323,11 +299,14 @@ validate_links <- function(x) {
     )
   }
 
-  for (y in as.list(x)) {
-    validate_link(y)
+  if (!is.list(x)) {
+    abort(
+      "Expecting a board links objects behave list-like.",
+      class = "links_list_like_invalid"
+    )
   }
 
-  fields <- c("id", "to", "input")
+  fields <- c("id", "from", "to", "input")
 
   if (!all(fields %in% fields(x))) {
     abort(
@@ -336,6 +315,10 @@ validate_links <- function(x) {
       ),
       class = "links_fields_invalid"
     )
+  }
+
+  for (y in as.list(x)) {
+    validate_link(y)
   }
 
   if (any_dup(field(x, "id")) != 0L) {

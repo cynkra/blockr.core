@@ -5,18 +5,16 @@
 \alias{ser_deser_ui}
 \title{Serialization module}
 \usage{
-ser_deser_server(id, rv, ...)
+ser_deser_server(id, board, ...)
 
 ser_deser_ui(id, board)
 }
 \arguments{
 \item{id}{Namespace ID}
 
-\item{rv}{Reactive values object}
+\item{board}{The initial \code{board} object}
 
 \item{...}{Extra arguments passed from parent scope}
-
-\item{board}{The initial \code{board} object}
 }
 \value{
 A \code{\link[shiny:reactiveVal]{shiny::reactiveVal()}} object that evaluates to \code{NULL} or a

@@ -62,7 +62,10 @@ as.list.blocks <- function(x, ...) {
   if (is.null(value)) {
     value <- rep("", length(x))
   } else if (anyDuplicated(value) != 0L) {
-    stop("IDs are required to be unique.")
+    abort(
+      "IDs are required to be unique.",
+      class = "blocks_names_unique_invalid"
+    )
   }
 
   attr(x, "names") <- value
@@ -96,43 +99,27 @@ vec_restore.blocks <- function(x, to, ...) {
   validate_blocks(NextMethod())
 }
 
-#' @export
-vec_ptype2.blocks.blocks <- function(x, y, ...) x
-
-#' @export
-vec_ptype2.list.blocks <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.blocks.list <- function(x, y, ...) x
-
-#' @export
-vec_ptype2.block.blocks <- function(x, y, ...) y
-
-#' @export
-vec_ptype2.blocks.block <- function(x, y, ...) x
-
-#' @export
-vec_cast.blocks.blocks <- function(x, to, ...) x
-
-#' @export
-vec_cast.blocks.list <- function(x, to, ...) as_blocks(x)
-
-#' @export
-vec_cast.list.blocks <- function(x, to, ...) as.list(x)
-
-#' @export
-vec_cast.blocks.block <- function(x, to, ...) as_blocks(x)
+harmonize_list_of_blocks <- function(x) {
+  if (is_block(x)) {
+    list(x)
+  } else if (is_blocks(x)) {
+    as.list(x)
+  } else if (is.list(x) && all(lgl_ply(x, is_block))) {
+    x
+  } else {
+    list(as_block(x))
+  }
+}
 
 #' @export
 c.blocks <- function(...) {
 
-  args <- lapply(list(...), as_blocks)
-  args <- lapply(args, as.list)
-  args <- do.call(c, args)
-
-  validate_blocks(
-    do.call(c, args)
+  res <- unlist(
+    lapply(list(...), harmonize_list_of_blocks),
+    recursive = FALSE
   )
+
+  as_blocks(res)
 }
 
 #' @export
@@ -155,13 +142,25 @@ c.blocks <- function(...) {
   new_ids <- names(value)
 
   if (!setequal(new_ids, trg_ids)) {
-    stop(
-      "Replacing IDs ", paste_enum(trg_ids), " with ", paste_enum(new_ids),
-      " is not allowed."
+    abort(
+      paste0(
+        "Replacing IDs ", paste_enum(trg_ids), " with ", paste_enum(new_ids),
+        " is not allowed."
+      ),
+      class = "blocks_assignment_name_invalid"
     )
   }
 
   blocks_assign(x, i, value[trg_ids])
+}
+
+#' @export
+`[[<-.blocks` <- function(x, i, ..., value) {
+
+  i <- vec_as_location2(i, length(x), names(x))
+  val <- set_names(list(as_block(value)), x$id[i])
+
+  blocks_assign(x, i, as_blocks(val))
 }
 
 blocks_slice <- function(...) {
@@ -175,21 +174,33 @@ blocks_assign <- function(...) {
 validate_blocks <- function(x) {
 
   if (!is_blocks(x)) {
-    stop("Expecting blocks to inherit from \"blocks\".")
+    abort(
+      "Expecting blocks to inherit from \"blocks\".",
+      class = "blocks_class_invalid"
+    )
   }
 
   if (!is.list(x) || !all(lgl_ply(x, is_block))) {
-    stop("Expecting the board to contain a set of blocks.")
+    abort(
+      "Expecting the board to contain a set of blocks.",
+      class = "blocks_contains_invalid"
+    )
   }
 
   ids <- names(x)
 
   if (length(ids) != length(x) || any(is.na(ids) | !nchar(ids))) {
-    stop("Block IDs are required to be nonempty strings.")
+    abort(
+      "Block IDs are required to be nonempty strings.",
+      class = "blocks_names_invalid"
+    )
   }
 
   if (anyDuplicated(ids) != 0) {
-    stop("Block IDs are required to be unique.")
+    abort(
+      "Block IDs are required to be unique.",
+      class = "blocks_names_invalid"
+    )
   }
 
   x

@@ -12,7 +12,16 @@
 \usage{
 block_server(id, x, data = list(), ...)
 
-\method{block_server}{block}(id, x, data = list(), ...)
+\method{block_server}{block}(
+  id,
+  x,
+  data = list(),
+  block_id = id,
+  edit_block = NULL,
+  board = reactiveValues(),
+  update = reactiveVal(),
+  ...
+)
 
 expr_server(x, data, ...)
 
@@ -25,13 +34,21 @@ block_eval(x, expr, data, ...)
 \method{block_eval}{plot_block}(x, expr, data, ...)
 }
 \arguments{
-\item{id}{Block ID}
+\item{id}{Namespace ID}
 
 \item{x}{Object for which to generate a \code{\link[=moduleServer]{moduleServer()}}}
 
 \item{data}{Input data (list of reactives)}
 
 \item{...}{Generic consistency}
+
+\item{block_id}{Block ID}
+
+\item{edit_block}{Block edit plugin}
+
+\item{board}{Reactive values object containing board information}
+
+\item{update}{Reactive value object to initiate board updates}
 
 \item{expr}{Quoted expression to evaluate in the context of \code{data}}
 }

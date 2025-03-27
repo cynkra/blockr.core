@@ -9,6 +9,7 @@
 \alias{as_block.block}
 \alias{as_block.list}
 \alias{block_name}
+\alias{block_name<-}
 \alias{block_ctor}
 \alias{block_expr_server}
 \alias{block_expr_ui}
@@ -39,8 +40,8 @@ new_block(
   ctor,
   ctor_pkg,
   dat_valid = NULL,
-  name = NULL,
   allow_empty_state = FALSE,
+  name = NULL,
   ...
 )
 
@@ -53,6 +54,8 @@ as_block(x, ...)
 \method{as_block}{list}(x, ...)
 
 block_name(x)
+
+block_name(x) <- value
 
 block_ctor(x)
 
@@ -109,14 +112,16 @@ new_transform_block(server, ui, class, ctor = sys.parent(), ...)
 
 \item{dat_valid}{(Optioanl) input data validator}
 
-\item{name}{Block name}
-
 \item{allow_empty_state}{Either \code{TRUE}, \code{FALSE} or a character vector of
 \code{state} values that may be empty while still moving forward with block eval}
+
+\item{name}{Block name}
 
 \item{...}{Further (metadata) attributes}
 
 \item{x}{An object inheriting from \code{"block"}}
+
+\item{value}{New value}
 
 \item{data}{Data inputs}
 }

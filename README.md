@@ -57,7 +57,8 @@ serve(
     links = c(
       ac = new_link("a", "c", "x"),
       bc = new_link("b", "c", "y")
-    )
+    ),
+    stacks = list(ac = c("a", "c"))
   )
 )
 ```

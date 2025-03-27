@@ -3,7 +3,7 @@
 #' Object (de)serialization in a board server context.
 #'
 #' @param id Namespace ID
-#' @param rv Reactive values object
+#' @param board Reactive values object
 #' @param ... Extra arguments passed from parent scope
 #'
 #' @return A [shiny::reactiveVal()] object that evaluates to `NULL` or a
@@ -11,13 +11,14 @@
 #'
 #' @rdname ser_deser
 #' @export
-ser_deser_server <- function(id, rv, ...) {
+ser_deser_server <- function(id, board, ...) {
   moduleServer(
     id,
     function(input, output, session) {
+
       output$serialize <- downloadHandler(
-        board_filename(rv),
-        write_board_to_disk(rv)
+        board_filename(board),
+        write_board_to_disk(board, session)
       )
 
       res <- reactiveVal()
@@ -40,12 +41,17 @@ ser_deser_ui <- function(id, board) {
   tagList(
     downloadButton(
       NS(id, "serialize"),
-      "Save",
+      "Save"
     ),
-    fileInput(
-      NS(id, "restore"),
-      "Restore"
-    )
+    htmltools::tagQuery(
+      fileInput(
+        NS(id, "restore"),
+        "",
+        buttonLabel = tagList(icon("upload"), "Restore")
+      )
+    )$addAttrs(
+      style = "margin-bottom: 8px;"
+    )$allTags()
   )
 }
 
@@ -60,16 +66,24 @@ board_filename <- function(rv) {
   }
 }
 
-write_board_to_disk <- function(rv) {
+write_board_to_disk <- function(rv, session) {
+
   function(con) {
+
     blocks <- lapply(
       lst_xtr(rv$blocks, "server", "state"),
       lapply,
       reval_if
     )
 
+    opts <- lapply(
+      set_names(nm = list_board_options(rv$board)),
+      board_option_from_userdata,
+      session
+    )
+
     json <- jsonlite::prettify(
-      to_json(rv$board, blocks)
+      to_json(rv$board, blocks, opts)
     )
 
     writeLines(json, con)
@@ -81,7 +95,10 @@ check_ser_deser_val <- function(val) {
     TRUE,
     {
       if (!is.reactive(val)) {
-        stop("Expecting a `ser_deser` server to return a reactive value.")
+        abort(
+          "Expecting `preserve_board` to return a reactive value.",
+          class = "preserve_board_return_invalid"
+        )
       }
     },
     once = TRUE
@@ -91,9 +108,12 @@ check_ser_deser_val <- function(val) {
     val(),
     {
       if (!is_board(val())) {
-        stop(
-          "Expecting the `ser_deser` return value to evaluate to a ",
-          "`board` object."
+        abort(
+          paste(
+            "Expecting the `preserve_board` return value to evaluate to a",
+            "`board` object."
+          ),
+          class = "preserve_board_return_invalid"
         )
       }
 

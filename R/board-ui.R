@@ -15,29 +15,32 @@ board_ui <- function(id, x, ...) {
 #' @rdname board_ui
 #' @export
 board_ui.board <- function(id, x, plugins = list(), ...) {
-  validate_plugins(plugins)
 
-  ser_deser <- get_plugin("preserve_board", plugins)
-  add_rm_block <- get_plugin("manage_blocks", plugins)
-  add_rm_link <- get_plugin("manage_links", plugins)
-  block_notifications <- get_plugin("notify_user", plugins)
-  gen_code <- get_plugin("generate_code", plugins)
+  plugins <- as_plugins(plugins)
 
-  ns <- NS(id)
+  toolbar_plugins <- c("preserve_board", "manage_blocks", "manage_links",
+                       "manage_stacks", "generate_code")
 
-  toolbar_args <- list(
-    if (length(ser_deser)) ser_deser(ns("preserve_board"), x),
-    if (length(add_rm_block)) add_rm_block(ns("manage_blocks"), x),
-    if (length(add_rm_link)) add_rm_link(ns("manage_links"), x),
-    if (length(gen_code)) gen_code(ns("generate_code"), x)
+  toolbar_plugins <- plugins[intersect(toolbar_plugins, names(plugins))]
+
+  toolbar_ui <- do.call(
+    tagList,
+    list(
+      board_ui(id, toolbar_plugins, x),
+      board_ui(id, board_options(x))
+    )
   )
 
-  toolbar_args <- do.call(tagList, toolbar_args)
-
-  if (length(block_notifications)) {
-    block_notifications <- block_notifications(ns("notify_user"), x)
+  if ("edit_block" %in% names(plugins)) {
+    block_plugin <- plugins[["edit_block"]]
   } else {
-    block_notifications <- tagList()
+    block_plugin <- NULL
+  }
+
+  if ("edit_stack" %in% names(plugins)) {
+    stack_plugin <- plugins[["edit_stack"]]
+  } else {
+    stack_plugin <- NULL
   }
 
   tagList(
@@ -49,29 +52,43 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
           "bg-light-subtle sticky-top border rounded-4",
           "m-2 gap-5 p-2"
         ),
-        toolbar_args
+        toolbar_ui
       )
     ),
-    do.call(div, block_notifications),
-    do.call(div, c(id = paste0(id, "_blocks"), block_ui(id, x)))
+    if ("notify_user" %in% names(plugins)) {
+      div(board_ui(id, plugins[["notify_user"]], x))
+    },
+    div(
+      id = paste0(id, "_board"),
+      stack_ui(id, x, edit_ui = stack_plugin),
+      block_ui(id, x, edit_ui = block_plugin)
+    )
   )
 }
 
+#' @rdname board_ui
+#' @export
+board_ui.NULL <- function(id, x, ...) NULL
+
 #' @param blocks (Additional) blocks (or IDs) for which to generate the UI
+#' @param edit_ui Block edit plugin
 #' @rdname block_ui
 #' @export
-block_ui.board <- function(id, x, blocks = NULL, ...) {
-  block_card <- function(x, id, ns) {
-    div(
-      class = "card shadow-sm p-2 mb-2 border",
-      id = paste0(id, "_block"),
-      div(
-        class = "card-body p-1",
-        h5(
-          class = "card-title",
-          paste0(block_name(x), " (", id, ")")
-        ),
-        block_ui(ns(id), x)
+block_ui.board <- function(id, x, blocks = NULL, edit_ui = NULL, ...) {
+
+  block_card <- function(x, block_id, board_ns, card_elems) {
+
+    blk_id <- board_ns(paste0("block_", block_id))
+
+    bslib::card(
+      id = paste0(block_id, "_block"),
+      card_elems(
+        x,
+        NS(blk_id, "edit_block"),
+        bslib::card_body(
+          expr_ui(blk_id, x),
+          block_ui(blk_id, x)
+        )
       )
     )
   }
@@ -79,15 +96,35 @@ block_ui.board <- function(id, x, blocks = NULL, ...) {
   stopifnot(is_string(id))
 
   if (is.null(blocks)) {
-    blocks <- sort(x)
+    blocks <- board_blocks(x)
   } else if (is.character(blocks)) {
     blocks <- board_blocks(x)[blocks]
   }
 
   stopifnot(is_blocks(blocks))
 
-  tagList(
-    map(block_card, blocks, names(blocks), MoreArgs = list(ns = NS(id)))
+  if (is.null(edit_ui)) {
+    edit_ui <- function(x, id, ...) {
+      tagList(
+        bslib::card_header(block_name(x)),
+        ...
+      )
+    }
+  } else {
+    edit_ui <- get_plugin_ui(edit_ui)
+  }
+
+  args <- list(
+    board_ns = NS(id),
+    card_elems = edit_ui
+  )
+
+  do.call(
+    div,
+    c(
+      id = paste0(id, "_blocks"),
+      map(block_card, blocks, names(blocks), MoreArgs = args)
+    )
   )
 }
 
@@ -101,12 +138,13 @@ insert_block_ui <- function(id, x, blocks = NULL, ...) {
 #' @rdname board_ui
 #' @export
 insert_block_ui.board <- function(id, x, blocks = NULL, ...) {
+
   stopifnot(is_string(id))
 
   insertUI(
     paste0("#", id, "_blocks"),
     "beforeEnd",
-    block_ui(id, x, blocks),
+    block_ui(id, x, blocks, ...),
     immediate = TRUE
   )
 }
@@ -120,7 +158,9 @@ remove_block_ui <- function(id, x, blocks = NULL, ...) {
 #' @rdname board_ui
 #' @export
 remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
+
   if (is.null(blocks)) {
+
     stopifnot(is_string(id))
 
     removeUI(
@@ -128,8 +168,10 @@ remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
       multiple = TRUE,
       immediate = TRUE
     )
+
   } else {
-    stopifnot(is.character(blocks), all(blocks %in% board_block_ids(x)))
+
+    stopifnot(is.character(blocks))
 
     for (block in blocks) {
       removeUI(
@@ -138,4 +180,17 @@ remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
       )
     }
   }
+}
+
+#' @param session Shiny session
+#' @rdname board_ui
+#' @export
+update_ui <- function(x, session, ...) {
+  UseMethod("update_ui", x)
+}
+
+#' @rdname board_ui
+#' @export
+update_ui.board <- function(x, session, ...) {
+  update_ui(board_options(x), session)
 }

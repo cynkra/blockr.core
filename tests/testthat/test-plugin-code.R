@@ -26,7 +26,26 @@ test_that("generate code", {
       expect_type(res, "character")
       expect_length(res, 1L)
     },
-    args = list(x = board, plugins = list(generate_code = gen_code_server))
+    args = list(
+      x = board,
+      plugins = list(
+        generate_code(server = gen_code_server, ui = gen_code_ui)
+      )
+    )
+  )
+})
+
+test_that("gen_code return validation", {
+  with_mock_session(
+    {
+      check_gen_code_val(list(a = 1))
+      sink_msg(
+        expect_warning(
+          session$flushReact(),
+          "Expecting `generate_code` to return `NULL`"
+        )
+      )
+    }
   )
 })
 

@@ -4,9 +4,12 @@
 \alias{blockr_ser}
 \alias{blockr_ser.block}
 \alias{blockr_ser.blocks}
+\alias{blockr_ser.board_options}
 \alias{blockr_ser.board}
 \alias{blockr_ser.link}
 \alias{blockr_ser.links}
+\alias{blockr_ser.stack}
+\alias{blockr_ser.stacks}
 \alias{blockr_deser}
 \alias{blockr_deser.list}
 \alias{blockr_deser.block}
@@ -14,6 +17,9 @@
 \alias{blockr_deser.board}
 \alias{blockr_deser.link}
 \alias{blockr_deser.links}
+\alias{blockr_deser.stack}
+\alias{blockr_deser.stacks}
+\alias{blockr_deser.board_options}
 \alias{to_json}
 \alias{from_json}
 \title{Serialization utilities}
@@ -24,11 +30,17 @@ blockr_ser(x, ...)
 
 \method{blockr_ser}{blocks}(x, blocks = NULL, ...)
 
-\method{blockr_ser}{board}(x, blocks = NULL, ...)
+\method{blockr_ser}{board_options}(x, options = NULL, ...)
+
+\method{blockr_ser}{board}(x, blocks = NULL, options = NULL, ...)
 
 \method{blockr_ser}{link}(x, ...)
 
 \method{blockr_ser}{links}(x, ...)
+
+\method{blockr_ser}{stack}(x, ...)
+
+\method{blockr_ser}{stacks}(x, ...)
 
 blockr_deser(x, ...)
 
@@ -44,6 +56,12 @@ blockr_deser(x, ...)
 
 \method{blockr_deser}{links}(x, data, ...)
 
+\method{blockr_deser}{stack}(x, data, ...)
+
+\method{blockr_deser}{stacks}(x, data, ...)
+
+\method{blockr_deser}{board_options}(x, data, ...)
+
 to_json(x, ...)
 
 from_json(x)
@@ -56,6 +74,8 @@ from_json(x)
 \item{state}{Object state (as returned from an \code{expr_server})}
 
 \item{blocks}{Block states (\code{NULL} defaults to values from ctor scope)}
+
+\item{options}{Board option values (\code{NULL} means default values)}
 
 \item{data}{List valued data (converted from JSON)}
 }

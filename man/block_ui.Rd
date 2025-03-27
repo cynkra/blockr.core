@@ -27,25 +27,25 @@ expr_ui(id, x, ...)
 
 \method{expr_ui}{block}(id, x, ...)
 
-block_output(x, result)
+block_output(x, result, session)
 
-\method{block_output}{block}(x, result)
+\method{block_output}{block}(x, result, session)
 
-\method{block_ui}{board}(id, x, blocks = NULL, ...)
+\method{block_ui}{board}(id, x, blocks = NULL, edit_ui = NULL, ...)
 
-\method{block_output}{data_block}(x, result)
+\method{block_output}{data_block}(x, result, session)
 
 \method{block_ui}{data_block}(id, x, ...)
 
-\method{block_output}{parser_block}(x, result)
+\method{block_output}{parser_block}(x, result, session)
 
 \method{block_ui}{parser_block}(id, x, ...)
 
-\method{block_output}{plot_block}(x, result)
+\method{block_output}{plot_block}(x, result, session)
 
 \method{block_ui}{plot_block}(id, x, ...)
 
-\method{block_output}{transform_block}(x, result)
+\method{block_output}{transform_block}(x, result, session)
 
 \method{block_ui}{transform_block}(id, x, ...)
 }
@@ -58,7 +58,11 @@ block_output(x, result)
 
 \item{result}{Reactive block result}
 
+\item{session}{Shiny session object}
+
 \item{blocks}{(Additional) blocks (or IDs) for which to generate the UI}
+
+\item{edit_ui}{Block edit plugin}
 }
 \description{
 Generics for creating fields and block UI containers.

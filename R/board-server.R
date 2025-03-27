@@ -3,7 +3,7 @@
 #' Shiny server function for `board` objects.
 #'
 #' @param x Board
-#' @param id (Optional) parent namespace
+#' @param id Parent namespace
 #' @param ... Generic consistency
 #'
 #' @export
@@ -19,7 +19,7 @@ board_server <- function(id, x, ...) {
 board_server.board <- function(id, x, plugins = list(), callbacks = list(),
                                ...) {
 
-  validate_plugins(plugins)
+  plugins <- as_plugins(plugins)
 
   if (is.function(callbacks)) {
     callbacks <- list(callbacks)
@@ -35,142 +35,171 @@ board_server.board <- function(id, x, plugins = list(), callbacks = list(),
 
       ns <- session$ns
 
+      board_options_to_userdata(x, input, session)
+
       rv <- reactiveValues(
         blocks = list(),
         inputs = list(),
         board = x,
         board_id = id,
         links = list(),
-        msgs = list()
+        msgs = list(),
+        stacks = list()
       )
+
+      rv_lst <- list(board = make_read_only(rv))
+
+      board_update <- reactiveVal()
+
+      plugin_args <- c(rv_lst, list(update = board_update), dot_args)
+
+      edit_block <- get_plugin("edit_block", plugins)
+      edit_stack <- get_plugin("edit_stack", plugins)
 
       observeEvent(
         TRUE,
         {
-          rv <- setup_blocks(rv)
+          rv <- setup_board(rv, edit_block, edit_stack, plugin_args, session)
         },
         once = TRUE
       )
 
-      ser_deser <- get_plugin("preserve_board", plugins)
+      call_plugin_server(
+        "manage_blocks",
+        server_args = plugin_args,
+        plugins = plugins
+      )
 
-      if (not_null(ser_deser)) {
-        board_refresh <- check_ser_deser_val(
-          do.call(ser_deser, c(list("preserve_board", rv), dot_args))
-        )
+      call_plugin_server(
+        "manage_links",
+        server_args = plugin_args,
+        plugins = plugins
+      )
+
+      call_plugin_server(
+        "manage_stacks",
+        server_args = plugin_args,
+        plugins = plugins
+      )
+
+      observeEvent(
+        board_update(),
+        {
+          upd <- validate_board_update(board_update, rv)
+
+          if (length(upd$blocks$add)) {
+
+            insert_block_ui(ns(NULL), rv$board, upd$blocks$add,
+                            edit_ui = edit_block)
+
+            board_blocks(rv$board) <- c(board_blocks(rv$board), upd$blocks$add)
+
+            for (blk in names(upd$blocks$add)) {
+              rv <- setup_block(
+                upd$blocks$add[[blk]], blk, rv, edit_block, plugin_args
+              )
+            }
+          }
+
+          if (length(upd$blocks$mod)) {
+            blks <- board_blocks(rv$board)
+            blks[names(upd$blocks$mod)] <- upd$blocks$mod
+            board_blocks(rv$board) <- blks
+          }
+
+          if (length(upd$links$mod)) {
+            upd$links$add <- c(upd$links$add, upd$links$mod)
+            upd$links$rm <- c(upd$links$rm, names(upd$links$mod))
+          }
+
+          if (length(upd$links$add) || length(upd$links$rm)) {
+
+            rm <- board_links(rv$board)[upd$links$rm]
+            rv <- update_block_links(rv, upd$links$add, rm)
+
+            rv$board <- modify_board_links(rv$board, upd$links$add,
+                                           upd$links$rm)
+          }
+
+          rv <- update_stack_blocks(rv, upd$stacks, edit_stack, plugin_args,
+                                    session)
+
+          rv$board <- modify_board_stacks(rv$board, upd$stacks$add,
+                                          upd$stacks$rm, upd$stacks$mod)
+
+          if (length(upd$blocks$rm)) {
+            rv <- destroy_rm_blocks(upd$blocks$rm, rv, session)
+            remove_block_ui(ns(NULL), rv$board, upd$blocks$rm)
+          }
+
+          board_update(NULL)
+        }
+      )
+
+      board_refresh <- call_plugin_server(
+        "preserve_board",
+        server_args = plugin_args,
+        plugins = plugins
+      )
+
+      if (not_null(board_refresh)) {
 
         observeEvent(
           board_refresh(),
           {
+            log_trace("removing existing ui components")
             remove_block_ui(ns(NULL), rv$board)
 
+            log_trace("refreshing rv$board")
             rv$board <- board_refresh()
 
-            insert_block_ui(ns(NULL), rv$board)
+            log_trace("updating board ui")
+            update_ui(rv$board, session)
 
-            rv <- setup_blocks(rv)
+            log_trace("inserting new ui components")
+            insert_block_ui(ns(NULL), rv$board, edit_ui = edit_block)
+
+            log_trace("setting up block observers")
+            rv <- setup_board(rv, edit_block, edit_stack, plugin_args, session)
+
+            log_trace("completed board refresh")
           }
         )
       }
 
-      add_rm_block <- get_plugin("manage_blocks", plugins)
-
-      if (not_null(add_rm_block)) {
-        blocks <- check_add_rm_block_val(
-          do.call(add_rm_block, c(list("manage_blocks", rv), dot_args)),
-          rv
-        )
-
-        observeEvent(
-          blocks$add,
-          {
-            insert_block_ui(ns(NULL), rv$board, blocks$add)
-
-            board_blocks(rv$board) <- c(board_blocks(rv$board), blocks$add)
-
-            for (blk in names(blocks$add)) {
-              rv <- setup_block(blocks$add[[blk]], blk, rv)
-            }
-          }
-        )
-
-        observeEvent(
-          blocks$rm,
-          {
-            remove_block_ui(ns(NULL), rv$board, blocks$rm)
-
-            rv <- destroy_rm_blocks(blocks$rm, rv)
-          }
-        )
-      }
-
-      add_rm_link <- get_plugin("manage_links", plugins)
-
-      if (not_null(add_rm_link)) {
-        links <- check_add_rm_link_val(
-          do.call(add_rm_link, c(list("manage_links", rv), dot_args)),
-          rv
-        )
-
-        observeEvent(
-          links(),
-          {
-            updates <- links()
-
-            rm <- board_links(rv$board)[updates$rm]
-            rv <- update_block_links(rv, updates$add, rm)
-
-            rv$board <- modify_links(rv$board, updates$add, updates$rm)
-          },
-          ignoreInit = TRUE
-        )
-      }
-
-      block_notifications <- get_plugin("notify_user", plugins)
-
-      if (is.null(block_notifications)) {
-        rv$msgs <- reactive(
+      rv$msgs <- coal(
+        call_plugin_server(
+          "notify_user",
+          server_args = plugin_args,
+          plugins = plugins
+        ),
+        reactive(
           filter_all_zero_len(lst_xtr_reval(rv$blocks, "server", "cond"))
         )
-      } else {
-        rv$msgs <- check_block_notifications_val(
-          do.call(
-            block_notification_server,
-            c(list("notify_user", rv), dot_args)
-          )
-        )
+      )
+
+      call_plugin_server(
+        "generate_code",
+        server_args = plugin_args,
+        plugins = plugins
+      )
+
+      cb_res <- vector("list", length(callbacks))
+
+      for (i in seq_along(callbacks)) {
+        cb_res[[i]] <- do.call(callbacks[[i]], plugin_args)
       }
 
-      gen_code <- get_plugin("generate_code", plugins)
-
-      if (not_null(gen_code)) {
-        check_gen_code_val(
-          do.call(gen_code, c(list("generate_code", rv), dot_args))
-        )
-      }
-
-      for (callback in callbacks) {
-
-        res <- do.call(callback, c(list(rv), dot_args))
-
-        if (!is.null(res)) {
-          warning(
-            "Callbacks are only called for their side-effects and are ",
-            "expected to return `NULL`."
-          )
-        }
-      }
-
-      rv
+      c(rv_lst, dot_args)
     }
   )
 }
 
-setup_blocks <- function(rv) {
+setup_board <- function(rv, blk_mod, stk_mod, args, sess) {
 
   stopifnot(
     is.reactivevalues(rv),
-    all(c("blocks", "inputs", "board", "links") %in% names(rv)),
+    all(c("blocks", "inputs", "board", "links", "stacks") %in% names(rv)),
     is_board(rv$board)
   )
 
@@ -181,17 +210,21 @@ setup_blocks <- function(rv) {
   rv$blocks <- list()
   rv$inputs <- list()
   rv$links <- list()
+  rv$stacks <- list()
 
-  blks <- sort(rv$board)
+  blks <- board_blocks(rv$board)
 
   for (i in names(blks)) {
-    rv <- setup_block(blks[[i]], i, rv)
+    rv <- setup_block(blks[[i]], i, rv, blk_mod, args)
   }
+
+  rv <- setup_stacks(rv, stk_mod, args)
+  rv <- add_blocks_to_stacks(rv, board_stacks(rv$board), sess)
 
   rv
 }
 
-setup_block <- function(blk, id, rv) {
+setup_block <- function(blk, id, rv, mod, args) {
 
   arity <- block_arity(blk)
   inpts <- block_inputs(blk)
@@ -209,35 +242,44 @@ setup_block <- function(blk, id, rv) {
 
   links <- board_links(rv$board)
 
-  todo <- as.list(links[links$to == id])
-
-  for (i in names(todo)) {
-    rv <- do.call(setup_link, c(list(rv, i), todo[[i]]))
-  }
+  rv <- update_block_links(rv, links[links$to == id])
 
   rv$blocks[[id]] <- list(
     block = blk,
-    server = block_server(id, blk, rv$inputs[[id]])
+    server = do.call(
+      block_server,
+      c(list(paste0("block_", id), blk, rv$inputs[[id]], id, mod), args)
+    )
   )
 
   rv
 }
 
-destroy_rm_blocks <- function(ids, rv) {
+destroy_rm_blocks <- function(ids, rv, sess) {
 
   links <- board_links(rv$board)
-  blocks <- board_blocks(rv$board)
 
   rv <- update_block_links(
     rv,
     rm = links[links$from %in% ids | links$to %in% ids]
   )
 
+  for (id in ids) {
+
+    blk_id <- paste0("block_", id)
+    blk_ns <- sess$ns(blk_id)
+
+    destroy_inputs(blk_id, sess)
+    destroy_outputs(blk_ns, sess)
+    destroy_observers(blk_ns, sess)
+
+    remove_block_from_stack(rv$board, id, rv$board_id, sess)
+  }
+
   rv$inputs <- rv$inputs[!names(rv$inputs) %in% ids]
   rv$blocks <- rv$blocks[!names(rv$blocks) %in% ids]
 
-  board_links(rv$board) <- links[!links$from %in% ids & !links$to %in% ids]
-  board_blocks(rv$board) <- blocks[!names(blocks) %in% ids]
+  rv$board <- rm_blocks(rv$board, ids)
 
   rv
 }
@@ -302,50 +344,451 @@ update_block_links <- function(rv, add = NULL, rm = NULL) {
   rv
 }
 
-validate_plugins <- function(plugins) {
+setup_stacks <- function(rv, mod, args, stacks = board_stacks(rv$board)) {
 
-  if (!is.list(plugins)) {
-    stop("Expecting a list of plugins.")
+  serv <- get_plugin_server(mod)
+
+  for (i in names(stacks)) {
+
+    if (not_null(serv)) {
+      serv(c(list(id = paste0("stack_", i), stack_id = i), args))
+    }
+
+    rv$stacks[[i]] <- character()
   }
 
-  unknown <- setdiff(
-    names(plugins),
-    c("preserve_board", "manage_blocks", "manage_links", "notify_user",
-      "generate_code")
+  rv
+}
+
+destroy_stacks <- function(ids, rv, sess) {
+
+  stopifnot(all(lengths(rv$stacks[ids]) == 0L))
+
+  for (id in ids) {
+
+    stk_id <- paste0("stack_", id)
+    stk_ns <- sess$ns(stk_id)
+
+    destroy_inputs(stk_id, sess)
+    destroy_outputs(stk_ns, sess)
+    destroy_observers(stk_ns, sess)
+  }
+
+  rv$stacks[ids] <- NULL
+
+  rv
+}
+
+update_stack_blocks <- function(rv, upd, mod, args, session) {
+
+  if (length(upd$rm)) {
+    rv <- rm_blocks_from_stacks(rv, upd$rm, session)
+    rv <- destroy_stacks(upd$rm, rv, session)
+    remove_stack_ui(upd$rm, rv$board)
+  }
+
+  if (length(upd$add)) {
+    rv <- setup_stacks(rv, mod, args, upd$add)
+    insert_stack_ui(rv$board_id, upd$add, rv$board, mod)
+    rv <- add_blocks_to_stacks(rv, upd$add, session)
+  }
+
+  if (length(upd$mod)) {
+    rv <- update_blocks_in_stacks(rv, upd$mod, session)
+  }
+
+  rv
+}
+
+update_blocks_in_stacks <- function(rv, mod, sess) {
+
+  for (i in names(mod)) {
+    rv <- update_blocks_in_stack(i, rv, mod[[i]], sess)
+  }
+
+  rv
+}
+
+update_blocks_in_stack <- function(id, rv, val, sess) {
+
+  stopifnot(is_string(id), id %in% names(rv$stacks))
+
+  targ <- stack_blocks(val)
+
+  for (i in setdiff(rv$stacks[[id]], targ)) {
+    remove_block_from_stack(rv$board, i, rv$board_id, sess)
+  }
+
+  for (i in setdiff(targ, rv$stacks[[id]])) {
+    add_block_to_stack(rv$board, i, id, sess)
+  }
+
+  rv$stacks[[id]] <- targ
+
+  rv
+}
+
+rm_blocks_from_stacks <- function(rv, rm, session) {
+
+  stopifnot(is.character(rm), all(rm %in% names(rv$stacks)))
+
+  for (i in rm) {
+
+    for (j in rv$stacks[[i]]) {
+      remove_block_from_stack(rv$board, j, rv$board_id, session)
+    }
+
+    rv$stacks[[i]] <- character()
+  }
+
+  rv
+}
+
+add_blocks_to_stacks <- function(rv, add, session) {
+
+  stopifnot(
+    is_stacks(add),
+    all(names(add) %in% names(rv$stacks)),
+    all(lengths(rv$stacks[names(add)]) == 0L)
   )
 
-  if (length(unknown)) {
-    stop("Cannot deal with plungin(s) ", paste_enum(unknown), ".")
+  for (i in names(add)) {
+
+    blks <- stack_blocks(add[[i]])
+
+    for (j in stack_blocks(add[[i]])) {
+      add_block_to_stack(rv$board, j, i, session)
+    }
+
+    rv$stacks[[i]] <- blks
   }
 
-  for (plugin in plugins) {
-    if (!is.function(plugin)) {
-      stop("Expecting plugings to be passed as functions.")
+  rv
+}
+
+validate_board_update <- function(x, rv) {
+
+  if (!is.reactive(x)) {
+    abort(
+      "Expecting a board update to be passed as a reactive object.",
+      class = "board_update_object_invalid"
+    )
+  }
+
+  res <- x()
+
+  expected <- c("blocks", "links", "stacks")
+
+  if (!is.list(res)) {
+    abort(
+      "Expecting a board update to be specified as a list.",
+      class = "board_update_type_invalid"
+    )
+  }
+
+  if (!all(names(res) %in% expected)) {
+    abort(
+      paste0(
+        "Expecting a board update to consist of components ",
+        paste_enum(expected), ". Please remove ",
+        paste_enum(setdiff(names(res), expected)), "."
+      ),
+      class = "board_update_components_invalid"
+    )
+  }
+
+  expected <- c("add", "rm", "mod")
+
+  for (cmp in res) {
+
+    if (!is.list(cmp)) {
+      abort(
+        "Expecting a board update component to be specified as a list.",
+        class = "board_update_component_type_invalid"
+      )
     }
+
+    if (!length(names(cmp)) == length(cmp) || !all(names(cmp) %in% expected)) {
+
+      abort(
+        paste0(
+          "Expecting a board update component to consist of components ",
+          paste_enum(expected), ". Please remove ",
+          paste_enum(setdiff(names(cmp), expected)), "."
+        ),
+        class = "board_update_component_components_invalid"
+      )
+    }
+  }
+
+  if ("blocks" %in% names(res)) {
+    validate_board_update_blocks(res$blocks, rv)
+  }
+
+  if ("links" %in% names(res)) {
+    validate_board_update_links(res$links, rv)
+  }
+
+  if ("stacks" %in% names(res)) {
+    validate_board_update_stacks(res$stacks, rv)
+  }
+
+  res
+}
+
+validate_board_update_blocks <- function(x, rv) {
+
+  all_ids <- board_block_ids(rv$board)
+
+  if ("rm" %in% names(x) && is.character(x$rm)) {
+    cur_ids <- setdiff(all_ids, x$rm)
+  } else {
+    cur_ids <- all_ids
+  }
+
+  if ("add" %in% names(x) && !is.null(x$add)) {
+
+    if (!is_blocks(x$add)) {
+      abort(
+        paste(
+          "Expecting the \"add\" block component of a board update",
+          "to be `NULL` or a `blocks` object."
+        ),
+        class = "board_update_blocks_add_invalid"
+      )
+    }
+
+    if (any(names(x$add) %in% cur_ids)) {
+      abort(
+        "Expecting the newly added block to have a unique ID.",
+        class = "board_update_blocks_add_invalid"
+      )
+    }
+
+    validate_blocks(x$add)
+
+    if ("mod" %in% names(x) && !is.null(x$mod)) {
+      if (length(intersect(names(x$add), names(x$mod)))) {
+        abort(
+          "Cannot add and modify the same IDs simulatneously.",
+          class = "board_update_blocks_add_mod_clash"
+        )
+      }
+    }
+  }
+
+  if ("rm" %in% names(x) && !is.null(x$rm)) {
+
+    if (!is.character(x$rm)) {
+      abort(
+        paste(
+          "Expecting the \"rm\" block component of a board update",
+          "value to be `NULL` or a character vector."
+        ),
+        class = "board_update_blocks_rm_invalid"
+      )
+    }
+
+    if (!all(x$rm %in% all_ids)) {
+      abort(
+        "Expecting the removed block to be specified by a known ID.",
+        class = "board_update_blocks_rm_invalid"
+      )
+    }
+  }
+
+  if ("mod" %in% names(x)) {
+
+    if (!is_blocks(x$mod)) {
+      abort(
+        paste(
+          "Expecting the \"mod\" block component of a board update",
+          "value to be `NULL` or a `blocks` object."
+        ),
+        class = "board_update_blocks_mod_invalid"
+      )
+    }
+
+    if (!all(names(x$mod) %in% cur_ids)) {
+      abort(
+        "Expecting the modified blocks to be specified by known IDs.",
+        class = "board_update_blocks_mod_invalid"
+      )
+    }
+
+    validate_blocks(x$mod)
   }
 
   invisible()
 }
 
-get_plugin <- function(plugin, plugins) {
+validate_board_update_links <- function(x, rv) {
 
-  if (plugin %in% names(plugins)) {
-    return(plugins[[plugin]])
+  all_ids <- board_link_ids(rv$board)
+
+  if ("rm" %in% names(x) && is.character(x$rm)) {
+    cur_ids <- setdiff(all_ids, x$rm)
+  } else {
+    cur_ids <- all_ids
   }
 
-  NULL
+  if ("add" %in% names(x) && !is.null(x$add)) {
+
+    if (!is_links(x$add)) {
+      abort(
+        paste(
+          "Expecting the \"add\" link component of a board update",
+          "value to be `NULL` or a `links` object."
+        ),
+        class = "board_update_links_add_invalid"
+      )
+    }
+
+    if (any(names(x$add) %in% cur_ids)) {
+      abort(
+        "Expecting the newly added links to have a unique ID.",
+        class = "board_update_links_add_invalid"
+      )
+    }
+
+    validate_links(x$add)
+
+    if ("mod" %in% names(x) && !is.null(x$mod)) {
+      if (length(intersect(names(x$add), names(x$mod)))) {
+        abort(
+          "Cannot add and modify the same IDs simulatneously.",
+          class = "board_update_links_add_mod_clash"
+        )
+      }
+    }
+  }
+
+  if ("rm" %in% names(x) && !is.null(x$rm)) {
+
+    if (!is.character(x$rm)) {
+      abort(
+        paste(
+          "Expecting the \"rm\" link component of a board update",
+          "to be `NULL` or a character vector."
+        ),
+        class = "board_update_links_rm_invalid"
+      )
+    }
+
+    if (!all(x$rm %in% all_ids)) {
+      abort(
+        "Expecting all link IDs to be removed to be known.",
+        class = "board_update_links_rm_invalid"
+      )
+    }
+  }
+
+  if ("mod" %in% names(x) && !is.null(x$mod)) {
+
+    if (!is_links(x$mod)) {
+      abort(
+        paste(
+          "Expecting the \"mod\" link component of a board update",
+          "value to be `NULL` or a `links` object."
+        ),
+        class = "board_update_links_mod_invalid"
+      )
+    }
+
+    if (!all(names(x$mod) %in% cur_ids)) {
+      abort(
+        "Expecting the modified links to be specified by known IDs.",
+        class = "board_update_links_mod_invalid"
+      )
+    }
+
+    validate_links(x$mod)
+  }
+
+  invisible()
 }
 
-validate_callbacks <- function(x) {
+validate_board_update_stacks <- function(x, rv) {
 
-  if (!is.list(x)) {
-    stop("Expecting a list of callbacks.")
+  all_ids <- board_stack_ids(rv$board)
+
+  if ("rm" %in% names(x) && is.character(x$rm)) {
+    cur_ids <- setdiff(all_ids, x$rm)
+  } else {
+    cur_ids <- all_ids
   }
 
-  for (f in x) {
-    if (!is.function(f)) {
-      stop("Expecting callbacks to be passed as functions.")
+  if ("add" %in% names(x) && !is.null(x$add)) {
+
+    if (!is_stacks(x$add)) {
+      abort(
+        paste(
+          "Expecting the \"add\" stack component of a board update",
+          "to be `NULL` or a `stacks` object."
+        ),
+        class = "board_update_stacks_add_invalid"
+      )
     }
+
+    if (any(names(x$add) %in% cur_ids)) {
+      abort(
+        "Expecting the newly added stacks to have a unique ID.",
+        class = "board_update_stacks_add_invalid"
+      )
+    }
+
+    validate_stacks(x$add)
+
+    if ("mod" %in% names(x) && !is.null(x$mod)) {
+      if (length(intersect(names(x$add), names(x$mod)))) {
+        abort(
+          "Cannot add and modify the same IDs simulatneously.",
+          class = "board_update_stacks_add_mod_clash"
+        )
+      }
+    }
+  }
+
+  if ("rm" %in% names(x) && !is.null(x$rm)) {
+
+    if (!is.character(x$rm)) {
+      abort(
+        paste(
+          "Expecting the \"rm\" stack component of a board update",
+          "to be `NULL` or a character vector."
+        ),
+        class = "board_update_stacks_rm_invalid"
+      )
+    }
+
+    if (!all(x$rm %in% all_ids)) {
+      abort(
+        "Expecting all stack IDs to be removed to be known.",
+        class = "board_update_stacks_rm_invalid"
+      )
+    }
+  }
+
+  if ("mod" %in% names(x) && !is.null(x$mod)) {
+
+    if (!is_stacks(x$mod)) {
+      abort(
+        paste(
+          "Expecting the \"mod\" stack component of a board update",
+          "value to be `NULL` or a `stacks` object."
+        ),
+        class = "board_update_stacks_mod_invalid"
+      )
+    }
+
+    if (!all(names(x$mod) %in% cur_ids)) {
+      abort(
+        "Expecting the modified stacks to be specified by known IDs.",
+        class = "board_update_stacks_mod_invalid"
+      )
+    }
+
+    validate_stacks(x$mod)
   }
 
   invisible()

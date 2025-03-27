@@ -1,48 +1,130 @@
-test_that("add/rm blocks", {
+test_that("edit blocks", {
 
   testServer(
-    add_rm_block_server,
+    edit_block_server,
     {
-      expect_null(res$add)
-      expect_null(res$rm)
+      expect_null(update())
+
+      session$setInputs(block_name_in = "iris")
+
+      session$flushReact()
+
+      res <- update()$blocks
+
+      expect_length(res$add, 0L)
+      expect_length(res$rm, 0L)
+      expect_length(res$mod, 1L)
+
+      expect_named(res$mod, "a")
+      expect_identical(block_name(res$mod[["a"]]), "iris")
+
+      expect_null(session$returned)
+    },
+    args = list(
+      block_id = "a",
+      board = reactiveValues(
+        board = new_board(blocks = list(a = new_dataset_block("iris")))
+      ),
+      update = reactiveVal()
+    )
+  )
+
+  testServer(
+    edit_block_server,
+    {
+      expect_null(update())
 
       session$setInputs(
-        registry_select = "dataset_block",
-        block_id = "a",
-        confirm_add = 1
+        add_block_after = 1,
+        registry_select = "subset_block",
+        block_id = "c",
+        input_select = "data",
+        link_id = "bc",
+        confirm_insert = 1
       )
 
-      expect_s3_class(res$add, "blocks")
-      expect_length(res$add, 1L)
-      expect_null(res$rm)
-    },
-    args = list(rv = reactiveValues(board = new_board()))
-  )
+      session$flushReact()
 
-  board <- new_board(
-    blocks = c(
-      a = new_dataset_block("iris"),
-      b = new_subset_block()
-    ),
-    links = links(from = "a", to = "b")
+      blk <- update()$blocks
+
+      expect_length(blk$add, 1L)
+      expect_length(blk$mod, 0L)
+      expect_length(blk$rm, 0L)
+
+      lnk <- update()$links
+
+      expect_length(lnk$add, 1L)
+      expect_length(lnk$mod, 0L)
+      expect_length(lnk$rm, 0L)
+
+      expect_null(session$returned)
+    },
+    args = list(
+      block_id = "b",
+      board = reactiveValues(
+        board = new_board(
+          blocks = c(
+            a = new_dataset_block("iris"),
+            b = new_merge_block()
+          ),
+          links = list(from = "a", to = "b", input = "x"),
+          stacks = list(ab = c("a", "b"))
+        )
+      ),
+      update = reactiveVal()
+    )
   )
 
   testServer(
-    add_rm_block_server,
+    edit_block_server,
     {
-      expect_null(res$add)
-      expect_null(res$rm)
+      expect_null(update())
 
-      session$setInputs(block_select = "a", confirm_rm = 1)
+      session$setInputs(
+        add_block_before = 1,
+        registry_select = "dataset_block",
+        block_id = "c",
+        input_select = "y",
+        link_id = "cb",
+        confirm_insert = 1
+      )
 
-      expect_type(res$rm, "character")
-      expect_length(res$rm, 1L)
-      expect_null(res$add)
+      session$flushReact()
+
+      blk <- update()$blocks
+
+      expect_length(blk$add, 1L)
+      expect_length(blk$mod, 0L)
+      expect_length(blk$rm, 0L)
+
+      lnk <- update()$links
+
+      expect_length(lnk$add, 1L)
+      expect_length(lnk$mod, 0L)
+      expect_length(lnk$rm, 0L)
+
+      expect_null(session$returned)
     },
-    args = list(rv = reactiveValues(board = board))
+    args = list(
+      block_id = "b",
+      board = reactiveValues(
+        board = new_board(
+          blocks = c(
+            a = new_dataset_block("iris"),
+            b = new_merge_block()
+          ),
+          links = list(from = "a", to = "b", input = "x"),
+          stacks = list(ab = c("a", "b"))
+        )
+      ),
+      update = reactiveVal()
+    )
   )
 })
 
-test_that("dummy add/rm block ui test", {
-  expect_s3_class(add_rm_block_ui("add_rm", new_board()), "shiny.tag.list")
+test_that("dummy edit block ui test", {
+  expect_s3_class(
+    edit_block_ui(new_dataset_block(), "edit_block"),
+    "shiny.tag.list"
+  )
 })

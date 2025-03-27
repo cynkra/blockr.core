@@ -10,7 +10,7 @@ board_server(id, x, ...)
 \method{board_server}{board}(id, x, plugins = list(), callbacks = list(), ...)
 }
 \arguments{
-\item{id}{(Optional) parent namespace}
+\item{id}{Parent namespace}
 
 \item{x}{Board}
 
