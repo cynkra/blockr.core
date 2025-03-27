@@ -17,7 +17,7 @@
 #'
 #' @export
 new_block <- function(server, ui, class, ctor, ctor_pkg, dat_valid = NULL,
-                      name = NULL, allow_empty_state = FALSE, ...) {
+                      allow_empty_state = FALSE, name = NULL, ...) {
 
   stopifnot(is.character(class), length(class) > 0L)
 
@@ -329,7 +329,7 @@ as.list.block <- function(x, state = NULL, ...) {
     attrs[
       setdiff(
         names(attrs),
-        c("name", "names", "ctor", "ctor_pkg", "class", "allow_empty_state")
+        c("names", "ctor", "ctor_pkg", "class", "allow_empty_state")
       )
     ]
   )
@@ -359,6 +359,15 @@ c.block <- function(...) {
 block_name <- function(x) {
   stopifnot(is_block(x))
   attr(x, "name")
+}
+
+#' @param value New value
+#' @rdname new_block
+#' @export
+`block_name<-` <- function(x, value) {
+  stopifnot(is_block(x), is_string(value))
+  attr(x, "name") <- value
+  x
 }
 
 #' @rdname new_block
@@ -418,50 +427,6 @@ validate_data_inputs <- function(x, data) {
   NULL
 }
 
-#' @param id Block ID
-#' @param data Data inputs
-#' @rdname serve
-#' @export
-serve.block <- function(x, id = "block", ..., data = list()) {
-
-  init_data <- function(x, is_variadic) {
-    if (is_variadic) do.call(reactiveValues, x) else reactiveVal(x)
-  }
-
-  if (...length() && !length(data)) {
-    data <- list(...)
-  }
-
-  dot_args <- !names(data) %in% block_inputs(x)
-
-  if (!is.na(block_arity(x)) && any(dot_args)) {
-    stop("Unexpected arguments.")
-  }
-
-  if (any(dot_args)) {
-    data <- c(data[!dot_args], list(...args = data[dot_args]))
-  }
-
-  ui <- bslib::page_fluid(
-    title = id,
-    expr_ui(id, x),
-    block_ui(id, x)
-  )
-
-  server <- function(input, output, session) {
-
-    res <- block_server(id, x, Map(init_data, data, names(data) == "...args"))
-
-    exportTestValues(
-      result = safely_export(res$result())()
-    )
-
-    invisible()
-  }
-
-  shinyApp(ui, server)
-}
-
 #' @rdname new_block
 #' @export
 block_inputs <- function(x, ...) {
@@ -487,6 +452,14 @@ initial_block_state <- function(x) {
     set_names(nm = block_ctor_inputs(x)),
     get,
     envir = environment(block_expr_server(x))
+  )
+}
+
+block_base_attrs <- function() {
+  setdiff(
+    names(formals(new_block)),
+    c("server", "ui", "class", "ctor", "ctor_pkg", "dat_valid",
+      "allow_empty_state")
   )
 }
 

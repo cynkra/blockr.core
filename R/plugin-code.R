@@ -3,20 +3,20 @@
 #' Generate reproducible code from a board.
 #'
 #' @param id Namespace ID
-#' @param rv Reactive values object
+#' @param board Reactive values object
 #' @param ... Extra arguments passed from parent scope
 #'
 #' @return NULL (invisibly)
 #'
 #' @rdname gen_code
 #' @export
-gen_code_server <- function(id, rv, ...) {
+gen_code_server <- function(id, board, ...) {
   moduleServer(
     id,
     function(input, output, session) {
 
       code <- reactive(
-        generate_code(rv)
+        gen_code(board)
       )
 
       observeEvent(

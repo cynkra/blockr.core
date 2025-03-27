@@ -2,7 +2,7 @@
 #'
 #' Calls shiny modules for the given element (block, fields).
 #'
-#' @param id Block ID
+#' @param id Namespace ID
 #' @param x Object for which to generate a [moduleServer()]
 #' @param data Input data (list of reactives)
 #' @param ... Generic consistency
@@ -12,9 +12,18 @@ block_server <- function(id, x, data = list(), ...) {
   UseMethod("block_server", x)
 }
 
+#' @param block_id Block ID
+#' @param edit_block Block edit plugin
+#' @param board Reactive values object containing board information
+#' @param update Reactive value object to initiate board updates
 #' @rdname block_server
 #' @export
-block_server.block <- function(id, x, data = list(), ...) {
+block_server.block <- function(id, x, data = list(), block_id = id,
+                               edit_block = NULL, board = reactiveValues(),
+                               update = reactiveVal(), ...) {
+
+  dot_args <- list(...)
+
   moduleServer(
     id,
     function(input, output, session) {
@@ -24,23 +33,6 @@ block_server.block <- function(id, x, data = list(), ...) {
       )
 
       set_globals(0L, session = session)
-
-      curr_block_name <- reactiveVal(block_name(x))
-
-      observeEvent(
-        input$block_name_in,
-        {
-          req(input$block_name_in)
-          curr_block_name(input$block_name_in)
-        }
-      )
-
-      output$block_name_out <- renderUI({
-        list(
-          bslib::tooltip(curr_block_name(), paste("Block ID: ", id)),
-          bsicons::bs_icon("pencil-square")
-        )
-      })
 
       rv <- reactiveValues(
         data_valid = if (block_has_data_validator(x)) NULL else TRUE,
@@ -76,18 +68,23 @@ block_server.block <- function(id, x, data = list(), ...) {
         }
       )
 
-      validate_block_observer(id, x, dat, res, rv, session)
-      state_check_observer(id, x, dat, res, exp, rv, session)
-      data_eval_observer(id, x, dat, res, exp, lang, rv, session)
+      validate_block_observer(block_id, x, dat, res, rv, session)
+      state_check_observer(block_id, x, dat, res, exp, rv, session)
+      data_eval_observer(block_id, x, dat, res, exp, lang, rv, session)
       output_result_observer(x, res, output, session)
+
+      call_plugin_server(
+        edit_block,
+        server_args = c(
+          list(block_id = block_id, board = board, update = update),
+          dot_args
+        )
+      )
 
       list(
         result = res,
         expr = lang,
-        state = c(
-          exp$state,
-          list(name = curr_block_name)
-        ),
+        state = exp$state,
         cond = reactive(
           list(
             data = rv$data_cond,
@@ -342,23 +339,62 @@ check_expr_val <- function(val, x) {
   observeEvent(
     val,
     {
-      if (!setequal(names(val), c("expr", "state"))) {
-        stop("The block server for ", class(x)[1L],
-             " is expected to return values `expr` and `state`.")
+      cls <- class(x)[1L]
+
+      if (!is.list(val)) {
+        abort(
+          paste(
+            "The block server for", cls,
+            "is expected to return a list."
+          ),
+          class = "expr_server_return_type_invalid"
+        )
+      }
+
+      required <- c("expr", "state")
+
+      if (!setequal(required, names(val))) {
+        abort(
+          paste0(
+            "The block server for ", cls, " is expected to ",
+            "return values ", paste_enum(required), "."
+          ),
+          class = "expr_server_return_component_missing"
+        )
       }
 
       if (!is.reactive(val[["expr"]])) {
-        stop("The `expr` component of the return value for ", class(x)[1L],
-             " is expected to be a reactive.")
+        abort(
+          paste(
+            "The `expr` component of the return value for", cls,
+            "is expected to be a reactive."
+          ),
+          class = "expr_server_return_type_invalid"
+        )
+      }
+
+      if (!is.list(val[["state"]])) {
+        abort(
+          paste(
+            "The `state` component of the return value for", cls,
+            "is expected to be a list."
+          ),
+          class = "expr_server_return_type_invalid"
+        )
       }
 
       expected <- block_ctor_inputs(x)
       current <- names(val[["state"]])
 
       if (!setequal(current, expected)) {
-        stop("The `state` component of the return value for ", class(x)[1L],
-             " is expected to additionally return ",
-             paste0("`", setdiff(expected, current), "`", collapse = ", "))
+        abort(
+          paste0(
+            "The `state` component of the return value for ", cls,
+            " is expected to additionally return ",
+            paste_enum(setdiff(expected, current))
+          ),
+          class = "expr_server_return_state_invalid"
+        )
       }
     },
     once = TRUE

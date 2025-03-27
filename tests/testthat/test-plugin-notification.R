@@ -8,7 +8,7 @@ test_that("notify_user", {
       expect_null(session$returned())
       expect_identical(get_globals(session = session), list())
 
-      rv$blocks <- list(
+      board$blocks <- list(
         a = list(
           server = list(
             cond = function() {
@@ -42,7 +42,7 @@ test_that("notify_user", {
         list(a = session$ns(1))
       )
 
-      rv$blocks <- list()
+      board$blocks <- list()
 
       expect_null(session$returned())
 
@@ -53,7 +53,7 @@ test_that("notify_user", {
         list(a = NULL)[0]
       )
     },
-    args = list(rv = reactiveValues(blocks = list()))
+    args = list(board = reactiveValues(blocks = list()))
   )
 })
 

@@ -4,7 +4,8 @@
 #' board.
 #'
 #' @param id Namespace ID
-#' @param rv Reactive values object
+#' @param board Reactive values object
+#' @param update Reactive value object to initiate board updates
 #' @param ... Extra arguments passed from parent scope
 #'
 #' @return A reactive value that evaualtes to `NULL` or a list with components
@@ -14,7 +15,7 @@
 #'
 #' @rdname add_rm_link
 #' @export
-add_rm_link_server <- function(id, rv, ...) {
+add_rm_link_server <- function(id, board, update, ...) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -27,36 +28,38 @@ add_rm_link_server <- function(id, rv, ...) {
       upd <- reactiveValues(
         add = links(),
         rm = character(),
-        curr = isolate(board_links(rv$board)),
+        curr = isolate(board_links(board$board)),
         obs = list(),
         edit = NULL
       )
 
       observeEvent(
-        board_links(rv$board),
+        board_links(board$board),
         {
-          upd$curr <- board_links(rv$board)
+          upd$curr <- board_links(board$board)
         }
       )
 
       output$links_dt <- DT::renderDataTable(
-        link_dt(isolate(upd$curr), session$ns, isolate(rv$board)),
+        link_dt(isolate(upd$curr), session$ns, isolate(board$board)),
         server = TRUE
       )
 
-      links_proxy <- DT::dataTableProxy("links_dt")
+      links_proxy <- DT::dataTableProxy("links_dt", session)
 
-      create_link_obs_observer(input, rv, upd, session, links_proxy)
+      create_link_obs_observer(input, board, upd, session, links_proxy)
 
-      edit_link_observer(upd, rv)
+      edit_link_observer(upd, board)
 
-      add_link_observer(input, rv, upd, session)
+      add_link_observer(input, board, upd, session)
 
-      rm_link_observer(input, rv, upd, session)
+      rm_link_observer(input, board, upd, session)
 
-      cancel_link_observer(input, rv, upd, session)
+      cancel_link_observer(input, board, upd, session)
 
-      modify_link_observer(input, rv, upd, session, links_proxy)
+      modify_link_observer(input, board, upd, session, links_proxy, update)
+
+      NULL
     }
   )
 }
@@ -311,15 +314,11 @@ links_modal <- function(ns) {
       )$allTags(),
       tags$style(
         type = "text/css",
-        paste0(
-          "#", ns("new_link_id"), " {padding: 0.75em 2em; margin: 4px;}"
-        )
+        paste0("#", ns("new_link_id"), " {padding: 0.75em 2em; margin: 4px;}")
       ),
       tags$style(
         type = "text/css",
-        paste0(
-          "#", ns("new_link_id"), "-label {text-align: left;}"
-        )
+        paste0("#", ns("new_link_id"), "-label {text-align: left;}")
       ),
       actionButton(ns("add_link"), "Add", icon = icon("plus")),
       actionButton(ns("rm_link"), "Remove", icon = icon("minus")),
@@ -462,11 +461,7 @@ cancel_link_observer <- function(input, rv, upd, session) {
   )
 }
 
-modify_link_observer <- function(input, rv, upd, session, proxy) {
-
-  res <- reactiveVal(
-    list(add = NULL, rm = NULL)
-  )
+modify_link_observer <- function(input, rv, upd, session, proxy, res) {
 
   observeEvent(
     input$modify_links,
@@ -482,7 +477,7 @@ modify_link_observer <- function(input, rv, upd, session, proxy) {
       }
 
       new <- tryCatch(
-        modify_links(rv$board, upd$add, upd$rm),
+        modify_board_links(rv$board, upd$add, upd$rm),
         warning = function(e) {
           showNotification(conditionMessage(e), duration = NULL,
                            type = "warning")
@@ -495,8 +490,10 @@ modify_link_observer <- function(input, rv, upd, session, proxy) {
 
       res(
         list(
-          add = if (length(upd$add)) upd$add else links(),
-          rm = if (length(upd$rm)) upd$rm else character()
+          links = list(
+            add = if (length(upd$add)) upd$add,
+            rm = if (length(upd$rm)) upd$rm
+          )
         )
       )
 
@@ -513,95 +510,4 @@ modify_link_observer <- function(input, rv, upd, session, proxy) {
       removeModal()
     }
   )
-
-  res
-}
-
-check_add_rm_link_val <- function(val, rv) {
-
-  observeEvent(
-    TRUE,
-    {
-      if (!is.reactive(val)) {
-        abort(
-          "Expecting `manage_links` to return a reactive value.",
-          class = "manage_links_return_invalid"
-        )
-      }
-    },
-    once = TRUE,
-    priority = 4
-  )
-
-  observeEvent(
-    val(),
-    {
-      if (!is.list(val()) || !setequal(names(val()), c("add", "rm"))) {
-        abort(
-          paste(
-            "Expecting the `manage_links` return value to evaluate to a list",
-            "with components `add` and `rm`."
-          ),
-          class = "manage_links_return_invalid"
-        )
-      }
-    },
-    once = TRUE,
-    priority = 3
-  )
-
-  observeEvent(
-    val()$add,
-    {
-      if (!is_links(val()$add)) {
-        abort(
-          paste(
-            "Expecting the `add` component of the `manage_links` return",
-            "value to be `NULL` or a `links` object."
-          ),
-          class = "manage_links_return_invalid"
-        )
-      }
-    },
-    once = TRUE,
-    priority = 2
-  )
-
-  observeEvent(
-    val()$add,
-    validate_links(val()$add),
-    priority = 1
-  )
-
-  observeEvent(
-    val()$rm,
-    {
-      if (!is.character(val()$rm)) {
-        abort(
-          paste(
-            "Expecting the `rm` component of the `manage_links` return",
-            "value to be a character vector."
-          ),
-          class = "manage_links_return_invalid"
-        )
-      }
-    },
-    once = TRUE,
-    priority = 2
-  )
-
-  observeEvent(
-    val()$rm,
-    {
-      if (!all(val()$rm %in% board_link_ids(rv$board))) {
-        abort(
-          "Expecting all link IDs to be removed to be known.",
-          class = "manage_links_return_invalid"
-        )
-      }
-    },
-    priority = 1
-  )
-
-  val
 }

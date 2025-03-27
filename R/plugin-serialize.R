@@ -3,7 +3,7 @@
 #' Object (de)serialization in a board server context.
 #'
 #' @param id Namespace ID
-#' @param rv Reactive values object
+#' @param board Reactive values object
 #' @param ... Extra arguments passed from parent scope
 #'
 #' @return A [shiny::reactiveVal()] object that evaluates to `NULL` or a
@@ -11,14 +11,14 @@
 #'
 #' @rdname ser_deser
 #' @export
-ser_deser_server <- function(id, rv, ...) {
+ser_deser_server <- function(id, board, ...) {
   moduleServer(
     id,
     function(input, output, session) {
 
       output$serialize <- downloadHandler(
-        board_filename(rv),
-        write_board_to_disk(rv, session)
+        board_filename(board),
+        write_board_to_disk(board, session)
       )
 
       res <- reactiveVal()
@@ -41,12 +41,17 @@ ser_deser_ui <- function(id, board) {
   tagList(
     downloadButton(
       NS(id, "serialize"),
-      "Save",
+      "Save"
     ),
-    fileInput(
-      NS(id, "restore"),
-      "Restore"
-    )
+    htmltools::tagQuery(
+      fileInput(
+        NS(id, "restore"),
+        "",
+        buttonLabel = tagList(icon("upload"), "Restore")
+      )
+    )$addAttrs(
+      style = "margin-bottom: 8px;"
+    )$allTags()
   )
 }
 

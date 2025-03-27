@@ -10,11 +10,14 @@ test_that("add/rm links", {
   testServer(
     add_rm_link_server,
     {
+      expect_null(session$returned)
+      expect_null(update())
+
       expect_identical(upd$add, links())
       expect_identical(upd$rm, character())
       expect_null(upd$edit)
 
-      expect_identical(session$returned(), list(add = NULL, rm = NULL))
+      expect_null(update())
 
       session$setInputs(add_link = 1)
 
@@ -49,17 +52,19 @@ test_that("add/rm links", {
       session$setInputs(modify_links = 1)
 
       expect_identical(
-        session$returned(),
+        update()$links,
         list(
           add = as_links(set_names(list(new_link("a", "b", "data")), lnk)),
-          rm = character()
+          rm = NULL
         )
       )
 
       expect_identical(upd$add, links())
       expect_identical(upd$rm, character())
+
+      expect_null(session$returned)
     },
-    args = list(rv = reactiveValues(board = board))
+    args = list(board = reactiveValues(board = board), update = reactiveVal())
   )
 
   testServer(
@@ -95,7 +100,7 @@ test_that("add/rm links", {
       expect_length(upd$add, 1L)
     },
     args = list(
-      rv = list(
+      board = list(
         board = new_board(
           blocks = c(
             a = new_dataset_block("iris"),
@@ -105,7 +110,8 @@ test_that("add/rm links", {
           ),
           links = links(ac = new_link(from = "a", to = "c"))
         )
-      )
+      ),
+      update = reactiveVal()
     )
   )
 
@@ -120,6 +126,9 @@ test_that("add/rm links", {
   testServer(
     add_rm_link_server,
     {
+      expect_null(session$returned)
+      expect_null(update())
+
       expect_s3_class(upd$curr, "links")
       expect_length(upd$curr, 1L)
       expect_named(upd$curr, "aa")
@@ -133,15 +142,17 @@ test_that("add/rm links", {
       session$setInputs(modify_links = 1)
 
       expect_identical(
-        session$returned(),
-        list(add = links(), rm = "aa")
+        update()$links,
+        list(add = NULL, rm = "aa")
       )
 
       expect_identical(upd$add, links())
       expect_identical(upd$rm, character())
       expect_identical(upd$curr, links())
+
+      expect_null(session$returned)
     },
-    args = list(rv = reactiveValues(board = board))
+    args = list(board = reactiveValues(board = board), update = reactiveVal())
   )
 })
 
@@ -150,7 +161,7 @@ test_that("add/rm links return validation", {
   with_mock_session(
     {
       val <- reactiveVal(
-        list(add = links(from = "a", to = "b"), rm = "ab")
+        list(links = list(add = links(from = "a", to = "b"), rm = "ab"))
       )
 
       rv <- list(
@@ -163,115 +174,71 @@ test_that("add/rm links return validation", {
         )
       )
 
-      res <- check_add_rm_link_val(val, rv)
+      res <- validate_board_update(val, rv)
 
-      expect_s3_class(isolate(res()$add), "links")
-      expect_length(isolate(res()$add), 1L)
+      expect_s3_class(res$links$add, "links")
+      expect_length(res$links$add, 1L)
 
-      expect_type(isolate(res()$rm), "character")
-      expect_length(isolate(res()$rm), 1L)
-
-
-      val(list(add = NULL, rm = "bc"))
-
-      sink_msg(
-        expect_warning(
-          session$flushReact(),
-          "Expecting all link IDs to be removed to be known"
-        )
-      )
+      expect_type(res$links$rm, "character")
+      expect_length(res$links$rm, 1L)
     }
   )
 
   with_mock_session(
     {
-      check_add_rm_link_val(list(), list())
-      sink_msg(
-        expect_warning(
-          session$flushReact(),
-          "Expecting `manage_links` to return a reactive value"
-        )
+      expect_error(
+        validate_board_update(
+          reactiveVal(list(links = "a")),
+          list()
+        ),
+        class = "board_update_component_type_invalid"
       )
-    }
-  )
 
-  with_mock_session(
-    {
-      check_add_rm_link_val(reactiveVal(1), list())
-      sink_msg(
-        expect_warning(
-          session$flushReact(),
-          paste(
-            "Expecting the `manage_links` return value to evaluate to a list",
-            "with components `add` and `rm`"
-          )
-        )
+      expect_error(
+        validate_board_update(
+          reactiveVal(list(links = list(abc = NULL))),
+          list()
+        ),
+        class = "board_update_component_components_invalid"
       )
-    }
-  )
 
-  with_mock_session(
-    {
-      check_add_rm_link_val(reactiveVal(list(add = 1, rm = NULL)), list())
-      sink_msg(
-        expect_warning(
-          session$flushReact(),
-          paste(
-            "Expecting the `add` component of the `manage_links` return",
-            "value to be `NULL` or a `links` object"
-          )
-        )
+      expect_error(
+        validate_board_update(
+          reactiveVal(list(links = list(add = "a"))),
+          list(board = new_board())
+        ),
+        class = "board_update_links_add_invalid"
       )
-    }
-  )
 
-  with_mock_session(
-    {
-      check_add_rm_link_val(
-        reactiveVal(
+      expect_error(
+        validate_board_update(
+          reactiveVal(
+            list(links = list(add = links(a = new_link())))
+          ),
           list(
-            add = structure(
-              list(id = "x", from = "a", to = "a", input = ""),
-              class = class(links())
-            ),
-            rm = NULL
+            board = new_board(
+              blocks = c(a = new_dataset_block(), b = new_subset_block()),
+              links = links(a = new_link("a", "b"))
+            )
           )
         ),
-        list()
+        class = "board_update_links_add_invalid"
       )
 
-      sink_msg(
-        expect_warning(session$flushReact(), "Error in validate_link")
+      expect_error(
+        validate_board_update(
+          reactiveVal(list(links = list(rm = 1))),
+          list(board = new_board())
+        ),
+        class = "board_update_links_rm_invalid"
       )
-    }
-  )
 
-  with_mock_session(
-    {
-      check_add_rm_link_val(reactiveVal(list(add = NULL, rm = 1)), list())
-      sink_msg(
-        expect_warning(
-          session$flushReact(),
-          paste(
-            "Expecting the `rm` component of the `manage_links` return",
-            "value to be a character vector"
-          )
-        )
-      )
-    }
-  )
-
-  with_mock_session(
-    {
-      check_add_rm_link_val(
-        reactiveVal(list(add = NULL, rm = "a")),
-        list(board = new_board())
-      )
-      sink_msg(
-        expect_warning(
-          session$flushReact(),
-          "Expecting all link IDs to be removed to be known"
-        )
+      expect_error(
+        validate_board_update(
+          reactiveVal(list(links = list(rm = "a"))),
+          list(board = new_board())
+        ),
+        class = "board_update_links_rm_invalid"
       )
     }
   )

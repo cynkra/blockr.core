@@ -211,84 +211,6 @@ is_acyclic.board <- function(x) {
   is_acyclic(as.matrix(x))
 }
 
-#' @param id Board namespace ID
-#' @rdname serve
-#' @export
-#' @examplesShinylive
-#' webr::install("blockr.core", repos = "https://cynkra.github.io/blockr.webR/")
-#' library(blockr.core)
-#' serve(
-#'   new_board(
-#'     blocks = c(
-#'       a = new_dataset_block("BOD"),
-#'       b = new_dataset_block("ChickWeight"),
-#'       c = new_merge_block("Time")
-#'     ),
-#'     links = c(
-#'       ac = new_link("a", "c", "x"),
-#'       bc = new_link("b", "c", "y")
-#'     ),
-#'     stacks = list(ac = c("a", "c"))
-#'   )
-#' )
-serve.board <- function(x, id = rand_names(), ...) {
-
-  ui <- bslib::page_fluid(
-    title = board_option("board_name", x),
-    board_ui(id, x,
-      list(
-        preserve_board = ser_deser_ui,
-        manage_blocks = add_rm_block_ui,
-        manage_links = add_rm_link_ui,
-        manage_stacks = add_rm_stack_ui,
-        generate_code = gen_code_ui
-      )
-    ),
-    htmltools::htmlDependency(
-      "change-board-title",
-      pkg_version(),
-      src = pkg_file("assets", "js"),
-      script = "changeBoardTitle.js"
-    )
-  )
-
-  server <- function(input, output, session) {
-
-    observeEvent(
-      board_option_from_userdata("board_name", session),
-      session$sendCustomMessage(
-        "change-board-title",
-        board_option_from_userdata("board_name", session)
-      )
-    )
-
-    res <- board_server(id, x,
-      list(
-        preserve_board = ser_deser_server,
-        manage_blocks = add_rm_block_server,
-        manage_links = add_rm_link_server,
-        manage_stacks = add_rm_stack_server,
-        notify_user = block_notification_server,
-        generate_code = gen_code_server
-      )
-    )
-
-    exportTestValues(
-      result = lapply(
-        lapply(
-          lapply(lst_xtr(res$blocks, "server", "result"), safely_export),
-          reval
-        ),
-        reval
-      )
-    )
-
-    invisible()
-  }
-
-  shinyApp(ui, server)
-}
-
 #' @rdname new_board
 #' @export
 board_blocks <- function(x) {
@@ -377,9 +299,14 @@ available_stack_blocks <- function(x, stacks = board_stacks(x),
 
 #' @param add Links/stacks to add
 #' @param rm Link/stack IDs to remove
+#' @param mod Link/stack IDs to modify
 #' @rdname new_board
 #' @export
-modify_links <- function(x, add = NULL, rm = NULL) {
+modify_board_links <- function(x, add = NULL, rm = NULL, mod = NULL) {
+
+  if (!length(add) && !length(rm) && !length(mod)) {
+    return(x)
+  }
 
   links <- board_links(x)
 
@@ -392,6 +319,10 @@ modify_links <- function(x, add = NULL, rm = NULL) {
     links <- links[!names(links) %in% rm]
   }
 
+  if (length(mod)) {
+    links[names(mod)] <- mod
+  }
+
   board_links(x) <- c(links, add)
 
   x
@@ -399,7 +330,11 @@ modify_links <- function(x, add = NULL, rm = NULL) {
 
 #' @rdname new_board
 #' @export
-modify_stacks <- function(x, add = NULL, rm = NULL) {
+modify_board_stacks <- function(x, add = NULL, rm = NULL, mod = NULL) {
+
+  if (!length(add) && !length(rm) && !length(mod)) {
+    return(x)
+  }
 
   stacks <- board_stacks(x)
 
@@ -410,6 +345,10 @@ modify_stacks <- function(x, add = NULL, rm = NULL) {
   if (length(rm)) {
     stopifnot(is.character(rm), all(rm %in% names(stacks)))
     stacks <- stacks[!names(stacks) %in% rm]
+  }
+
+  if (length(mod)) {
+    stacks[names(mod)] <- mod
   }
 
   board_stacks(x) <- c(stacks, add)

@@ -20,6 +20,8 @@ library(blockr.core)
 
 ## Get started
 
+### Using the blockr.core UI
+
 Spin up an app with a single block:
 
 ```{r eval = FALSE}
@@ -58,7 +60,7 @@ serve(
 # extract the code from knitr code chunks by ID
 code <- paste0(
   c(
-    "webr::install(\"blockr.core\", repos = \"https://cynkra.github.io/blockr.webR/\")",
+    "webr::install(\"blockr.core\", repos = \"https://cynkra.github.io/blockr.webR/\")", #nolint
     "library(blockr.core)",
     "library(bsicons)",
     knitr::knit_code$get("simple-board")

@@ -7,7 +7,9 @@ new_plot_block <- function(server, ui, class, ctor = sys.parent(), ...) {
 #' @rdname block_ui
 #' @export
 block_output.plot_block <- function(x, result, session) {
-  renderPlot(grDevices::replayPlot(attr(result, "plot")))
+  plt <- attr(result, "plot")
+  req(plt)
+  renderPlot(grDevices::replayPlot(plt))
 }
 
 #' @rdname block_ui
