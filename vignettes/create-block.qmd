@@ -128,7 +128,7 @@ The return value should be a call to `new_block()` (or if applicable a call to t
 We can finish out block template:
 
 ```{r eval = FALSE}
-example_constructor <- function(ui_state = character()) {
+example_constructor <- function(ui_state = character(), ...) {
   ui <- function(id) { #nolint
     tagList(textInput(NS(id, "ui_state")))
   }
@@ -142,7 +142,7 @@ example_constructor <- function(ui_state = character()) {
         expr = reactive(quote(identity(data))),
         state = list(
           # name must match what is defined in the constructor signature
-          ui_state = ...
+          ui_state = <STATE_VALUE>
         )
       )
     })
@@ -157,6 +157,8 @@ example_constructor <- function(ui_state = character()) {
   )
 }
 ```
+
+The `...` is forwarded to `new_block` or any `new_*_block`.
 
 ### Example
 

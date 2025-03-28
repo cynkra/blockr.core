@@ -1,0 +1,263 @@
+---
+title: "3. Browse for blocks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{2. Create a block}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(blockr.core)
+```
+
+## Introduction
+
+The __registry__ is a __environment__ which provides access to multiple __blocks__ as well as some
+metadata:
+
+- The block __description__.
+- The block __category__.
+- The block __package__.
+- ...
+
+In other words, the __registry__ is a __"supermarket"__ for data analysis. As shown below, if you develop your own blocks package and registers blocks on load, these blocks become available to the end user. Therefore this makes it powerful for __collaboration__ between data science teams.
+
+```{mermaid}
+flowchart LR
+  subgraph blockr_ggplot2[blockr.ggplot2]
+    new_block1[New block]
+    new_block2[New block]
+  end
+  subgraph blockr_echarts4r[blockr.echarts4r]
+    new_block3[New block]
+    new_block4[New block]
+  end
+  blockr_ggplot2 --> |register| registry
+  blockr_echarts4r --> |register| registry
+  subgraph registry[Registry]
+    subgraph select_reg[Select block]
+      reg_name[Name: select block]
+      reg_descr[Description: select columns in a table]
+      reg_classes[Classes: select_block, tranform_block]
+      reg_category[Category: transform]
+      reg_ctor[Construcor: new_select_block]
+      reg_package[Package: blockr.dplyr]
+    end
+    subgraph filter_reg[Filter block]
+    end
+    filter_reg --x |unregister| trash['fa:fa-trash']
+  end
+```
+
+## Previewing available blocks
+
+Upon loading, `{blockr}` __registers__ its internal __blocks__ with `register_blockr_blocks()`.
+You won't have to call this function as it is not exported anyway. This makes the __registry__ environment
+ready to be queried by `available_blocks()`. A truncated output example below:
+
+```{r, eval=FALSE}
+available_blocks()[["dataset_block"]]
+```
+
+```r
+function(dataset = character(), package = "datasets", ...) {
+  ...
+}
+<environment: namespace:blockr.core>
+attr(,"name")
+[1] "dataset block"
+attr(,"description")
+[1] "Choose a dataset from a package"
+attr(,"classes")
+[1] "dataset_block" "data_block"    "block"         "vctrs_vctr"    "list"         
+attr(,"category")
+[1] "data"
+attr(,"ctor_name")
+[1] "new_dataset_block"
+attr(,"package")
+[1] "blockr.core"
+attr(,"class")
+[1] "registry_entry"
+```
+
+```{r, eval=TRUE}
+names(available_blocks())
+```
+
+## Register a block
+To register your own blocks, user facing functions are:
+
+- `register_block()` to register a block in the __registry__. If the __block__ is already registered,
+it __overwrites__ the existing one.
+- `register_blocks()` to register multiple blocks.
+
+Let's say you want to create a new `new_dummy_block` which does nothing specific:
+
+```{r, eval=TRUE}
+new_dummy_block <- function(text = "Hello World", ...) {
+  new_data_block(
+    function(id) {
+      moduleServer(id, function(input, output, session) {
+        list(
+          expr = reactive(quote(text)),
+          state = list(text = text)
+        )
+      })
+    },
+    function(id) {
+      tagList()
+    },
+    class = "dummy_block",
+    ...
+  )
+}
+
+register_dummy_blocks <- function() {
+  register_blocks(
+    c("new_dummy_block"),
+    name = c("dummy block"),
+    description = c("A block that does nothing"),
+    category = c("transform"),
+    package = NULL,
+    overwrite = TRUE
+  )
+}
+
+register_dummy_blocks()
+```
+
+If we now query the registry, the new block is available:
+
+```{r, eval=TRUE}
+available_blocks()[["dummy_block"]]
+```
+
+If you develop your block as part of a package, you may create a `zzz.R` script where you run:
+
+```r
+.onLoad <- function(libname, pkgname) {
+  register_dummy_blocks()
+  invisible(NULL)
+}
+```
+
+## Unregister a block
+
+The counterpart of `register_block()` is `unregister_blocks()`. We can remove
+our new `dummy_block` from the registry:
+
+```{r, eval=TRUE}
+unregister_blocks(uid = "dummy_block")
+
+# Check it out
+names(available_blocks())
+```
+
+where __uid__ is/are the block(s) class(s) passed in the constructor.
+
+## Create your own registry UI
+
+Within `blockr.core`, the registry is used to create a dropdown of possible blocks when the user wants to add
+a block:
+
+```r
+selectInput(
+  ns("registry_select"),
+  "Select block from registry",
+  choices = list_blocks()
+)
+```
+
+In the `blockr.ui` [package](), we designed a more sofisticated UI for the registry. We leverage our `scoutbaR` [package](https://cynkra.github.io/scoutbaR/) that provides a React-powered contextual menu with search and nicer metadata display. Block __categories__ are first extracted to
+create the widget __sections__ with `scout_section()` and passing the right `label`. Within each section (ie block category) we create one `scout_action()`
+per block. Each `scout_action()` display the block icon for better user experience, the block name and its description.
+
+```r
+# pak::pak("scoutbaR")
+library(scoutbaR)
+blk_icon <- function(category) {
+  switch(
+    category,
+    "data" = "table",
+    "file" = "file-import",
+    "parse" = "cogs",
+    "plot" = "chart-line",
+    "transform" = "wand-magic-sparkles",
+    "table" = "table"
+  )
+}
+
+blk_choices <- function() {
+  blk_cats <- sort(
+    unique(chr_ply(available_blocks(), \(b) attr(b, "category")))
+  )
+
+  lapply(blk_cats, \(cat) {
+    scout_section(
+      label = cat,
+      .list = dropNulls(
+        unname(
+          lapply(available_blocks(), \(choice) {
+            if (attr(choice, "category") == cat) {
+              scout_action(
+                id = attr(choice, "classes")[1],
+                label = attr(choice, "name"),
+                description = attr(choice, "description"),
+                icon = blk_icon(cat)
+              )
+            }
+          })
+        )
+      )
+    )
+  })
+}
+```
+
+A demo is available below, where you can click on `New block` or press `cmd/ctrl + K` to trigger the contextual menu.
+
+```{r blockr.ui-demo, eval=FALSE, echo = FALSE}
+library(blockr.ui)
+library(blockr.dplyr)
+library(blockr.sdtm)
+library(blockr.io)
+run_demo_app()
+```
+
+::: {.callout-note}
+The demo below runs with shinylive. Not all feature may work as expected due to compatibility issues with webR.
+:::
+
+```{r shinylive_url, echo = FALSE, results = 'asis'}
+# extract the code from knitr code chunks by ID
+code <- paste0(
+  c(
+    "webr::install(\"blockr.ui\", repos = \"https://cynkra.github.io/blockr.webR/\")",
+    "webr::install(\"blockr.dplyr\", repos = \"https://cynkra.github.io/blockr.webR/\")",
+    "webr::install(\"blockr.sdtm\", repos = \"https://cynkra.github.io/blockr.webR/\")",
+    "webr::install(\"blockr.io\", repos = \"https://cynkra.github.io/blockr.webR/\")",
+    knitr::knit_code$get("blockr.ui-demo")
+  ),
+  collapse = "\n"
+)
+
+url <- roxy.shinylive::create_shinylive_url(code, header = FALSE)
+```
+
+```{r shinylive_iframe, echo = FALSE, eval = TRUE}
+tags$iframe(
+  class = "border border-5 rounded shadow-lg",
+  src = url,
+  style = "zoom: 0.75;",
+  width = "100%",
+  height = "1100px"
+)
+```

@@ -6,3 +6,14 @@ template:
     in_header: >
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.5.0/mermaid.min.js" integrity="sha512-3EZqKCkk3nMLmbrI7mfry81KH7dkzy/BoDfQrodwLQnS/RbsVlERdYP6J0oiJegRUxSOmx7Y35WNbVKSw7mipw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+navbar:
+ components:
+   articles:
+    text: Articles
+    menu:
+    - text: Get started
+      href: articles/get-started.html
+    - text: Create a block
+      href: articles/create-block.html
+    - text: Browse for blocks
+      href: articles/blocks-registry.html

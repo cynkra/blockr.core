@@ -66,11 +66,10 @@ blockr.ui example
 We started to build blockr extensions to enrich blockr.core’s
 capabilities:
 
-- [blockr.dplyr](https://github.com/cynkra/blockr.dplyr): provide an
-  entry point to the `dplyr` ecosystem.
-- [blockr.ai](https://github.com/cynkra/blockr.ai): to leverage
-  LLM-powered blocks.
-- [blockr.io](https://github.com/cynkra/blockr.io): manage different
+- [blockr.dplyr](https://github.com/cynkra/blockr.dplyr): an entry point
+  to the `dplyr` ecosystem.
+- [blockr.ai](https://github.com/cynkra/blockr.ai): LLM-powered blocks.
+- [blockr.io](https://github.com/cynkra/blockr.io): handle different
   data input format (xpt, csv, …) and output for export.
 - [blockr.sdtm](https://github.com/cynkra/blockr.sdtm): pharmaverse
   datasets blocks.
