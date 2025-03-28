@@ -36,7 +36,7 @@ block_eval(x, expr, data, ...)
 \arguments{
 \item{id}{Namespace ID}
 
-\item{x}{Object for which to generate a \code{\link[=moduleServer]{moduleServer()}}}
+\item{x}{Object for which to generate a \code{\link[shiny:moduleServer]{shiny::moduleServer()}}}
 
 \item{data}{Input data (list of reactives)}
 
