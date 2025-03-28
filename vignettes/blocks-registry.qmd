@@ -99,9 +99,12 @@ To register your own blocks, user facing functions are:
 it __overwrites__ the existing one.
 - `register_blocks()` to register multiple blocks.
 
-Let's say you want to create a new `new_dummy_block` which does nothing specific:
+Note that, for the moment, you must develop blocks in a __package__ context to register them successfuly.
+
+Let's say you want to create a new `new_dummy_block` which does nothing specific in the `./R/dummy-block.R` script:
 
 ```{r, eval=TRUE}
+# ./R/dummy-block.R
 new_dummy_block <- function(text = "Hello World", ...) {
   new_data_block(
     function(id) {
@@ -126,7 +129,6 @@ register_dummy_blocks <- function() {
     name = c("dummy block"),
     description = c("A block that does nothing"),
     category = c("transform"),
-    package = NULL,
     overwrite = TRUE
   )
 }
@@ -136,13 +138,14 @@ register_dummy_blocks()
 
 If we now query the registry, the new block is available:
 
-```{r, eval=TRUE}
+```r
 available_blocks()[["dummy_block"]]
 ```
 
-If you develop your block as part of a package, you may create a `zzz.R` script where you run:
+Finally, we create a `.R/zzz.R` script where you run this code to register the block(s) whenever the package loads:
 
 ```r
+# ./R/zzz.R
 .onLoad <- function(libname, pkgname) {
   register_dummy_blocks()
   invisible(NULL)
@@ -154,7 +157,7 @@ If you develop your block as part of a package, you may create a `zzz.R` script 
 The counterpart of `register_block()` is `unregister_blocks()`. We can remove
 our new `dummy_block` from the registry:
 
-```{r, eval=TRUE}
+```r
 unregister_blocks(uid = "dummy_block")
 
 # Check it out
