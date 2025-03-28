@@ -154,3 +154,24 @@ test_that("block utils", {
   expect_s3_class(c(blk, blk), "blocks")
   expect_s3_class(c(blk, lst), "blocks")
 })
+
+test_that("Without package blocks can print", {
+  blk <- new_dummy_block <- function(text = "Hello World", ...) {
+    new_data_block(
+      function(id) {
+        moduleServer(id, function(input, output, session) {
+          list(
+            expr = reactive(quote(text)),
+            state = list(text = text)
+          )
+        })
+      },
+      function(id) {
+        tagList()
+      },
+      class = "dummy_block",
+      ...
+    )
+  }
+  expect_snapshot(blk())
+})

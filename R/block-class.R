@@ -520,10 +520,12 @@ format.block <- function(x, ...) {
     out <- c(out, "Stateless block")
   }
 
-  c(
-    out,
-    paste0("Constructor: ", attr(x, "ctor_pkg"), "::", attr(x, "ctor"), "()")
-  )
+  if (!is.null(attr(x, "ctor_pkg"))) {
+    ctor <- paste0(attr(x, "ctor_pkg"), "::", attr(x, "ctor"), "()")
+  } else {
+    ctor <- "<local function>"
+  }
+  c(out, paste("Constructor:", ctor))
 }
 
 #' @export
