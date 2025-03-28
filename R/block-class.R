@@ -520,7 +520,7 @@ format.block <- function(x, ...) {
     out <- c(out, "Stateless block")
   }
 
-  if (!is.null(attr(x, "ctor_pkg"))){
+  if (!is.null(attr(x, "ctor_pkg"))) {
     ctor <- paste0(attr(x, "ctor_pkg"), "::", attr(x, "ctor"), "()")
   } else {
     ctor <- paste(deparse(attr(x, "ctor")), collapse = "\n")

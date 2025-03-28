@@ -173,6 +173,5 @@ test_that("Without package blocks can print", {
       ...
     )
   }
-  
   expect_snapshot(blk())
 })
