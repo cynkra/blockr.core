@@ -11,3 +11,24 @@
        $ package: chr "datasets"
       Constructor: blockr.core::new_dataset_block()
 
+# Without package blocks can print
+
+    Code
+      blk()
+    Output
+      <dummy_block<data_block<block>>>
+      Name: "Dummy block"
+      No data inputs
+      Initial block state:
+       $ text: chr "Hello World"
+      Constructor: function (text = "Hello World", ...) 
+      {
+          new_data_block(function(id) {
+              moduleServer(id, function(input, output, session) {
+                  list(expr = reactive(quote(text)), state = list(text = text))
+              })
+          }, function(id) {
+              tagList()
+          }, class = "dummy_block", ...)
+      }
+
