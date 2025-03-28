@@ -110,7 +110,17 @@ unlst <- function(x, recursive = FALSE, use_names = FALSE) {
 
 na_to_empty <- function(x) replace(x, is.na(x), "")
 
-get_option <- function(name, default) {
+#' Blockr Options
+#'
+#' Retrieves options via `getOption()` or environment variable and prefixes
+#' the option with `blockr.` or `blockr_` respectively. Also converts to lower
+#' case for `getOption()` and upper case for environment variables.
+#'
+#' @param name Option name
+#' @param default Default value
+#'
+#' @export
+blockr_option <- function(name, default) {
 
   opt <- tolower(paste0("blockr.", name))
   env <- toupper(paste0("blockr_", name))

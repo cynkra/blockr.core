@@ -14,10 +14,10 @@
 \usage{
 new_board_options(
   board_name = "Board",
-  n_rows = get_option("n_rows", 50L),
-  page_size = get_option("page_size", 5L),
-  filter_rows = get_option("filter_rows", FALSE),
-  dark_mode = get_option("dark_mode", NULL),
+  n_rows = blockr_option("n_rows", 50L),
+  page_size = blockr_option("page_size", 5L),
+  filter_rows = blockr_option("filter_rows", FALSE),
+  dark_mode = blockr_option("dark_mode", NULL),
   ...,
   class = character()
 )
