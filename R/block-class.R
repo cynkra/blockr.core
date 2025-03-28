@@ -523,7 +523,7 @@ format.block <- function(x, ...) {
   if (!is.null(attr(x, "ctor_pkg"))) {
     ctor <- paste0(attr(x, "ctor_pkg"), "::", attr(x, "ctor"), "()")
   } else {
-    ctor <- paste(deparse(attr(x, "ctor")), collapse = "\n")
+    ctor <- "<local function>"
   }
   c(out, paste("Constructor:", ctor))
 }

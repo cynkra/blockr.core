@@ -21,14 +21,5 @@
       No data inputs
       Initial block state:
        $ text: chr "Hello World"
-      Constructor: function (text = "Hello World", ...) 
-      {
-          new_data_block(function(id) {
-              moduleServer(id, function(input, output, session) {
-                  list(expr = reactive(quote(text)), state = list(text = text))
-              })
-          }, function(id) {
-              tagList()
-          }, class = "dummy_block", ...)
-      }
+      Constructor: <local function>
 
