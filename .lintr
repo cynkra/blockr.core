@@ -2,5 +2,7 @@ linters: linters_with_defaults(
   object_name_linter = NULL
   )
 exclusions: list(
-    "vignettes/2-create-block.qmd"
+    "vignettes/create-block.qmd",
+    "vignettes/extend-blockr.qmd",
+    "vignettes/blocks-registry.qmd"
   )

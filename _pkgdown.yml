@@ -17,3 +17,5 @@ navbar:
       href: articles/create-block.html
     - text: Browse for blocks
       href: articles/blocks-registry.html
+    - text: Extend blockr
+      href: articles/extend-blockr.html

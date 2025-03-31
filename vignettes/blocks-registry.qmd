@@ -129,17 +129,12 @@ register_dummy_blocks <- function() {
     name = c("dummy block"),
     description = c("A block that does nothing"),
     category = c("transform"),
+    package = NULL,
     overwrite = TRUE
   )
 }
 
 register_dummy_blocks()
-```
-
-If we now query the registry, the new block is available:
-
-```r
-available_blocks()[["dummy_block"]]
 ```
 
 Finally, we create a `.R/zzz.R` script where you run this code to register the block(s) whenever the package loads:
@@ -150,6 +145,12 @@ Finally, we create a `.R/zzz.R` script where you run this code to register the b
   register_dummy_blocks()
   invisible(NULL)
 }
+```
+
+If we now query the registry, the new block is available:
+
+```r
+available_blocks()[["dummy_block"]]
 ```
 
 ## Unregister a block

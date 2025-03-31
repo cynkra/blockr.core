@@ -14,8 +14,64 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r packages, message=FALSE, warning=FALSE}
+library(shiny)
+library(bslib)
+library(scoutbaR)
 library(blockr.core)
+```
+
+```{r custom-plugin-setup, eval = FALSE, echo=FALSE}
+chr_ply <- function(x, fun, ..., length = 1L, use_names = FALSE) {
+  vapply(x, fun, character(length), ..., USE.NAMES = use_names)
+}
+
+#' @keywords internal
+lgl_ply <- function(x, fun, ..., length = 1L, use_names = FALSE) {
+  vapply(x, fun, logical(length), ..., USE.NAMES = use_names)
+}
+
+dropNulls <- function(x) {
+  x[!lgl_ply(x, is.null)]
+}
+
+blk_icon <- function(category) {
+  switch(
+    category,
+    "data" = "table",
+    "file" = "file-import",
+    "parse" = "cogs",
+    "plot" = "chart-line",
+    "transform" = "wand-magic-sparkles",
+    "table" = "table"
+  )
+}
+
+blk_choices <- function() {
+  blk_cats <- sort(
+    unique(chr_ply(available_blocks(), \(b) attr(b, "category")))
+  )
+
+  lapply(blk_cats, \(cat) {
+    scout_section(
+      label = cat,
+      .list = dropNulls(
+        unname(
+          lapply(available_blocks(), \(choice) {
+            if (attr(choice, "category") == cat) {
+              scout_action(
+                id = attr(choice, "classes")[1],
+                label = attr(choice, "name"),
+                description = attr(choice, "description"),
+                icon = blk_icon(cat)
+              )
+            }
+          })
+        )
+      )
+    )
+  })
+}
 ```
 
 ## Introduction
@@ -43,7 +99,7 @@ __plugins__ are used to customize/enhance UX aspects of the __board__ module, th
 As stated above, there are a couple of plugins already available in the core, such that when you want to create a custom blockr app,
 you can do this on the UI side:
 
-```r
+```{r, eval=FALSE}
 main_ui <- function(id, board) {
   ns <- NS(id)
   board_ui(
@@ -70,7 +126,7 @@ but not create new ones. On the server side, you call `board_server()`, the serv
 and a subset (or all) of plugins. `callbacks` are to inject code directly into the board server function, as opposed to plugins which are nested submodules.
 `parent` is used to __communicate__ application state between all parts of the application in a standardized way.
 
-```r
+```{r, eval=FALSE}
 main_server <- function(id, board) {
   moduleServer(
     id,
@@ -105,7 +161,7 @@ main_server <- function(id, board) {
 
 Looking at the `board_plugins()` function:
 
-```r
+```{r, eval=FALSE}
 board_plugins <- function(which = NULL) {
 
   plugins <- plugins(
@@ -129,7 +185,7 @@ board_plugins <- function(which = NULL) {
 
 Each plugin is composed of a __server__ and __ui__ part, since they are modules. For instance, the `manage_blocks` plugin is defined as:
 
-```r
+```{r, eval=FALSE}
 manage_blocks <- function(server, ui) {
   new_plugin(server, ui, validator = expect_null, class = "manage_blocks")
 }
@@ -140,21 +196,30 @@ In the following, we want to create a custom `manage_blocks` plugin that uses th
 ### A custom manage_blocks
 
 To create our custom manage blocks, we'll first need to overwrite the `add_rm_block_server` and `add_rm_block_ui` functions. 
-For sake of simplicity, on the UI side, we only provide a `Add` block button:
+For sake of simplicity, on the UI side, we provide a `Add` block button as well as as scoutbar widget (`blk_choices()` is described in the following [vignette](https://cynkra.github.io/blockr.core/articles/blocks-registry.html)):
 
-```{r, eval=TRUE}
+```{r custom-plugin-ui, eval=FALSE}
 add_rm_block_ui <- function(id, board) {
-  actionButton(
-    NS(id, "add_block"),
-    "New block",
-    icon = icon("circle-plus"),
+  tagList(
+    scoutbar(
+      NS(id, "scoutbar"),
+      placeholder = "Search for a block",
+      actions = blk_choices(),
+      theme = "dark",
+      showRecentSearch = TRUE
+    ),
+    actionButton(
+      NS(id, "add_block"),
+      "New block",
+      icon = icon("circle-plus"),
+    )
   )
 }
 ```
 
 On the server part, a plugin is always defined as follows (documentation has been left for reference):
 
-```r
+```{r, eval=FALSE}
 #' Add/remove block module
 #'
 #' Customizable logic for adding/removing blocks to the board.
@@ -187,7 +252,7 @@ to send updates to the board module and `...` is used to recover parameters pass
 
 We now want to open the `scoutbaR` widget whenever the users clicks on the `Add block` button. We can achieve that by calling `update_scoutbar` passing `revealScoutbar = TRUE`.
 
-```r
+```{r, eval=FALSE}
 add_rm_block_server <- function(id, board, update, ...) {
   moduleServer(
     id,
@@ -212,7 +277,7 @@ add_rm_block_server <- function(id, board, update, ...) {
 
 Next step is to manage the user choice, that is when a scoutbar action is selected. We listen to `input$scoutbar` which holds the name of the selected block. Since it is a string, we call `create_block()`, which instantiates a block from its name, and wrap it by `as_blocks()`. Finally, we signal this change to the board by refreshing the `update` reactive value, saying we want to add a new block `list(blocks = list(add = new_blk))`:
 
-```{r, eval=TRUE}
+```{r custom-plugin-server, eval=FALSE}
 add_rm_block_server <- function(id, board, update, ...) {
   moduleServer(
     id,
@@ -244,28 +309,12 @@ add_rm_block_server <- function(id, board, update, ...) {
 
 ### Register plugins
 
-To register our new plugin, we can defined a custom `board_plugins()` function that calls our own plugin for `manage_blocks()` (all other plugins are left as default):
+To register our new plugin, we can defined a custom `board_plugins()` function that calls our own plugin for `manage_blocks()`. For sake of simplicity, all other plugins are omitted:
 
-```{r, eval=TRUE}
+```{r custom-plugin-helpers, eval=FALSE}
 custom_board_plugins <- function(which = NULL) {
   plugins <- plugins(
-    preserve_board(server = blockr.core::ser_deser_server, ui = blockr.core::ser_deser_ui),
-    manage_blocks(server = add_rm_block_server, ui = add_rm_block_ui),
-    manage_links(server = blockr.core::add_rm_link_server, ui = blockr.core::add_rm_link_ui),
-    manage_stacks(
-      server = blockr.core::add_rm_stack_server,
-      ui = blockr.core::add_rm_stack_ui
-    ),
-    notify_user(server = blockr.core::block_notification_server),
-    generate_code(server = blockr.core::gen_code_server, ui = gen_code_ui),
-    edit_block(
-      server = blockr.core::edit_block_server,
-      ui = blockr.core::edit_block_ui
-    ),
-    edit_stack(
-      server = blockr.core::edit_stack_server,
-      ui = blockr.core::edit_stack_ui
-    )
+    manage_blocks(server = add_rm_block_server, ui = add_rm_block_ui)
   )
 
   if (is.null(which)) {
@@ -278,7 +327,10 @@ custom_board_plugins <- function(which = NULL) {
 
 ### Testing the new plugin
 
-```r
+In the below example, you may click on the `Add block` button and see the scoubar opening and then select a block.
+
+```{r custom-plugin-app, eval=FALSE}
+#| code-fold: true
 main_ui <- function(id, board) {
   ns <- NS(id)
   board_ui(
@@ -312,7 +364,48 @@ main_server <- function(id, board) {
     }
   )
 }
+
+board <- new_board()
+
+ui <- page_fluid(
+  main_ui("app", board)
+)
+
+server <- function(input, output, session) {
+  main_server("app", board)
+}
+
+shinyApp(ui, server)
 ```
 
+::: {.callout-note}
+The demo below runs with shinylive. Not all feature may work as expected due to compatibility issues with webR.
+:::
 
+```{r shinylive_url, echo = FALSE, results = 'asis'}
+# extract the code from knitr code chunks by ID
+code <- paste0(
+  c(
+    "webr::install(\"blockr.core\", repos = \"https://cynkra.github.io/blockr.webR/\")",
+    knitr::knit_code$get("packages"),
+    knitr::knit_code$get("custom-plugin-setup"),
+    knitr::knit_code$get("custom-plugin-ui"),
+    knitr::knit_code$get("custom-plugin-server"),
+    knitr::knit_code$get("custom-plugin-helpers"),
+    knitr::knit_code$get("custom-plugin-app")
+  ),
+  collapse = "\n"
+)
 
+url <- roxy.shinylive::create_shinylive_url(code, header = FALSE)
+```
+
+```{r shinylive_iframe, echo = FALSE, eval = TRUE}
+shiny::tags$iframe(
+  class = "border border-5 rounded shadow-lg",
+  src = url,
+  style = "zoom: 0.75;",
+  width = "100%",
+  height = "1100px"
+)
+```
