@@ -34,7 +34,8 @@ new_merge_block <- function(by = character(), all_x = FALSE, all_y = FALSE,
               allx("all.x" %in% input$type)
               ally("all.y" %in% input$type)
             },
-            ignoreNULL = FALSE
+            ignoreNULL = FALSE,
+            ignoreInit = TRUE
           )
 
           cols <- reactive(by_choices(x(), y()))
@@ -46,17 +47,6 @@ new_merge_block <- function(by = character(), all_x = FALSE, all_y = FALSE,
               choices = cols(),
               selected = sels()
             )
-          )
-
-          observe(
-            {
-              updateCheckboxGroupInput(
-                session,
-                inputId = "type",
-                choices = c("all.x", "all.y"),
-                selected = c("all.x", "all.y")[c(allx(), ally())]
-              )
-            }
           )
 
           list(
@@ -86,7 +76,8 @@ new_merge_block <- function(by = character(), all_x = FALSE, all_y = FALSE,
         checkboxGroupInput(
           inputId = NS(id, "type"),
           label = "Join type",
-          choices = c("all.x", "all.y")
+          choices = c("all.x", "all.y"),
+          selected = c("all.x", "all.y")[c(all_x, all_y)]
         )
       )
     },
