@@ -1,0 +1,113 @@
+---
+title: "5. Testing blocks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{1. Testing blocks}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+# This vignette is a work in progress
+
+As a block developer, you will likely want to write unit tests for any blocks you create.
+Testing blocks is a little more complex than writing unit tests for non-reactive R code, as we need some new methods for capturing the state and expressions returned by our blocks.
+This vignette will show you some methods for testing blocks.
+
+## Blocks are just modules
+As blocks as just shiny modules, we can use `shiny::testServer()` to our advantage to simulate a blockr application, without having to actually spin up an app.
+
+## Examples to include (tweak to use blockr.core blocks):
+
+### Test class of object
+
+```{r, eval = FALSE}
+test_that("style block constructor", {
+    expect_s3_class(new_style_gt_block(), "style_gt_block")
+})
+```
+
+### Test input widgets work
+
+```{r, eval = FALSE}
+test_that("style block server handles color changes", {
+    testServer(
+        app = new_style_gt_block()$expr_server,
+        args = list(gt_obj = reactive(gt::gt(mtcars))),
+        expr = {
+            session$setInputs(color = "green")
+            expect_equal(color(), "green")
+
+            session$setInputs(color = "cyan")
+            expect_equal(color(), "cyan")
+        }
+    )
+})
+```
+
+### Test that state is correctly returned
+
+```{r, eval = FALSE}
+test_that("style state is correctly returned", {
+    testServer(
+        app = new_style_gt_block()$expr_server,
+        args = list(gt_obj = reactive(gt::gt(mtcars))),
+        expr = {
+            expect_equal(session$returned$state$style(), numeric())
+            expect_equal(session$returned$state$color(), character())
+            expect_equal(session$returned$state$striping(), character())
+
+            session$setInputs(style = 1)
+            expect_equal(session$returned$state$style(), 1)
+
+            session$setInputs(color = "pink")
+            expect_equal(session$returned$state$color(), "pink")
+
+            session$setInputs(striping = "no")
+            expect_equal(session$returned$state$striping(), "no")
+        }
+    )
+})
+```
+
+### Test that expressions are correctly returned
+
+```{r, eval = FALSE}
+test_that("expr evaluates correctly", {
+    testServer(
+        app = new_style_gt_block()$expr_server,
+        args = list(gt_obj = reactive(gt::gt(mtcars))),
+        expr = {
+            session$setInputs(style = 1)
+            session$setInputs(color = "cyan")
+            session$setInputs(striping = "yes")
+            evaluated_expr <- eval(session$returned$expr())
+            expect_s3_class(evaluated_expr, "gt_tbl")
+        }
+    )
+})
+```
+
+### Test that expressions correctly throw errors
+
+
+```{r, eval = FALSE}
+test_that("incorrect colors throw an error", {
+    testServer(
+        app = new_style_gt_block()$expr_server,
+        args = list(gt_obj = reactive(gt::gt(mtcars))),
+        expr = {
+            session$setInputs(style = 1)
+            session$setInputs(color = "Ooops")
+            session$setInputs(striping = "yes")
+            expect_error(eval(session$returned$expr()))
+        }
+    )
+})
+```
