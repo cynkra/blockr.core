@@ -58,7 +58,7 @@ We started to build blockr extensions to enrich blockr.core's capabilities:
 - [blockr.io](https://github.com/cynkra/blockr.io): handle different data input format (xpt, csv, ...) and output for export.
 - [blockr.sdtm](https://github.com/cynkra/blockr.sdtm): pharmaverse datasets blocks.
 
-If you wish to learn to develop your own blocks, have a look at this [vignette](https://cynkra.github.io/blockr.core/articles/2-create-block.html).
+If you wish to learn to develop your own blocks, have a look at this [vignette](https://cynkra.github.io/blockr.core/articles/create-block.html).
 
 ## What is a block?
 
@@ -76,5 +76,5 @@ pak::pak("cynkra/blockr.core")
 
 ## How to get started?
 
-To get started, we invite you to read this [vignette](https://cynkra.github.io/blockr.core/articles/1-get-started.html).
+To get started, we invite you to read this [vignette](https://cynkra.github.io/blockr.core/articles/get-started.html).
 

@@ -1,0 +1,318 @@
+---
+title: "4. Extend blockr"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{4. Extend blockr}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(blockr.core)
+```
+
+## Introduction
+
+In the `Create block` [vignette](https://cynkra.github.io/blockr.core/articles/create-block.html),
+you were taught how to design new blocks for blockr. Did you know that we could go much further?
+
+Each major `blockr.core` feature belongs to its own __plugin__, materialized as a shiny module:
+
+- Manage blocks (create/remove, append, ...)
+- Manage __links__, that is how blocks are connected. Linking block A to block B means that block A passes its output
+data to block B.
+- Manage __stacks__ (group blocks together).
+- Preserve the __board__ state: save and restore the application state.
+- ...
+
+All of the above is fully customisable by yourself, `blockr.core` only provides resonable defaults to get you started.
+`blockr.ui` is an example of full customisation.
+
+## blockr plugins
+
+### Background
+
+__plugins__ are used to customize/enhance UX aspects of the __board__ module, that is the top level module exposed by `blockr.core`.
+As stated above, there are a couple of plugins already available in the core, such that when you want to create a custom blockr app,
+you can do this on the UI side:
+
+```r
+main_ui <- function(id, board) {
+  ns <- NS(id)
+  board_ui(
+    ns("board"),
+    board,
+    plugins = board_plugins(
+      c(
+        "preserve_board",
+        "manage_blocks",
+        "manage_links",
+        "manage_stacks",
+        "generate_code",
+        "notify_user"
+      )
+    )
+  )
+}
+```
+
+`board_ui()` expects the namespace of the module, a __board__ object which you can create with `new_board`. The board is, in general, passed
+when you call `serve` on the board object such that you can start an app with predefined blocks, links and stacks.
+where `board_plugins()` expect a vector of plugin names. It is important to state that at the moment, you can only overwrite existing plugins
+but not create new ones. On the server side, you call `board_server()`, the server counter part of `board_ui()` which expects a namespace, the board object
+and a subset (or all) of plugins. `callbacks` are to inject code directly into the board server function, as opposed to plugins which are nested submodules.
+`parent` is used to __communicate__ application state between all parts of the application in a standardized way.
+
+```r
+main_server <- function(id, board) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      ns <- session$n
+
+      app_state <- reactiveValues(
+        # App state for module communication
+      )
+
+      # Board module
+      board_server(
+        "board",
+        board,
+        plugins = board_plugins(
+          c(
+            "preserve_board",
+            "manage_blocks",
+            "manage_links",
+            "manage_stacks",
+            "generate_code",
+            "notify_user"
+          )
+        ),
+        callbacks = list(),
+        parent = app_state
+      )
+    }
+  )
+}
+```
+
+Looking at the `board_plugins()` function:
+
+```r
+board_plugins <- function(which = NULL) {
+
+  plugins <- plugins(
+    preserve_board(server = ser_deser_server, ui = ser_deser_ui),
+    manage_blocks(server = add_rm_block_server, ui = add_rm_block_ui),
+    manage_links(server = add_rm_link_server, ui = add_rm_link_ui),
+    manage_stacks(server = add_rm_stack_server, ui = add_rm_stack_ui),
+    notify_user(server = block_notification_server),
+    generate_code(server = gen_code_server, ui = gen_code_ui),
+    edit_block(server = edit_block_server, ui = edit_block_ui),
+    edit_stack(server = edit_stack_server, ui = edit_stack_ui)
+  )
+
+  if (is.null(which)) {
+    return(plugins)
+  }
+
+  plugins[which]
+}
+```
+
+Each plugin is composed of a __server__ and __ui__ part, since they are modules. For instance, the `manage_blocks` plugin is defined as:
+
+```r
+manage_blocks <- function(server, ui) {
+  new_plugin(server, ui, validator = expect_null, class = "manage_blocks")
+}
+```
+
+In the following, we want to create a custom `manage_blocks` plugin that uses the `scoutbaR` package, described in [vignette](https://cynkra.github.io/blockr.core/articles/blocks-registry.html)
+
+### A custom manage_blocks
+
+To create our custom manage blocks, we'll first need to overwrite the `add_rm_block_server` and `add_rm_block_ui` functions. 
+For sake of simplicity, on the UI side, we only provide a `Add` block button:
+
+```{r, eval=TRUE}
+add_rm_block_ui <- function(id, board) {
+  actionButton(
+    NS(id, "add_block"),
+    "New block",
+    icon = icon("circle-plus"),
+  )
+}
+```
+
+On the server part, a plugin is always defined as follows (documentation has been left for reference):
+
+```r
+#' Add/remove block module
+#'
+#' Customizable logic for adding/removing blocks to the board.
+#'
+#' @param id Namespace ID
+#' @param board Reactive values object
+#' @param update Reactive value object to initiate board updates
+#' @param ... Extra arguments passed from parent scope
+#'
+#' @return A [shiny::reactiveValues()] object with components `add` and `rm`,
+#' where `add` may be `NULL` or a `block` object and `rm` be `NULL` or a string
+#' (block ID).
+#'
+#' @rdname add_rm_block
+#' @export
+add_rm_block_server <- function(id, board, update, ...) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      # SERVER LOGIC
+
+      NULL
+    }
+  )
+}
+```
+
+The server function __signature__ must start with the module id, `board` refers to internal reactive values (read-only), `update` is a reactive value
+to send updates to the board module and `...` is used to recover parameters passed from the top level like `parent`. The plugin always returns `NULL`.
+
+We now want to open the `scoutbaR` widget whenever the users clicks on the `Add block` button. We can achieve that by calling `update_scoutbar` passing `revealScoutbar = TRUE`.
+
+```r
+add_rm_block_server <- function(id, board, update, ...) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      # Trigger add block
+      observeEvent(
+        input$add_block,
+        {
+          update_scoutbar(
+            session,
+            "scoutbar",
+            revealScoutbar = TRUE
+          )
+        }
+      )
+
+      NULL
+    }
+  )
+}
+```
+
+Next step is to manage the user choice, that is when a scoutbar action is selected. We listen to `input$scoutbar` which holds the name of the selected block. Since it is a string, we call `create_block()`, which instantiates a block from its name, and wrap it by `as_blocks()`. Finally, we signal this change to the board by refreshing the `update` reactive value, saying we want to add a new block `list(blocks = list(add = new_blk))`:
+
+```{r, eval=TRUE}
+add_rm_block_server <- function(id, board, update, ...) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      # Trigger add block
+      observeEvent(
+        input$add_block,
+        {
+          update_scoutbar(
+            session,
+            "scoutbar",
+            revealScoutbar = TRUE
+          )
+        }
+      )
+
+      observeEvent(input$scoutbar, {
+        new_blk <- as_blocks(create_block(input$scoutbar))
+        update(
+          list(blocks = list(add = new_blk))
+        )
+      })
+
+      NULL
+    }
+  )
+}
+```
+
+### Register plugins
+
+To register our new plugin, we can defined a custom `board_plugins()` function that calls our own plugin for `manage_blocks()` (all other plugins are left as default):
+
+```{r, eval=TRUE}
+custom_board_plugins <- function(which = NULL) {
+  plugins <- plugins(
+    preserve_board(server = blockr.core::ser_deser_server, ui = blockr.core::ser_deser_ui),
+    manage_blocks(server = add_rm_block_server, ui = add_rm_block_ui),
+    manage_links(server = blockr.core::add_rm_link_server, ui = blockr.core::add_rm_link_ui),
+    manage_stacks(
+      server = blockr.core::add_rm_stack_server,
+      ui = blockr.core::add_rm_stack_ui
+    ),
+    notify_user(server = blockr.core::block_notification_server),
+    generate_code(server = blockr.core::gen_code_server, ui = gen_code_ui),
+    edit_block(
+      server = blockr.core::edit_block_server,
+      ui = blockr.core::edit_block_ui
+    ),
+    edit_stack(
+      server = blockr.core::edit_stack_server,
+      ui = blockr.core::edit_stack_ui
+    )
+  )
+
+  if (is.null(which)) {
+    return(plugins)
+  }
+
+  plugins[which]
+}
+```
+
+### Testing the new plugin
+
+```r
+main_ui <- function(id, board) {
+  ns <- NS(id)
+  board_ui(
+    ns("board"),
+    board,
+    plugins = custom_board_plugins(
+      c(
+        "manage_blocks"
+      )
+    )
+  )
+}
+
+main_server <- function(id, board) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      ns <- session$n
+
+      # Board module
+      board_server(
+        "board",
+        board,
+        plugins = custom_board_plugins(
+          c(
+            "manage_blocks"
+          )
+        ),
+        callbacks = list()
+      )
+    }
+  )
+}
+```
+
+
+

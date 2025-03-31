@@ -2,7 +2,7 @@
 title: "3. Browse for blocks"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{2. Create a block}
+  %\VignetteIndexEntry{3. Browse for blocks}
   %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---

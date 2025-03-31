@@ -75,7 +75,7 @@ capabilities:
   datasets blocks.
 
 If you wish to learn to develop your own blocks, have a look at this
-[vignette](https://cynkra.github.io/blockr.core/articles/2-create-block.html).
+[vignette](https://cynkra.github.io/blockr.core/articles/create-block.html).
 
 ## What is a block?
 
@@ -96,4 +96,4 @@ pak::pak("cynkra/blockr.core")
 ## How to get started?
 
 To get started, we invite you to read this
-[vignette](https://cynkra.github.io/blockr.core/articles/1-get-started.html).
+[vignette](https://cynkra.github.io/blockr.core/articles/get-started.html).
