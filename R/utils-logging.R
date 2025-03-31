@@ -19,8 +19,8 @@ write_log <- function(..., level = "info") {
 
   msg <- paste0(
     "[", toupper(level), "]",
-    if (isTRUE(get_option("log_time", TRUE))) get_timmestamp("[", "]"),
-    if (isTRUE(get_option("log_mem", FALSE))) get_mem_use("[", "]"),
+    if (isTRUE(blockr_option("log_time", TRUE))) get_timmestamp("[", "]"),
+    if (isTRUE(blockr_option("log_mem", FALSE))) get_mem_use("[", "]"),
     " ", ...
   )
 
@@ -91,13 +91,13 @@ trace_log_level <- as_log_level("trace")
 
 get_log_level <- function() {
   as_log_level(
-    get_option("log_level", "info")
+    blockr_option("log_level", "info")
   )
 }
 
 get_logger <- function() {
 
-  fun <- get_option("logger", "cat_logger")
+  fun <- blockr_option("logger", "cat_logger")
 
   if (is.function(fun)) {
     return(fun)
