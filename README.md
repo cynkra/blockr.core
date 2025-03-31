@@ -16,16 +16,23 @@ blockr is a framework for **data analysis**, using a **web-based** point
 and click user interface. Use blockr to create web apps that perform
 **visual programming**, leveraging the power of **R**.
 
+## What is a block?
+
+A **block** is a fundamental unit of a data analysis workflow. A single
+block performs a single **task**, such as loading or filtering or
+visualisation. Blocks can be joined together using a **DAG** (direct
+acyclic graph) to create powerful data **workflows**.
+
 ## Who is it for?
 
-blockr has 2 main user targets:
+blockr targets two main user groups:
 
-- On the one hand, it empowers **non technical** users to create
-  insightful data workflows using pre-built blocks that can be
-  **easily** connected, all without writing a single line of code.
-- On the other hand, it provides **developers** with a set of tools to
-  seamlessly create new blocks, thereby enhancing the entire framework
-  and fostering **collaboration** within organizations teams.
+- **non technical** users are empowered to create insightful data
+  workflows using pre-built blocks that can be **easily** connected, all
+  without writing a single line of code.
+- **developers** are provided with a set of tools to seamlessly create
+  new blocks, thereby enhancing the entire framework and fostering
+  **collaboration** within organizations teams.
 
 ## What is blockr.core
 
@@ -34,6 +41,8 @@ functionality needed to get started. It can be run as a stand-alone app,
 but is designed with extensibility in mind. A rich **API** is provided
 to connect your own blocks and override the default behaviours (e.g.,
 you can add your own GUI layer or serialisation).
+
+## Key features
 
 1.  **User-Friendly Interface**: Build data pipelines with intuitive
     interface, like with
@@ -76,13 +85,6 @@ capabilities:
 
 If you wish to learn to develop your own blocks, have a look at this
 [vignette](https://cynkra.github.io/blockr.core/articles/create-block.html).
-
-## What is a block?
-
-A **block** is a fundamental unit of a data analysis workflow. A single
-block performs a single **tasks**, such as loading or filtering or
-visualisation. Blocks can be joined together using a **DAG** (direct
-acyclic graph) to create powerful data **workflows**.
 
 ## Installation
 
