@@ -16,6 +16,23 @@ blockr is a framework for **data analysis**, using a **web-based** point
 and click user interface. Use blockr to create web apps that perform
 **visual programming**, leveraging the power of **R**.
 
+## Installation
+
+You can install the development version of blockr.core from
+[GitHub](https://github.com/) with:
+
+``` r
+pak::pak("cynkra/blockr.core")
+```
+
+## What is blockr.core
+
+`blockr.core` is the entry point to blockr, providing the core
+functionality needed to get started. It can be run as a stand-alone app,
+but is designed with extensibility in mind. A rich **API** is provided
+to connect your own blocks and override the default behaviours (e.g.,
+you can add your own GUI layer or serialisation).
+
 ## What is a block?
 
 A **block** is a fundamental unit of a data analysis workflow. A single
@@ -34,15 +51,7 @@ blockr targets two main user groups:
   new blocks, thereby enhancing the entire framework and fostering
   **collaboration** within organizations teams.
 
-## What is blockr.core
-
-`blockr.core` is the entry point to blockr, providing the core
-functionality needed to get started. It can be run as a stand-alone app,
-but is designed with extensibility in mind. A rich **API** is provided
-to connect your own blocks and override the default behaviours (e.g.,
-you can add your own GUI layer or serialisation).
-
-## Key features
+## What are the key features
 
 1.  **User-Friendly Interface**: Build data pipelines with intuitive
     interface, like with
@@ -70,7 +79,12 @@ blockr.ui example
 
 </div>
 
-### The blockr ecosystem
+## How to get started?
+
+To get started, we invite you to read this
+[vignette](https://cynkra.github.io/blockr.core/articles/get-started.html).
+
+### How can I develop my own blocks?
 
 We started to build blockr extensions to enrich blockr.core’s
 capabilities:
@@ -85,17 +99,3 @@ capabilities:
 
 If you wish to learn to develop your own blocks, have a look at this
 [vignette](https://cynkra.github.io/blockr.core/articles/create-block.html).
-
-## Installation
-
-You can install the development version of blockr.core from
-[GitHub](https://github.com/) with:
-
-``` r
-pak::pak("cynkra/blockr.core")
-```
-
-## How to get started?
-
-To get started, we invite you to read this
-[vignette](https://cynkra.github.io/blockr.core/articles/get-started.html).
