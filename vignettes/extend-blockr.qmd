@@ -436,7 +436,202 @@ shiny::tags$iframe(
 
 ## Custom UI components
 
-If you'd like to use the board with another UI kit than `bslib` you can create a customized version of serve ...
+If you'd like to use the board with another UI kit than `bslib` you can create a new method for `board_ui()`. For that,
+you'll need a little bit of S3 [knowledge](https://adv-r.hadley.nz/s3.html).
+
+The function signature should contain `id` (module namespace), `x` (board object), and `plugins` to use `blockr.core` plugins.
+In the following, we leverage the brand new `shinyNextUI` to power the custom board UI:
+
+```{r custom-board-ui, eval=FALSE}
+board_ui.custom_board <- function(id, x, plugins = list(), ...) {
+  plugins <- as_plugins(plugins)
+  div(
+    id = paste0(id, "_board"),
+    board_ui(id, plugins[["manage_blocks"]], x),
+    div(
+      id =  paste0(id, "_blocks"),
+      block_ui(id, x)
+    )
+  )
+}
+```
+
+We have to customize the `block_ui` too. Overall, we leverage the `shinyNextUI::card` component to create the block layout:
+
+```{r custom-block-ui, eval=FALSE}
+get_block_registry <- function(x) {
+  stopifnot(is_block(x))
+  available_blocks()[[strsplit(attr(x, "ctor"), "new_")[[1]][2]]]
+}
+
+block_ui.custom_board <- function(id, x, blocks = NULL, ...) {
+  block_card <- function(x, id, ns) {
+    id <- paste0("block_", id)
+
+    blk_info <- get_block_registry(x)
+
+    div(
+      class = "m-2",
+      id = ns(id),
+      shinyNextUI::card(
+        variant = "bordered",
+        shinyNextUI::card_header(
+          className = "d-flex justify-content-between",
+          icon(blk_icon(attr(blk_info, "category"))),
+          sprintf(
+            "Block: %s (id: %s)",
+            attr(blk_info, "name"),
+            gsub("block_", "", id)
+          ),
+          shinyNextUI::tooltip(
+            icon("info-circle"),
+            content = tagList(
+              p(
+              icon("lightbulb"),
+              "How to use this block?",
+              ),
+              p(attr(blk_info, "description"), ".")
+            )
+          )
+        ),
+        shinyNextUI::divider(),
+        shinyNextUI::card_body(
+          expr_ui(ns(id), x),
+          block_ui(ns(id), x)
+        ),
+        shinyNextUI::divider(),
+        shinyNextUI::card_footer(
+          sprintf(
+            "Type: %s; Package: %s",
+            attr(blk_info, "category"),
+            attr(blk_info, "package")
+          )
+        )
+      )
+    )
+  }
+
+  stopifnot(is.character(id) && length(id) == 1L)
+
+  if (is.null(blocks)) {
+    blocks <- board_blocks(x)
+  } else if (is.character(blocks)) {
+    blocks <- board_blocks(x)[blocks]
+  }
+
+  stopifnot(is_blocks(blocks))
+
+  tagList(
+    Map(
+      block_card,
+      blocks,
+      names(blocks),
+      MoreArgs = list(ns = NS(id)),
+      USE.NAMES = FALSE
+    )
+  )
+}
+```
+
+Notice the use of few `blockr.core` helpers along the way:
+
+- `board_blocks()` to extract and validate the blocks of a board.
+- `is_blocks()` check whether an object correspond to a list of blocks.
+- `get_block_registry()` to get the current block metadata from the [registry](https://cynkra.github.io/blockr.core/articles/blocks-registry.html).
+
+`add_rm_block_ui()` now leverages `shinyNextUI::actionButton`:
+
+```{r custom-plugin-ui-nextui, eval=FALSE}
+add_rm_block_ui <- function(id, board) {
+  tagList(
+    scoutbar(
+      NS(id, "scoutbar"),
+      placeholder = "Search for a block",
+      actions = blk_choices(),
+      theme = "dark",
+      showRecentSearch = TRUE
+    ),
+    shinyNextUI::actionButton(
+      NS(id, "add_block"),
+      "New block",
+      icon = icon("circle-plus"),
+    )
+  )
+}
+```
+
+Since `blockr.core` blocks utilises `shiny`/`bslib` UI, you'd also have to rewrite the UI and/or server part whenever necessary.
+
+As a final step, when you call `new_board()` don't forget to add it the `custom_board` class so that the custom S3 methods are invoked.
+
+```{r custom-ui-app, eval=FALSE}
+#| code-fold: true
+board <- new_board(class = "custom_board")
+
+ui <- nextui_page(
+  board_ui(
+    "board",
+    board,
+    plugins = custom_board_plugins(
+      c(
+        "manage_blocks"
+      )
+    )
+  ) 
+)
+
+server <- function(input, output, session) {
+  board_server(
+    "board",
+    board,
+    plugins = custom_board_plugins(
+      c(
+        "manage_blocks"
+      )
+    ),
+    callbacks = list()
+  )
+}
+
+shinyApp(ui, server)
+```
+
+::: {.callout-note}
+The demo below runs with shinylive. Not all feature may work as expected due to compatibility issues with webR.
+:::
+
+```{r shinylive2_url, echo = FALSE, results = 'asis'}
+# extract the code from knitr code chunks by ID
+code <- paste0(
+  c(
+    "webr::install(\"blockr.core\", repos = \"https://cynkra.github.io/blockr.webR/\")",
+    "library(shiny)",
+    "library(scoutbaR)",
+    "library(blockr.core)",
+    "library(shinyNextUI)",
+    knitr::knit_code$get("custom-plugin-setup"),
+    knitr::knit_code$get("custom-plugin-ui-nextui"),
+    knitr::knit_code$get("custom-plugin-server"),
+    knitr::knit_code$get("custom-plugin-helpers"),
+    knitr::knit_code$get("custom-block-ui"),
+    knitr::knit_code$get("custom-board-ui"),
+    knitr::knit_code$get("custom-ui-app")
+  ),
+  collapse = "\n"
+)
+
+url <- roxy.shinylive::create_shinylive_url(code, header = FALSE)
+```
+
+```{r shinylive2_iframe, echo = FALSE, eval = TRUE}
+shiny::tags$iframe(
+  class = "border border-5 rounded shadow-lg",
+  src = url,
+  style = "zoom: 0.75;",
+  width = "100%",
+  height = "1100px"
+)
+```
 
 ## Customize board options
 
