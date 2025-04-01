@@ -101,6 +101,40 @@ If none of the solution meet your needs, keep in mind that `blockr.core` is enti
 
 ## {blockr} for developers
 
+### Introduction
+
+`blockr.core` decomposes entire data pipeline workflows into smaller units called __block__, responsible for performing a single __task__. At the end of the day, you obtain a __DAG__ to create powerful data __workflows__.
+
+```{mermaid}
+flowchart TD
+  subgraph board[Board]
+
+    subgraph stack1[Stack 1]
+      direction TB
+      import[Data 1]
+      transform[Transform]
+      visualise[Visualise]
+      import2[Data 2]
+      merge[Merge data]
+      transform2[Subset columns]
+      import --> transform --> |filter| merge --> |left join| visualise
+      import2 --> transform2 --> |subset| merge
+    end
+
+    subgraph stack2[Stack 2]
+      direction TB
+      import3[Data 3]
+      llm[Transform LLM]
+      visualise_llm[Visualise LLM]
+      import3 --> llm --> visualise_llm
+    end
+  end
+```
+
+At the top level, a blockr app is made of a __board__ object. That board may contains __blocks__, __stacks__ or group of blocks, and connections between blocks, also known as __links__. You may find interesting to read more about block metadata in this [vignette](https://cynkra.github.io/blockr.core/articles/blocks-registry.html).
+
+### How to run a blockr.core app?
+
 Spin up an app with a single block:
 
 ```{r eval = FALSE}
