@@ -433,3 +433,11 @@ shiny::tags$iframe(
   height = "1100px"
 )
 ```
+
+## Custom UI components
+
+If you'd like to use the board with another UI kit than `bslib` you can create a customized version of serve ...
+
+## Customize board options
+
+TBD

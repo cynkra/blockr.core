@@ -20,7 +20,8 @@ library(blockr.core)
 
 ## {blockr} for non coders
 
-In that case, you likely just want to get started to create your first data pipeline.
+In that case, you likely just want to get started to create your first data pipeline. After all,
+isn't that a promise of blockr framework?
 
 ### The user interface
 
@@ -101,6 +102,8 @@ If none of the solution meet your needs, keep in mind that `blockr.core` is enti
 
 ## {blockr} for developers
 
+As a developer you may have to serve blockr applications or develop custom blocks. We provide a introduction below.
+
 ### Introduction
 
 `blockr.core` decomposes entire data pipeline workflows into smaller units called __block__, responsible for performing a single __task__. At the end of the day, you obtain a __DAG__ to create powerful data __workflows__.
@@ -133,9 +136,10 @@ flowchart TD
 
 At the top level, a blockr app is made of a __board__ object. That board may contains __blocks__, __stacks__ or group of blocks, and connections between blocks, also known as __links__. You may find interesting to read more about block metadata in this [vignette](https://cynkra.github.io/blockr.core/articles/blocks-registry.html).
 
-### How to run a blockr.core app?
+### Serve blocks
 
-Spin up an app with a single block:
+This is mostly available for testing, you can serve a block as an entire application.
+Below is all what you need to spin up an app with a single block:
 
 ```{r eval = FALSE}
 serve(new_dataset_block("iris"))
@@ -150,7 +154,33 @@ serve(
 )
 ```
 
-Use the board object to manage and spin up an app with multiple blocks (more on boards, links, and stacks, later):
+Notice that in the above example, data is a named list with `x` and `y`. How to name this list is given by the signature
+of the corresponding block server function (see truncated example below with `new_merge_block()`):
+
+```r
+new_merge_block <- function(by = character(), all_x = FALSE, all_y = FALSE, ...) {
+
+  new_transform_block(
+    server = function(id, x, y) {
+      moduleServer(
+        id,
+        function(input, output, session) {
+          # ... server logic ...
+        })
+    })
+}
+```
+
+### Serve a board
+
+In most of the case, you want to serve an entire board.
+
+```{r eval = FALSE}
+serve(new_board())
+```
+
+This single line of code spins up an ready-to-use blockr board. In some cases, it is 
+possible to initialise the board with few blocks, stacks and links:
 
 ```{r simple-board, eval = FALSE}
 serve(
@@ -188,3 +218,35 @@ cat(sprintf("[Open in Shinylive](%s)\n\n", url))
 ```{r shinylive_iframe, echo = FALSE, out.width = '150%', out.extra = 'style = "position: relative; z-index:1"', eval = knitr::is_html_output()}
 knitr::include_url(url, height = "800px")
 ```
+
+You can then deploy this application to any hosting solution like 
+Posit Connect, Shiny server or even shinylive like in this example.
+
+### Use the board as a module
+
+`serve()` assumes the board to be at the top level of the shiny app module structure. Under the hood, `serve()` returns
+a `shinyapp` object. You may need to embed the board into a larger app, which is also possible. There are two entry points and you
+may look at the `serve.board` method for reference:
+
+- `board_ui()`: the board UI module.
+- `board_server()`: the board server module.
+
+```r
+ui <- bslib::page_fluid(
+  board_ui(id, x, plugins)
+)
+server <- function(input, output, session) {
+  res <- board_server(id, x, plugins)
+}
+shinyApp(ui, server)
+```
+
+### What's next?
+
+#### Develop new blocks
+
+If you had to develop custom blocks, you can read this [vignette](https://cynkra.github.io/blockr.core/articles/create-block.html).
+
+#### Extend blockr.core
+
+If you wish to customise the look and feel of block, look no further than this [article](https://cynkra.github.io/blockr.core/articles/extend-blockr.html).

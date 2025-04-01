@@ -4,5 +4,7 @@ linters: linters_with_defaults(
 exclusions: list(
     "vignettes/create-block.qmd",
     "vignettes/extend-blockr.qmd",
-    "vignettes/blocks-registry.qmd"
+    "vignettes/blocks-registry.qmd",
+    "vignettes/get-started.qmd",
+    "vignettes/testing-blocks.qmd"
   )
