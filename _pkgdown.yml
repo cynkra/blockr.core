@@ -19,3 +19,5 @@ navbar:
       href: articles/blocks-registry.html
     - text: Extend blockr
       href: articles/extend-blockr.html
+    - text: Testing blocks
+      href: articles/testing-blocks.html
