@@ -11,3 +11,15 @@
        $ package: chr "datasets"
       Constructor: blockr.core::new_dataset_block()
 
+# Without package blocks can print
+
+    Code
+      blk()
+    Output
+      <dummy_block<data_block<block>>>
+      Name: "Dummy block"
+      No data inputs
+      Initial block state:
+       $ text: chr "Hello World"
+      Constructor: <local function>
+
