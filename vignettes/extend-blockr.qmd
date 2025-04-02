@@ -560,7 +560,7 @@ add_rm_block_ui <- function(id, board) {
 }
 ```
 
-Since `blockr.core` blocks utilises `shiny`/`bslib` UI, you'd also have to rewrite the UI and/or server part whenever necessary.
+Since `blockr.core` blocks utilises `shiny`/`bslib` UI, you'd also have to rewrite the UI and/or server part whenever necessary. This [vignette](https://cynkra.github.io/blockr.core/articles/create-block.html) provides a starting point to authoring blocks.
 
 As a final step, when you call `new_board()` don't forget to add it the `custom_board` class so that the custom S3 methods are invoked.
 
