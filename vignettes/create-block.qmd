@@ -374,6 +374,8 @@ serve(
 )
 ```
 
+As closing remark, since the `esquisse` block is stateless, save and restore won't work for this block.
+
 ::: {.callout-note}
 The demo below runs with shinylive. Not all feature may work as expected due to compatibility issues with webR.
 :::

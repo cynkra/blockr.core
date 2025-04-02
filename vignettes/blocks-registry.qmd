@@ -99,7 +99,8 @@ To register your own blocks, user facing functions are:
 it __overwrites__ the existing one.
 - `register_blocks()` to register multiple blocks.
 
-Note that, for the moment, you must develop blocks in a __package__ context to register them successfuly.
+Note that, if you develop your block outside a package context, you must call `register_block` (or `register_blocks`)
+passing the constructor as a function and not as a string (see below).
 
 Let's say you want to create a new `new_dummy_block` which does nothing specific in the `./R/dummy-block.R` script:
 
@@ -125,11 +126,9 @@ new_dummy_block <- function(text = "Hello World", ...) {
 
 register_dummy_blocks <- function() {
   register_blocks(
-    c("new_dummy_block"),
+    c(new_dummy_block),
     name = c("dummy block"),
     description = c("A block that does nothing"),
-    category = c("transform"),
-    package = NULL,
     overwrite = TRUE
   )
 }
