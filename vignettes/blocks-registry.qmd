@@ -148,7 +148,7 @@ Finally, we create a `.R/zzz.R` script where you run this code to register the b
 
 If we now query the registry, the new block is available:
 
-```r
+```{r}
 available_blocks()[["dummy_block"]]
 ```
 
@@ -157,7 +157,7 @@ available_blocks()[["dummy_block"]]
 The counterpart of `register_block()` is `unregister_blocks()`. We can remove
 our new `dummy_block` from the registry:
 
-```r
+```{r}
 unregister_blocks(uid = "dummy_block")
 
 # Check it out
