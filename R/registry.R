@@ -30,9 +30,16 @@ register_block <- function(ctor, name, description, classes = NULL, uid = NULL,
     ctor <- get(ctor, asNamespace(package), mode = "function")
   }
 
+  stopifnot(is.function(ctor))
+
   if (is.null(classes)) {
-    stopifnot(is_string(ctor_name), is_string(package))
-    obj <- ctor(ctor = ctor_name, ctor_pkg = package)
+
+    if (is.null(ctor_name)) {
+      obj <- ctor(ctor = ctor, ctor_pkg = NULL)
+    } else {
+      obj <- ctor(ctor = ctor_name, ctor_pkg = package)
+    }
+
     classes <- class(obj)
   }
 
