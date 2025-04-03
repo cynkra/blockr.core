@@ -19,7 +19,7 @@ Description: A framework for data manipulation and visualization using a
     web-based point and click user interface.
 License: GPL (>= 3)
 Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
+Roxygen: list(markdown = TRUE, packages = c("roxy.shinylive"))
 RoxygenNote: 7.3.2
 Imports:
     shiny (>= 1.5.0),
@@ -37,5 +37,11 @@ Suggests:
     memuse,
     withr,
     grDevices,
-    shinytest2
+    shinytest2,
+    roxy.shinylive,
+    knitr,
+    rmarkdown,
+    quarto,
+    scoutbaR
 Config/testthat/edition: 3
+VignetteBuilder: quarto
