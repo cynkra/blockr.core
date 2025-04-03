@@ -4,276 +4,147 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>A block-based framework for data manipulation and visualization • blockr.core</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
-<script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="A block-based framework for data manipulation and visualization">
+<script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="A block-based framework for data manipulation and visualization">
+<meta name="description" content="A framework for data manipulation and visualization using a web-based point and click user interface.">
 <meta property="og:description" content="A framework for data manipulation and visualization using a web-based point and click user interface.">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.5.0/mermaid.min.js" integrity="sha512-3EZqKCkk3nMLmbrI7mfry81KH7dkzy/BoDfQrodwLQnS/RbsVlERdYP6J0oiJegRUxSOmx7Y35WNbVKSw7mipw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
-<body data-spy="scroll" data-target="#toc">
+<body>
+    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <div class="container template-home">
-      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">blockr.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.1</span>
-      </span>
-    </div>
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="reference/index.html">Reference</a>
+    <a class="navbar-brand me-2" href="index.html">blockr.core</a>
+
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar" class="collapse navbar-collapse ms-3">
+      <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="articles/get-started.html">Get started</a></li>
+    <li><a class="dropdown-item" href="articles/create-block.html">Create a block</a></li>
+    <li><a class="dropdown-item" href="articles/blocks-registry.html">Browse for blocks</a></li>
+    <li><a class="dropdown-item" href="articles/extend-blockr.html">Extend blockr</a></li>
+    <li><a class="dropdown-item" href="articles/testing-blocks.html">Testing blocks</a></li>
+  </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
+</form></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
+      </ul>
 </div>
-<!--/.nav-collapse -->
+
+
   </div>
-<!--/.container -->
-</div>
-<!--/.navbar -->
-
-
-
-      </header><div class="row">
-  <div class="contents col-md-9">
-<div class="section level1">
+</nav><div class="container template-home">
+<div class="row">
+  <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="blockrcore">blockr.core<a class="anchor" aria-label="anchor" href="#blockrcore"></a>
 </h1></div>
 <!-- badges: start -->
 
-<p>Designed to democratize data analysis, <code>blockr.core</code> provides a flexible, intuitive, and <strong>code-free</strong> approach to building data pipelines.</p>
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>blockr is a framework for <strong>data analysis</strong>, using a <strong>web-based</strong> point and click user interface. Use blockr to create web apps that perform <strong>visual programming</strong>, leveraging the power of <strong>R</strong>.</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the development version of blockr.core from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"cynkra/blockr.core"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"cynkra/blockr.core"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h2 id="what-is-blockrcore">What is blockr.core<a class="anchor" aria-label="anchor" href="#what-is-blockrcore"></a>
 </h2>
-<p>A single block server instance can be spun up as</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">blockr.core</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span><span class="fu"><a href="reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span><span class="st">"iris"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>or for a block that requires input, by additionally passing static data such as</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="reference/new_merge_block.html">new_merge_block</a></span><span class="op">(</span>by <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span>,</span>
-<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/BOD.html" class="external-link">BOD</a></span>, y <span class="op">=</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/ChickWeight.html" class="external-link">ChickWeight</a></span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>If previewing multiple connected block is desired, a board can be created and passed to <code><a href="reference/serve.html">serve()</a></code>, e.g.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="reference/new_board.html">new_board</a></span><span class="op">(</span></span>
-<span>    blocks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>      a <span class="op">=</span> <span class="fu"><a href="reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span><span class="st">"BOD"</span><span class="op">)</span>,</span>
-<span>      b <span class="op">=</span> <span class="fu"><a href="reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span><span class="st">"ChickWeight"</span><span class="op">)</span>,</span>
-<span>      c <span class="op">=</span> <span class="fu"><a href="reference/new_merge_block.html">new_merge_block</a></span><span class="op">(</span><span class="st">"Time"</span><span class="op">)</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    links <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>      ac <span class="op">=</span> <span class="fu"><a href="reference/new_link.html">new_link</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"c"</span>, <span class="st">"x"</span><span class="op">)</span>,</span>
-<span>      bc <span class="op">=</span> <span class="fu"><a href="reference/new_link.html">new_link</a></span><span class="op">(</span><span class="st">"b"</span>, <span class="st">"c"</span>, <span class="st">"y"</span><span class="op">)</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    stacks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ac <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"c"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<p><code>blockr.core</code> is the entry point to blockr, providing the core functionality needed to get started. It can be run as a stand-alone app, but is designed with extensibility in mind. A rich <strong>API</strong> is provided to connect your own blocks and override the default behaviours (e.g., you can add your own GUI layer or serialisation).</p>
 </div>
 <div class="section level2">
-<h2 id="how-to-create-a-block">How to create a block<a class="anchor" aria-label="anchor" href="#how-to-create-a-block"></a>
+<h2 id="what-is-a-block">What is a block?<a class="anchor" aria-label="anchor" href="#what-is-a-block"></a>
 </h2>
-<p>A block constructor should expose as arguments anything that defines its <em>state</em>, i.e. things the user might set via UI which are not derived from input data. For example in a <code><a href="https://rdrr.io/pkg/shiny/man/selectInput.html" class="external-link">shiny::selectInput()</a></code>, where the <code>choices</code> are data columns, this should not be a constructor argument (as this value will be computed from the data), whereas the <code>selected</code> value should be exposed.</p>
-<p>The constructor return value should be a call to <code><a href="reference/new_block.html">new_block()</a></code> (or if applicable a call to the more specific <em>virtual</em> constructors <code><a href="reference/new_block.html">new_data_block()</a></code>, <code><a href="reference/new_block.html">new_transform_block()</a></code>, etc.). Arguments <code>server</code> and <code>ui</code> both expect closures with a specific structure.</p>
-<div class="section level3">
-<h3 id="block-server">Block <code>server</code>
-<a class="anchor" aria-label="anchor" href="#block-server"></a>
-</h3>
+<p>A <strong>block</strong> is a fundamental unit of a data analysis workflow. A single block performs a single <strong>task</strong>, such as loading or filtering or visualisation. Blocks can be joined together using a <strong>DAG</strong> (direct acyclic graph) to create powerful data <strong>workflows</strong>.</p>
+</div>
+<div class="section level2">
+<h2 id="who-is-it-for">Who is it for?<a class="anchor" aria-label="anchor" href="#who-is-it-for"></a>
+</h2>
+<p>blockr targets two main user groups:</p>
 <ul>
-<li>A signature with as many arguments as data inputs is expected: zero for a data block, one for a transform block such as a select block, two for a join block and the special argument <code>...args</code> for variadic blocks, such as an <code>rbind</code> block (all, excluding the required first argument <code>id</code>).</li>
-<li>The first argument <code>id</code> should be passed to the <code><a href="https://rdrr.io/pkg/shiny/man/moduleServer.html" class="external-link">shiny::moduleServer()</a></code> call.</li>
-<li>As return value a call to <code><a href="https://rdrr.io/pkg/shiny/man/moduleServer.html" class="external-link">shiny::moduleServer()</a></code> is expected, containing a <code>module</code> function that in turn returns a list with entries <code>expr</code> and <code>state</code>.</li>
-<li>The block expression is a quoted reactive value that contains user-supplied components and is updated whenever user values change. Data names should match between expressio and the top-level function arguments.</li>
-<li>Block state is defined by the <code>state</code> entry which again is a list of reactives. The set of returned values should match (both in count and names) that of the constructor signature.</li>
+<li>
+<strong>non technical</strong> users are empowered to create insightful data workflows using pre-built blocks that can be <strong>easily</strong> connected, all without writing a single line of code.</li>
+<li>
+<strong>developers</strong> are provided with a set of tools to seamlessly create new blocks, thereby enhancing the entire framework and fostering <strong>collaboration</strong> within organizations teams.</li>
 </ul>
-<p>The <code>server</code> component of an identity transform block could be formed as</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu">moduleServer</span><span class="op">(</span></span>
-<span>    <span class="va">id</span>,</span>
-<span>    <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>        expr <span class="op">=</span> <span class="fu">reactive</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identity.html" class="external-link">identity</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>        state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">}</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>Note that <code>data</code> is the same name in the expression and the top-level function signature.</p>
 </div>
+<div class="section level2">
+<h2 id="what-are-the-key-features">What are the key features<a class="anchor" aria-label="anchor" href="#what-are-the-key-features"></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>
+<strong>User-Friendly Interface</strong>: Build data pipelines with intuitive interface, like with <a href="https://cynkra.github.io/blockr.ui/" class="external-link">blockr.ui</a>.</li>
+<li>
+<strong>Flexibility</strong>: Easily add, remove, or rearrange blocks in your pipeline.</li>
+<li>
+<strong>Extensibility</strong>: Developers can create custom blocks to extend functionality (<a href="https://github.com/cynkra/blockr.dplyr" class="external-link">blockr.dplyr</a>, <a href="https://github.com/cynkra/blockr.ai" class="external-link">blockr.ai</a>, <a href="https://github.com/cynkra/blockr.io" class="external-link">blockr.io</a>, <a href="https://github.com/cynkra/blockr.sdtm" class="external-link">blockr.sdtm</a>, …)</li>
+<li>
+<strong>Reproducibility</strong>: Pipelines created with <code>blockr.core</code> are easily shareable and reproducible, with exportable code.</li>
+<li>
+<strong>Interactivity</strong>: Real-time feedback as you build and modify your pipeline.</li>
+</ol>
+<div class="figure" style="text-align: center">
+<img src="reference/figures/blockr-ui.png" alt="blockr.ui example" width="100%"><p class="caption">
+blockr.ui example
+</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="how-to-get-started">How to get started?<a class="anchor" aria-label="anchor" href="#how-to-get-started"></a>
+</h2>
+<p>To get started, we invite you to read this <a href="https://cynkra.github.io/blockr.core/articles/get-started.html">vignette</a>.</p>
 <div class="section level3">
-<h3 id="block-ui">Block <code>ui</code>
-<a class="anchor" aria-label="anchor" href="#block-ui"></a>
+<h3 id="how-can-i-develop-my-own-blocks">How can I develop my own blocks?<a class="anchor" aria-label="anchor" href="#how-can-i-develop-my-own-blocks"></a>
 </h3>
+<p>We started to build blockr extensions to enrich blockr.core’s capabilities:</p>
 <ul>
-<li>The function signature is expected to contain a single <code>id</code> argument, which can be used with <code><a href="https://rdrr.io/pkg/shiny/man/NS.html" class="external-link">shiny::NS()</a></code> to construct namespaced IDs.</li>
-<li>A call to appropriate shiny UI functions is expected that return <code>shiny.tag</code> or <code>shiny.tag.list</code> objects.</li>
-<li>The initial evaluation of the <code>ui</code> function will be performed in the context of the constructor scope (i.e. if a value of name <code>xyz</code> is bound the the constructor scope or a parent thereof, this value will be passed as <code>xyz</code> argument).</li>
+<li>
+<a href="https://github.com/cynkra/blockr.dplyr" class="external-link">blockr.dplyr</a>: an entry point to the <code>dplyr</code> ecosystem.</li>
+<li>
+<a href="https://github.com/cynkra/blockr.ai" class="external-link">blockr.ai</a>: LLM-powered blocks.</li>
+<li>
+<a href="https://github.com/cynkra/blockr.io" class="external-link">blockr.io</a>: handle different data input format (xpt, csv, …) and output for export.</li>
+<li>
+<a href="https://github.com/cynkra/blockr.sdtm" class="external-link">blockr.sdtm</a>: pharmaverse datasets blocks.</li>
 </ul>
-<p>The <code>ui</code> component of an identity transform block is trivial:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu">tagList</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>Putting this together, a dataset block could be constructed as</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">new_dataset_block</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dataset</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">package</span> <span class="op">=</span> <span class="st">"datasets"</span>,</span>
-<span>                              <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span></span>
-<span>  <span class="va">envir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.environment.html" class="external-link">as.environment</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"package:"</span>, <span class="va">package</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="va">choices</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ls.html" class="external-link">ls</a></span><span class="op">(</span>envir <span class="op">=</span> <span class="va">envir</span><span class="op">)</span></span>
-<span>  <span class="va">choices</span> <span class="op">&lt;-</span> <span class="va">choices</span><span class="op">[</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/get.html" class="external-link">mget</a></span><span class="op">(</span><span class="va">choices</span>, envir <span class="op">=</span> <span class="va">envir</span><span class="op">)</span>, <span class="va">is.data.frame</span>, <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a></span><span class="op">(</span><span class="fl">1L</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">]</span></span>
-<span></span>
-<span>  <span class="fu"><a href="reference/new_block.html">new_data_block</a></span><span class="op">(</span></span>
-<span>    <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="fu">moduleServer</span><span class="op">(</span></span>
-<span>        <span class="va">id</span>,</span>
-<span>        <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span></span>
-<span></span>
-<span>          <span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu">reactiveVal</span><span class="op">(</span><span class="va">dataset</span><span class="op">)</span></span>
-<span></span>
-<span>          <span class="fu">observeEvent</span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">dataset</span>, <span class="fu">dat</span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">dataset</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span>          <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>            expr <span class="op">=</span> <span class="fu">reactive</span><span class="op">(</span></span>
-<span>              <span class="fu"><a href="https://rdrr.io/r/base/bquote.html" class="external-link">bquote</a></span><span class="op">(</span></span>
-<span>                <span class="fu">`::`</span><span class="op">(</span><span class="fu">.</span><span class="op">(</span><span class="va">pkg</span><span class="op">)</span>, <span class="fu">.</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">package</span>, dat <span class="op">=</span> <span class="fu">dat</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span>              <span class="op">)</span></span>
-<span>            <span class="op">)</span>,</span>
-<span>            state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>              dataset <span class="op">=</span> <span class="fu">reactive</span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">dataset</span><span class="op">)</span>,</span>
-<span>              package <span class="op">=</span> <span class="va">package</span></span>
-<span>            <span class="op">)</span></span>
-<span>          <span class="op">)</span></span>
-<span>        <span class="op">}</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">}</span>,</span>
-<span>    <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="fu">selectInput</span><span class="op">(</span></span>
-<span>        inputId <span class="op">=</span> <span class="fu">NS</span><span class="op">(</span><span class="va">id</span>, <span class="st">"dataset"</span><span class="op">)</span>,</span>
-<span>        label <span class="op">=</span> <span class="st">"Dataset"</span>,</span>
-<span>        choices <span class="op">=</span> <span class="va">choices</span>,</span>
-<span>        selected <span class="op">=</span> <span class="va">dataset</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">}</span>,</span>
-<span>    class <span class="op">=</span> <span class="st">"dataset_block"</span>,</span>
-<span>    <span class="va">...</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>Note that both <code>server</code> and <code>ui</code> are closures and therfore may refer to names bound in the constructor scope (e.g. <code>dataset</code> and <code>choices</code>). The <code>state</code> entry returned by the server module contains the static value <code>package</code> and this is needed for ser/deser (alongside the dynamic value <code>dataset</code>).</p>
-<p>The <code>expr</code> return value is here constructed via a call to <code><a href="https://rdrr.io/r/base/bquote.html" class="external-link">base::bquote()</a></code>. Many other options exsist, such as using tools offered by the rlang package or by passing a string to <code><a href="https://rdrr.io/r/base/parse.html" class="external-link">base::parse()</a></code>, e.g.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  expr <span class="op">=</span> <span class="fu">reactive</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/parse.html" class="external-link">parse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">package</span>, <span class="st">"::"</span>, <span class="va">dataset</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>The block can then be manipulated via UI as</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span><span class="fu"><a href="reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span><span class="st">"iris"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Another example is a <code><a href="https://rdrr.io/r/utils/head.html" class="external-link">utils::head()</a></code> block, such as the one offered as <code><a href="reference/new_head_block.html">new_head_block()</a></code>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">new_head_block</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">6L</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span></span>
-<span>  <span class="fu"><a href="reference/new_block.html">new_transform_block</a></span><span class="op">(</span></span>
-<span>    <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="fu">moduleServer</span><span class="op">(</span></span>
-<span>        <span class="va">id</span>,</span>
-<span>        <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span></span>
-<span></span>
-<span>          <span class="va">n_rows</span> <span class="op">&lt;-</span> <span class="fu">reactiveVal</span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
-<span></span>
-<span>          <span class="fu">observeEvent</span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">n</span>, <span class="fu">n_rows</span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">n</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span>          <span class="fu">observeEvent</span><span class="op">(</span></span>
-<span>            <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>            <span class="fu">updateNumericInput</span><span class="op">(</span></span>
-<span>              inputId <span class="op">=</span> <span class="st">"n"</span>,</span>
-<span>              value <span class="op">=</span> <span class="fu">n_rows</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>              min <span class="op">=</span> <span class="fl">1L</span>,</span>
-<span>              max <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span>            <span class="op">)</span></span>
-<span>          <span class="op">)</span></span>
-<span></span>
-<span>          <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>            expr <span class="op">=</span> <span class="fu">reactive</span><span class="op">(</span></span>
-<span>              <span class="fu"><a href="https://rdrr.io/r/base/bquote.html" class="external-link">bquote</a></span><span class="op">(</span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span>, n <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu">n_rows</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>            <span class="op">)</span>,</span>
-<span>            state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>              n <span class="op">=</span> <span class="va">n_rows</span></span>
-<span>            <span class="op">)</span></span>
-<span>          <span class="op">)</span></span>
-<span>        <span class="op">}</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">}</span>,</span>
-<span>    <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="fu">tagList</span><span class="op">(</span></span>
-<span>        <span class="fu">numericInput</span><span class="op">(</span></span>
-<span>          inputId <span class="op">=</span> <span class="fu">NS</span><span class="op">(</span><span class="va">id</span>, <span class="st">"n"</span><span class="op">)</span>,</span>
-<span>          label <span class="op">=</span> <span class="st">"Number of rows"</span>,</span>
-<span>          value <span class="op">=</span> <span class="va">n</span>,</span>
-<span>          min <span class="op">=</span> <span class="fl">1L</span></span>
-<span>        <span class="op">)</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">}</span>,</span>
-<span>    dat_val <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">is.data.frame</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">is.matrix</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="op">}</span>,</span>
-<span>    class <span class="op">=</span> <span class="st">"head_block"</span>,</span>
-<span>    <span class="va">...</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>Here, the state return value is a list of length 1, containing the current value for the only constructor argument. The current value for <code>n</code> is represented by a <code><a href="https://rdrr.io/pkg/shiny/man/reactiveVal.html" class="external-link">shiny::reactiveVal()</a></code>, <code>n_rows()</code>, which is initialized with the values <code>n</code> in the constructor scope and updated on every change to <code>input$n</code>. Furthermore the <code>max</code> value for the <code><a href="https://rdrr.io/pkg/shiny/man/numericInput.html" class="external-link">shiny::numericInput()</a></code> field is updated on every change to the number of data rows.</p>
-<p>A final <code>block</code> constructor argument of note might be <code>dat_val</code>, which is an optional function that can be passed which signals to the framework, if data passed to a block, can actually be processed by the block.</p>
-<p>An app containing such a head block can be spun up as</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span><span class="fu"><a href="reference/new_head_block.html">new_head_block</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10L</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>For an example with multiple data inputs, refer to examples such as <code><a href="reference/new_merge_block.html">new_merge_block()</a></code>. Such a binary block (with arguments <code>x</code> and <code>y</code>) can be explored in a standalone app (with nonsensical inputs) as</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/serve.html">serve</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="reference/new_merge_block.html">new_merge_block</a></span><span class="op">(</span>by <span class="op">=</span> <span class="st">"Time"</span><span class="op">)</span>,</span>
-<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/BOD.html" class="external-link">BOD</a></span>, y <span class="op">=</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/ChickWeight.html" class="external-link">ChickWeight</a></span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>The <code>data</code> argument to <code><a href="reference/serve.html">serve()</a></code> expects a list with names components that match the server function signature, i.e. <code>data</code> for <code><a href="reference/new_head_block.html">new_head_block()</a></code> and <code>x</code>, <code>y</code> for <code><a href="reference/new_merge_block.html">new_merge_block()</a></code>. Such names can be chosen freely by the block implementer (with the exception of integer-valued names, such as <code>`1`</code>, <code>`2`</code>, etc. which are reserved as positional arguments in <code>...args</code>).</p>
+<p>If you wish to learn to develop your own blocks, have a look at this <a href="https://cynkra.github.io/blockr.core/articles/create-block.html">vignette</a>.</p>
 </div>
 </div>
 </div>
-  </div>
-
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <div class="license">
+  </main><aside class="col-md-3"><div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
@@ -307,23 +178,20 @@
 </ul>
 </div>
 
-  </div>
+  </aside>
 </div>
 
 
-      <footer><div class="copyright">
-  <p></p>
-<p>Developed by Nicolas Bennett, David Granjon, Christoph Sax.</p>
+    <footer><div class="pkgdown-footer-left">
+  <p>Developed by Nicolas Bennett, David Granjon, Christoph Sax.</p>
 </div>
 
-<div class="pkgdown">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<div class="pkgdown-footer-right">
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
-      </footer>
+    </footer>
 </div>
-
 
 
 
