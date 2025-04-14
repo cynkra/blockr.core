@@ -21,3 +21,80 @@ navbar:
       href: articles/extend-blockr.html
     - text: Testing blocks
       href: articles/testing-blocks.html
+
+reference:
+- title: Blocks
+- subtitle: Data blocks
+  desc: Blocks that provide access to datasets.
+  contents:
+    - new_dataset_block
+    - new_static_block
+    - new_upload_block
+    - new_csv_block
+- subtitle: Transform blocks
+  desc: Data tranformation blocks.
+  contents:
+    - new_subset_block
+    - new_merge_block
+    - new_rbind_block
+    - new_head_block
+- subtitle: Plot blocks
+  desc: Blocks for data visualization.
+  contents:
+    - new_scatter_block
+- title: Board objects
+- subtitle: Blocks
+  desc: Utilities for creating an working with blocks
+  contents:
+    - new_block
+    - block_server
+    - block_ui
+    - register_block
+- subtitle: Links
+  desc: Utilities for creating an working with links
+  contents:
+    - new_link
+- subtitle: Stacks
+  desc: Utilities for creating an working with stacks
+  contents:
+    - new_stack
+    - stack_ui
+- subtitle: Board
+  desc: Utilities for creating an working with boards
+  contents:
+    - new_board
+    - board_server
+    - board_ui
+    - new_board_options
+- title: Board plugins
+- subtitle: Utilities
+  desc: Tools for creating and working with board plugins.
+  contents:
+  - new_plugin
+  - board_plugins
+- subtitle: Instances
+  desc: Plugin implementations provided by the core.
+  contents:
+  - add_rm_block_server
+  - add_rm_link_server
+  - add_rm_stack_server
+  - edit_block_server
+  - edit_stack_server
+  - gen_code_server
+  - block_notification_server
+  - ser_deser_server
+- title: Utilities
+- subtitle: Serialization
+  desc: Serialization and deserialization utilities.
+  contents:
+  - blockr_ser
+- subtitle: Logging
+  desc: Tools for logging.
+  contents:
+  - write_log
+- subtitle: Miscellaneous
+  desc: Various tools and utilities.
+  contents:
+  - topo_sort
+  - rand_names
+  - blockr_option
