@@ -13,7 +13,17 @@ Authors@R:
       person(given = "Christoph",
              family = "Sax",
              role = c("aut"),
-             email = "christoph@cynkra.com")
+             email = "christoph@cynkra.com"),
+      person(given = "Karma",
+             family = "Tarap",
+             role = c("ctb"),
+             email = "karma.tarap@bms.com"),
+      person(given = "John",
+             family = "Coene",
+             role = c("ctb"),
+             email = "john@opifex.org"),
+      person(family = "Bristol Myers Squibb",
+             role = "fnd")
     )
 Description: A framework for data manipulation and visualization using a
     web-based point and click user interface.
