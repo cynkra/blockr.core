@@ -71,7 +71,14 @@ block_server.block <- function(id, x, data = list(), block_id = id,
       validate_block_observer(block_id, x, dat, res, rv, session)
       state_check_observer(block_id, x, dat, res, exp, rv, session)
       data_eval_observer(block_id, x, dat, res, exp, lang, rv, session)
-      output_result_observer(x, res, output, session)
+
+      observeEvent(
+        res(),
+        {
+          output$result <- block_output(x, res(), session)
+        },
+        domain = session
+      )
 
       call_plugin_server(
         edit_block,
@@ -319,16 +326,6 @@ data_eval_observer <- function(id, x, dat, res, exp, lang, rv, sess) {
       )
 
       res(out)
-    },
-    domain = sess
-  )
-}
-
-output_result_observer <- function(x, res, output, sess) {
-
-  observe(
-    {
-      output$result <- block_output(x, res(), sess)
     },
     domain = sess
   )

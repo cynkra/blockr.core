@@ -28,9 +28,9 @@ register_block <- function(ctor, name, description, classes = NULL, uid = NULL,
     stopifnot(is_string(package))
     ctor_name <- ctor
     ctor <- get(ctor, asNamespace(package), mode = "function")
+  } else {
+    stopifnot(is.function(ctor), is.null(package))
   }
-
-  stopifnot(is.function(ctor))
 
   if (is.null(classes)) {
 
