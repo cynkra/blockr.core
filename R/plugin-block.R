@@ -55,7 +55,7 @@ edit_block_server <- function(id, block_id, board, update, ...) {
       output$block_summary <- renderText(
         block_summary(
           initial_block,
-          board$blocks[[block_id]]$server$result()
+          reval_if(board$blocks[[block_id]]$server$result)
         )
       )
 
