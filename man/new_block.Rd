@@ -8,17 +8,7 @@
 \alias{as_block}
 \alias{as_block.block}
 \alias{as_block.list}
-\alias{block_name}
-\alias{block_name<-}
-\alias{block_ctor}
-\alias{block_expr_server}
-\alias{block_expr_ui}
-\alias{block_dat_valid}
-\alias{block_has_data_validator}
 \alias{validate_data_inputs}
-\alias{block_inputs}
-\alias{block_inputs.block}
-\alias{block_arity}
 \alias{blocks}
 \alias{is_blocks}
 \alias{as_blocks}
@@ -53,27 +43,7 @@ as_block(x, ...)
 
 \method{as_block}{list}(x, ...)
 
-block_name(x)
-
-block_name(x) <- value
-
-block_ctor(x)
-
-block_expr_server(x)
-
-block_expr_ui(x)
-
-block_dat_valid(x)
-
-block_has_data_validator(x)
-
 validate_data_inputs(x, data)
-
-block_inputs(x, ...)
-
-\method{block_inputs}{block}(x, ...)
-
-block_arity(x)
 
 blocks(...)
 
@@ -87,7 +57,7 @@ as_blocks(x, ...)
 
 \method{as_blocks}{block}(x, ...)
 
-\method{block_inputs}{board}(x, ...)
+block_inputs.board(x, ...)
 
 new_data_block(server, ui, class, ctor = sys.parent(), ...)
 
@@ -106,11 +76,13 @@ new_transform_block(server, ui, class, ctor = sys.parent(), ...)
 
 \item{class}{Block subclass}
 
-\item{ctor}{Constructor name (or function/frame number)}
+\item{ctor}{String-valued constructor name or function/frame number (mostly
+for internal use or when defining constructors for virtual classes)}
 
-\item{ctor_pkg}{Package name (or \code{NULL})}
+\item{ctor_pkg}{String-valued package name when passing a string-valued
+constructor name or \code{NULL}}
 
-\item{dat_valid}{(Optioanl) input data validator}
+\item{dat_valid}{(Optional) input data validator}
 
 \item{allow_empty_state}{Either \code{TRUE}, \code{FALSE} or a character vector of
 \code{state} values that may be empty while still moving forward with block eval}
@@ -121,12 +93,152 @@ new_transform_block(server, ui, class, ctor = sys.parent(), ...)
 
 \item{x}{An object inheriting from \code{"block"}}
 
-\item{value}{New value}
-
-\item{data}{Data inputs}
+\item{data}{Data input values}
+}
+\value{
+Both \code{new_block()} and \code{as_block} return an object inheriting from
+\code{block}, while \code{is_block()} returns a boolean indicating whether an object
+inherits from \code{block} or not.
 }
 \description{
-Blocks consist of an expression that defines what the block produces (given
-the result of the previous block combined with user input), plus a class
-attribute
+Steps in a data analysis pipeline are represented by blocks. Each block
+combines data input with user inpus to produce an output. In order to
+create a block, which is implemented as a shiny module, we require a server
+function, a function that produces some UI and a class vector.
+}
+\details{
+A block constructor may have arguments, which taken together define the
+block state. It is good practice to expose all user-selectable arguments of
+a block (i.e. everythig excluding the "data" input) as block arguments such
+that block can be fully initialized via the constructor. Some default values
+are required such that blocks can be constructed via constructor calls
+without arguments. Where it is sensible to do so, specific default values
+are acceptable, but if in any way data dependant, defaults should map to
+an "empty" input. For example, a block that provides \code{\link[utils:head]{utils::head()}}
+functionality, one such argument could be \code{n} and a reasonable default value
+could be \code{6L} (in line with corresponding default S3 method implementation).
+On the other hand, a block that performs a \code{\link[base:merge]{base::merge()}} operation might
+expose a \code{by} argument, but a general purpose default value (that does not
+depend on the data) is not possible. Therefore, \code{\link[=new_merge_block]{new_merge_block()}} has
+\code{by = character()}.
+
+The return value of a block constructor should be the result of a call to
+\code{new_block()} and \code{...} should be contained in the constructor signature
+such that general block arguments (e.g. \code{name}) are available from the
+constructor.
+}
+\section{Server}{
+
+The server function (passed as \code{server}) is expected to be a function that
+returns a \code{\link[shiny:moduleServer]{shiny::moduleServer()}}. This function is expected to have at
+least an argument \code{id} (string-valued), which will be used as the module ID.
+Further arguments may be used in the function sigature, one for each "data"
+input. A block implementing \code{\link[utils:head]{utils::head()}} for example could have a single
+extra argument \code{data}, while a block that performs \code{\link[base:merge]{base::merge()}} requires
+two extra arguments, e.g. \code{x} and \code{y}. Finally, a variadic block, e.g.
+a block implementing something like \code{\link[base:cbind]{base::rbind()}}, needs to accomodate for
+an arbitrary number of inputs. This is achieved by passing a
+\code{\link[shiny:reactiveValues]{shiny::reactiveValues()}} object as \code{...args} and thus such a variadic block
+needs \code{...args} as part of the server function signature. All per-data input
+arguments are passed as \code{\link[shiny:reactive]{shiny::reactive()}} or \code{\link[shiny:reactiveVal]{shiny::reactiveVal()}}
+objects.
+
+The server function may implement arbitrary shiny logic and is expected to
+return a list with components \code{expr} and \code{state}. The expression corresponds
+to the R code necessary to perform the block task and is exprected to be
+a reactive quoted expression. It should contain user-chosen values for all
+user inputs and placeholders for all data inputs (using the same names for
+data inputs as in the server function signature). Such an expression for a
+\code{\link[base:merge]{base::merge()}} block could be created using \code{\link[base:bquote]{base::bquote()}} as
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{bquote(
+  merge(x, y, by = .(cols)),
+  list(cols = current_val())
+\}
+}\if{html}{\out{</div>}}
+
+where \code{current_val()} is a reactive that evaulates to the current user
+selection of the \code{by} columns. This should then be wrapped in a
+\code{\link[shiny:reactive]{shiny::reactive()}} call such that \code{current_val()} can be evaluated whenever
+the current expression is required.
+
+The \code{state} component is expected to be a named list with either reactive or
+"static" values. In most cases, components of \code{state} will be reactives,
+but it might make sense in some scenarios to have constructor arguments that
+are not exposed via UI components but are fixed at construction time. An
+example for this could be the \code{dataset_block} implementation where we have
+constructor arguments \code{dataset} and \code{package}, but only expose \code{dataset}
+as UI element. This means that \code{package} is fixed at construction time.
+Nevertheless, \code{package} is required as state component, as this is used for
+re-creating blocks from saved state.
+
+State component names are required to match block constructor arguments and
+re-creating saved objects basically calls the block constructor with values
+obtained from block state.
+}
+
+\section{UI}{
+
+Block UI is generated using the function passed as \code{ui} to the \code{new_block}
+constructor. This function is required to take a single argument \code{id} and
+shiny UI components have to be namespaced such that they are nested within
+this ID (i.e. by creating IDs as \code{shiny::NS(id, "some_value")}). Some care
+has to be taken to properly initialize inputs with constructor values. As a
+rule of thumb, input elements exposed to the UI should have corresponding
+block constructor arguments such that blocks can be created with a given
+initial state.
+
+Block UI should be limited to displaying and arranging user inputs to set
+block arguments. For outputs, use generics \code{\link[=block_output]{block_output()}} and
+\code{\link[=block_ui]{block_ui()}}.
+}
+
+\section{Sub-classing}{
+
+In addition to the specific class of a block, the core package uses virtual
+classes to group together blocks with similar behavior (e.g.
+\code{transform_block}) and makes use of this inheritance structure in S3
+dispatch for methods like \code{\link[=block_output]{block_output()}} and \code{\link[=block_ui]{block_ui()}}. This pattern is
+not required but encuoraged.
+}
+
+\section{Initialization/evaluation}{
+
+Some control over when a block is considered "ready for evaluation" is
+available via arguments \code{dat_valid} and \code{allow_empty_state}. Data input
+validation can optionally be performed by passing a predicate function with
+the same arguments as in the server function (not including \code{id}) and the
+block expression will not be evaluated as long as this function throws an
+error.
+
+Other conditions (messages and warnings) may be thrown as will be caught
+and displayed to the user but they will not interrupt evaulation. Errors
+are safe in that they will be caught as well but the will interrup evaluation
+as long as block data input does not satisfy valiidation.
+}
+
+\examples{
+new_identity_block <- function() {
+  new_transform_block(
+    function(id, data) {
+      moduleServer(
+        id,
+        function(input, output, session) {
+          list(
+            expr = reactive(quote(identity(data))),
+            state = list()
+          )
+        }
+      )
+    },
+    function(id) {
+      tagList()
+    },
+    class = "identity_block"
+  )
+}
+
+blk <- new_identity_block()
+is_block(blk)
+
 }

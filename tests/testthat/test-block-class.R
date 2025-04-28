@@ -4,7 +4,7 @@ test_that("block constructor", {
     new_transform_block(
       function(id, data) {
         moduleServer(
-          "expression",
+          id,
           function(input, output, session) {
             list(
               expr = reactive(quote(identity(data))),

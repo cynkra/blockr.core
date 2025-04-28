@@ -8,6 +8,13 @@
 \description{
 A framework for data manipulation and visualization using a web-based point and click user interface.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://cynkra.github.io/blockr.core}
+}
+
+}
 \author{
 \strong{Maintainer}: Nicolas Bennett \email{nicolas@cynkra.com}
 
@@ -15,6 +22,13 @@ Authors:
 \itemize{
   \item David Granjon \email{david@cynkra.com}
   \item Christoph Sax \email{christoph@cynkra.com}
+}
+
+Other contributors:
+\itemize{
+  \item Karma Tarap \email{karma.tarap@bms.com} [contributor]
+  \item John Coene \email{john@opifex.org} [contributor]
+  \item  Bristol Myers Squibb [funder]
 }
 
 }

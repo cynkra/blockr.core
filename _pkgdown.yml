@@ -23,30 +23,12 @@ navbar:
       href: articles/testing-blocks.html
 
 reference:
-- title: Blocks
-- subtitle: Data blocks
-  desc: Blocks that provide access to datasets.
-  contents:
-    - new_dataset_block
-    - new_static_block
-    - new_upload_block
-    - new_csv_block
-- subtitle: Transform blocks
-  desc: Data tranformation blocks.
-  contents:
-    - new_subset_block
-    - new_merge_block
-    - new_rbind_block
-    - new_head_block
-- subtitle: Plot blocks
-  desc: Blocks for data visualization.
-  contents:
-    - new_scatter_block
 - title: Board objects
 - subtitle: Blocks
-  desc: Utilities for creating an working with blocks
+  desc: Data analysis pipelines are decomposed into steps, each represented by a block.
   contents:
     - new_block
+    - block_name
     - block_server
     - block_ui
     - register_block
@@ -83,6 +65,25 @@ reference:
   - gen_code_server
   - block_notification_server
   - ser_deser_server
+- title: Blocks
+- subtitle: Data blocks
+  desc: Blocks that provide access to datasets.
+  contents:
+    - new_dataset_block
+    - new_static_block
+    - new_upload_block
+    - new_csv_block
+- subtitle: Transform blocks
+  desc: Data tranformation blocks.
+  contents:
+    - new_subset_block
+    - new_merge_block
+    - new_rbind_block
+    - new_head_block
+- subtitle: Plot blocks
+  desc: Blocks for data visualization.
+  contents:
+    - new_scatter_block
 - title: Utilities
 - subtitle: Serialization
   desc: Serialization and deserialization utilities.
