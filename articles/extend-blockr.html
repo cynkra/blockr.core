@@ -99,7 +99,7 @@
 <li>Preserve the <strong>board</strong> state: save and restore the application state.</li>
 <li>…</li>
 </ul>
-<p>All of the above is fully customisable by yourself, <code>blockr.core</code> only provides resonable defaults to get you started. <code>blockr.ui</code> is an example of full customisation.</p>
+<p>All of the above is fully customizable by yourself, <code>blockr.core</code> only provides reasonable defaults to get you started. <code>blockr.ui</code> is an example of full customization.</p>
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -349,7 +349,7 @@
 </div>
 </section><section class="level3"><h3 id="testing-the-new-plugin">Testing the new plugin<a class="anchor" aria-label="anchor" href="#testing-the-new-plugin"></a>
 </h3>
-<p>In the below example, you may click on the <code>Add block</code> button and see the scoubar opening and then select a block.</p>
+<p>In the below example, you may click on the <code>Add block</code> button and see the scoutbar opening and then select a block.</p>
 <div class="cell">
 <details class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">main_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">board</span><span class="op">)</span> <span class="op">{</span></span>
@@ -533,7 +533,7 @@
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
-<p>Since <code>blockr.core</code> blocks utilises <code>shiny</code>/<code>bslib</code> UI, you’d also have to rewrite the UI and/or server part whenever necessary. This <a href="https://cynkra.github.io/blockr.core/articles/create-block.html" class="external-link">vignette</a> provides a starting point to authoring blocks.</p>
+<p>Since <code>blockr.core</code> blocks utilizes <code>shiny</code>/<code>bslib</code> UI, you’d also have to rewrite the UI and/or server part whenever necessary. This <a href="https://cynkra.github.io/blockr.core/articles/create-block.html" class="external-link">vignette</a> provides a starting point to authoring blocks.</p>
 <p>As a final step, when you call <code><a href="../reference/new_board.html">new_board()</a></code> don’t forget to add it the <code>custom_board</code> class so that the custom S3 methods are invoked.</p>
 <div class="cell">
 <details class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">

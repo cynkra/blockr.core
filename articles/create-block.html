@@ -87,8 +87,8 @@
 </div>
 <section class="level2"><h2 id="creating-blocks">Creating blocks<a class="anchor" aria-label="anchor" href="#creating-blocks"></a>
 </h2>
-<p><strong>Note:</strong> If you are not already familiar with <a href="https://shiny.posit.co/r/articles/improve/modules/" class="external-link">Shiny modules</a>, it is recommended you familiarise yourself with them before continuing with this section.</p>
-<p><code>blockr.core</code> is built on top of Shiny. At it’s heart, a <strong>block</strong> is nothing more than a specialised Shiny <strong>module</strong> that returns two additional values:</p>
+<p><strong>Note:</strong> If you are not already familiar with <a href="https://shiny.posit.co/r/articles/improve/modules/" class="external-link">Shiny modules</a>, it is recommended you familiarize yourself with them before continuing with this section.</p>
+<p><code>blockr.core</code> is built on top of Shiny. At it’s heart, a <strong>block</strong> is nothing more than a specialized Shiny <strong>module</strong> that returns two additional values:</p>
 <ul>
 <li>
 <strong>An expression</strong> (called “expr”), a reactive expression defining a blocks computation. This allows R code to be exported and data analyses to be recreated, outside of blockr and a reactive context.</li>
@@ -121,7 +121,7 @@
 <ol type="1">
 <li>A <strong>UI function</strong> to define the user interface.</li>
 <li>A <strong>Server function</strong> to handle reactive logic that returns an expression and state object.</li>
-<li>A <strong>Constructor function</strong> wraps the UI and server to intialize the block state.</li>
+<li>A <strong>Constructor function</strong> wraps the UI and server to initialize the block state.</li>
 </ol>
 <p>Now, let’s go through each element, building up a block template as we go.</p>
 <section class="level3"><h3 id="ui-function">UI function<a class="anchor" aria-label="anchor" href="#ui-function"></a>
@@ -174,7 +174,7 @@
 </div>
 </div>
 </div>
-<p>A server function should return as ouput a <code>moduleServer()</code> call, defining:</p>
+<p>A server function should return as output a <code>moduleServer()</code> call, defining:</p>
 <ul>
 <li>
 <strong>expr</strong>: A quoted reactive expression representing the block’s computation. Data names should match between expression and the top-level server function arguments.</li>
@@ -199,7 +199,7 @@
 <span><span class="op">}</span></span></code></pre></div>
 </div>
 <p>Many options exist to build expressions, such as using tools offered by the <code>rlang</code> package or by passing a string to <code><a href="https://rdrr.io/r/base/parse.html" class="external-link">base::parse()</a></code>. As a block developer you are free to choose the tools that your prefer, as long as the evaluated expression returns non-reactive R code which can be executed outside of blockr.</p>
-<p>The state is needed for <strong>serialisation</strong> and <strong>deserialisation</strong> to respectively save and restore the state of a blockr application.</p>
+<p>The state is needed for <strong>serialisation</strong> and <strong>deserialization</strong> to respectively save and restore the state of a blockr application.</p>
 </section><section class="level3"><h3 id="constructor-function">Constructor function<a class="anchor" aria-label="anchor" href="#constructor-function"></a>
 </h3>
 <p>The <strong>constructor</strong> function wraps the UI and server functions and initializes the block. Note that both <code>server</code> and <code>ui</code> are <a href="https://adv-r.hadley.nz/environments.html#function-environments" class="external-link">closures</a> and therefore may refer to names bound in the constructor scope (e.g. <code>dataset</code> and <code>choices</code>).</p>
@@ -320,7 +320,7 @@
 <span><span class="va">results</span><span class="op">$</span><span class="va">data</span></span>
 <span><span class="va">results</span><span class="op">$</span><span class="va">code_filters</span></span>
 <span><span class="va">results</span><span class="op">$</span><span class="va">code_plot</span></span></code></pre></div>
-<p>When filters are applied with <code>esquisse</code>, the returned data are filtered, otherwise the module returns the unchanged input data. Based on what we already know about constructing block, we can write the following code for the constructor server function. This block will have 1 input materialised as the <code>data</code> parameter (data coming from the upstream block):</p>
+<p>When filters are applied with <code>esquisse</code>, the returned data are filtered, otherwise the module returns the unchanged input data. Based on what we already know about constructing block, we can write the following code for the constructor server function. This block will have 1 input materialized as the <code>data</code> parameter (data coming from the upstream block):</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">esquisse_block_server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
@@ -384,7 +384,7 @@
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
-<p>The UI function of our constructor is simple, even though you would be totally free to customise it further:</p>
+<p>The UI function of our constructor is simple, even though you would be totally free to customize it further:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">esquisse_block_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
