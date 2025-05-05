@@ -134,7 +134,7 @@ flowchart TD
   end
 ```
 
-At the top level, a blockr app is made of a __board__ object. That board may contains __blocks__, __stacks__ or group of blocks, and connections between blocks, also known as __links__. You may find interesting to read more about block metadata in this [vignette](https://cynkra.github.io/blockr.core/articles/blocks-registry.html).
+At the top level, a blockr app is made of a __board__ object. That board may contains __blocks__, __stacks__ or group of blocks, and connections between blocks, also known as __links__. You may find interesting to read more about block metadata in this [vignette](https://bristolmyerssquibb.github.io/blockr.core/articles/blocks-registry.html).
 
 ### Serve blocks
 
@@ -245,8 +245,8 @@ shinyApp(ui, server)
 
 #### Develop new blocks
 
-If you had to develop custom blocks, you can read this [vignette](https://cynkra.github.io/blockr.core/articles/create-block.html).
+If you had to develop custom blocks, you can read this [vignette](https://bristolmyerssquibb.github.io/blockr.core/articles/create-block.html).
 
 #### Extend blockr.core
 
-If you wish to customize the look and feel of block, look no further than this [article](https://cynkra.github.io/blockr.core/articles/extend-blockr.html).
+If you wish to customize the look and feel of block, look no further than this [article](https://bristolmyerssquibb.github.io/blockr.core/articles/extend-blockr.html).

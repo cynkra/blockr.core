@@ -7,7 +7,7 @@
 
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![status](https://github.com/BristolMyersSquibb/blockr.core/actions/workflows/ci.yaml/badge.svg)](https://github.com/BristolMyersSquibb/blockr.core/actions/workflows/ci.yaml)
-[![coverage](https://codecov.io/gh/BristolMyersSquibb/blockr.core/graph/badge.svg?token=VoOPRU65KA)](https://codecov.io/gh/BristolMyersSquibb/blockr.core)
+[![coverage](https://codecov.io/gh/BristolMyersSquibb/blockr.core/graph/badge.svg?token=VoOPRU65KA)](https://app.codecov.io/gh/BristolMyersSquibb/blockr.core)
 <!-- badges: end -->
 
 ## Overview

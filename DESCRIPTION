@@ -1,6 +1,6 @@
 Package: blockr.core
-Title: A block-based framework for data manipulation and visualization
-Version: 0.0.1
+Title: Graphical Web-Framework for Data Manipulation and Visualization
+Version: 0.0.2
 Authors@R: 
     c(person(given = "Nicolas",
              family = "Bennett",
@@ -26,8 +26,8 @@ Authors@R:
              role = "fnd")
     )
 Description: A framework for data manipulation and visualization using a
-    web-based point and click user interface.
-URL: https://bristolmyerssquibb.github.io/blockr.core
+    web-based point and click user interface where analysis pipelines are decomposed into re-usable and parametrizable blocks.
+URL: https://bristolmyerssquibb.github.io/blockr.core/
 BugReports: https://github.com/BristolMyersSquibb/blockr.core/issues
 License: GPL (>= 3)
 Encoding: UTF-8
