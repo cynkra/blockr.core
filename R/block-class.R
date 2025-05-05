@@ -494,7 +494,7 @@ c.block <- function(...) {
 #' and developpers are encouraged to use these instead of relying on object
 #' implementatsion to extract or modify attributes. If functionality for working
 #' with blocks in lacking, please consider opening an
-#' [issue](https://github.com/cynkra/blockr.core/issues/new).
+#' [issue](https://github.com/BristolMyersSquibb/blockr.core/issues/new).
 #'
 #' @section Block name:
 #' Each block can have a name (by default constructed from the class vector)
@@ -607,7 +607,7 @@ validate_data_inputs <- function(x, data) {
 
 #' @rdname block_name
 #' @export
-block_inputs <- function(x, ...) {
+block_inputs <- function(x) {
   setdiff(block_expr_inputs(x), "...args")
 }
 

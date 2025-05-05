@@ -8,7 +8,7 @@
 \alias{block_eval}
 \alias{block_eval.block}
 \alias{block_eval.plot_block}
-\title{Generics for server generation}
+\title{Block server}
 \usage{
 block_server(id, x, data = list(), ...)
 
@@ -36,7 +36,7 @@ block_eval(x, expr, data, ...)
 \arguments{
 \item{id}{Namespace ID}
 
-\item{x}{Object for which to generate a \code{\link[=moduleServer]{moduleServer()}}}
+\item{x}{Object for which to generate a \code{\link[shiny:moduleServer]{shiny::moduleServer()}}}
 
 \item{data}{Input data (list of reactives)}
 
@@ -53,5 +53,32 @@ block_eval(x, expr, data, ...)
 \item{expr}{Quoted expression to evaluate in the context of \code{data}}
 }
 \description{
-Calls shiny modules for the given element (block, fields).
+A block is represented by several (nested) shiny modules and the top level
+module is created using the \code{block_server()} generic. S3 dispatch is offered
+as a way to add flexibility, but in most cases the default method for the
+\code{block} class should suffice at top level. Further entry points for
+customization are offered by the generics \code{expr_server()} and \code{block_eval()},
+which are responsible for initializing the block "expression" module (i.e.
+the block server function passed in \code{\link[=new_block]{new_block()}}) and block evaluation
+(evaluating the interpolated expression in the context of input data),
+respectively.
+}
+\details{
+The module returned from \code{block_server()}, at least in the default
+implementation, provides much of the essential but block-type agnostic
+functionality, including data input validation (if available), instantiation
+of the block expression server (handling the block-specific functionality,
+i.e. block user inputs and expression), and instantiation of the
+\code{edit_block} module (if passed from the parent scope).
+
+A block is considered ready for evaluation whenever input data is available
+that satisfies validation (\code{\link[=validate_data_inputs]{validate_data_inputs()}}) and nonempty state
+values are available (unless otherwise instructed via \code{allow_empty_state}
+in \code{\link[=new_block]{new_block()}}). Conditions raised during validation and evaluation are
+caught and returned in order to be surfaced to the app user.
+
+Block-level user inputs (provided by the expression module) are separated
+from output, the behavior of which can be customized via the
+\code{\link[=block_output]{block_output()}} generic. The \code{\link[=block_ui]{block_ui()}} generic can then be used to
+control rendering of outputs.
 }

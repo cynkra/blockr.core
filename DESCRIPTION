@@ -27,7 +27,8 @@ Authors@R:
     )
 Description: A framework for data manipulation and visualization using a
     web-based point and click user interface.
-URL: https://cynkra.github.io/blockr.core
+URL: https://bristolmyerssquibb.github.io/blockr.core
+BugReports: https://github.com/BristolMyersSquibb/blockr.core/issues
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE, packages = c("roxy.shinylive"))

@@ -1,9 +1,35 @@
-#' Generics for server generation
+#' Block server
 #'
-#' Calls shiny modules for the given element (block, fields).
+#' A block is represented by several (nested) shiny modules and the top level
+#' module is created using the `block_server()` generic. S3 dispatch is offered
+#' as a way to add flexibility, but in most cases the default method for the
+#' `block` class should suffice at top level. Further entry points for
+#' customization are offered by the generics `expr_server()` and `block_eval()`,
+#' which are responsible for initializing the block "expression" module (i.e.
+#' the block server function passed in [new_block()]) and block evaluation
+#' (evaluating the interpolated expression in the context of input data),
+#' respectively.
+#'
+#' The module returned from `block_server()`, at least in the default
+#' implementation, provides much of the essential but block-type agnostic
+#' functionality, including data input validation (if available), instantiation
+#' of the block expression server (handling the block-specific functionality,
+#' i.e. block user inputs and expression), and instantiation of the
+#' `edit_block` module (if passed from the parent scope).
+#'
+#' A block is considered ready for evaluation whenever input data is available
+#' that satisfies validation ([validate_data_inputs()]) and nonempty state
+#' values are available (unless otherwise instructed via `allow_empty_state`
+#' in [new_block()]). Conditions raised during validation and evaluation are
+#' caught and returned in order to be surfaced to the app user.
+#'
+#' Block-level user inputs (provided by the expression module) are separated
+#' from output, the behavior of which can be customized via the
+#' [block_output()] generic. The [block_ui()] generic can then be used to
+#' control rendering of outputs.
 #'
 #' @param id Namespace ID
-#' @param x Object for which to generate a [moduleServer()]
+#' @param x Object for which to generate a [shiny::moduleServer()]
 #' @param data Input data (list of reactives)
 #' @param ... Generic consistency
 #'

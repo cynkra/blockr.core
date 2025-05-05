@@ -11,7 +11,7 @@ block_name(x)
 
 block_name(x) <- value
 
-block_inputs(x, ...)
+block_inputs(x)
 
 block_arity(x)
 }
@@ -36,7 +36,7 @@ Several utilities for working (and manipulating) \code{block} objects are export
 and developpers are encouraged to use these instead of relying on object
 implementatsion to extract or modify attributes. If functionality for working
 with blocks in lacking, please consider opening an
-\href{https://github.com/cynkra/blockr.core/issues/new}{issue}.
+\href{https://github.com/BristolMyersSquibb/blockr.core/issues/new}{issue}.
 }
 \section{Block name}{
 

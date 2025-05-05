@@ -11,7 +11,8 @@ A framework for data manipulation and visualization using a web-based point and 
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://cynkra.github.io/blockr.core}
+  \item \url{https://bristolmyerssquibb.github.io/blockr.core}
+  \item Report bugs at \url{https://github.com/BristolMyersSquibb/blockr.core/issues}
 }
 
 }

@@ -6,8 +6,8 @@
 <!-- badges: start -->
 
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![status](https://github.com/cynkra/blockr.core/actions/workflows/ci.yaml/badge.svg)](https://github.com/cynkra/blockr.core/actions/workflows/ci.yaml)
-[![coverage](https://codecov.io/gh/cynkra/blockr.core/graph/badge.svg?token=VoOPRU65KA)](https://codecov.io/gh/cynkra/blockr.core)
+[![status](https://github.com/BristolMyersSquibb/blockr.core/actions/workflows/ci.yaml/badge.svg)](https://github.com/BristolMyersSquibb/blockr.core/actions/workflows/ci.yaml)
+[![coverage](https://codecov.io/gh/BristolMyersSquibb/blockr.core/graph/badge.svg?token=VoOPRU65KA)](https://codecov.io/gh/BristolMyersSquibb/blockr.core)
 <!-- badges: end -->
 
 ## Overview
@@ -22,7 +22,7 @@ You can install the development version of blockr.core from
 [GitHub](https://github.com/) with:
 
 ``` r
-pak::pak("cynkra/blockr.core")
+pak::pak("BristolMyersSquibb/blockr.core")
 ```
 
 ## What is blockr.core
@@ -82,7 +82,7 @@ blockr.ui example
 ## How to get started?
 
 To get started, we invite you to read this
-[vignette](https://cynkra.github.io/blockr.core/articles/get-started.html).
+[vignette](https://bristolmyerssquibb.github.io/blockr.core/articles/get-started.html).
 
 ### How can I develop my own blocks?
 
@@ -98,4 +98,4 @@ capabilities:
   datasets blocks.
 
 If you wish to learn to develop your own blocks, have a look at this
-[vignette](https://cynkra.github.io/blockr.core/articles/create-block.html).
+[vignette](https://bristolmyerssquibb.github.io/blockr.core/articles/create-block.html).
