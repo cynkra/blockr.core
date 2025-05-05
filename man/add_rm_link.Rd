@@ -19,7 +19,7 @@ add_rm_link_ui(id, board)
 \item{...}{Extra arguments passed from parent scope}
 }
 \value{
-A reactive value that evaualtes to \code{NULL} or a list with components
+A reactive value that evaluates to \code{NULL} or a list with components
 \code{add} and \code{rm}, where \code{add} is either \code{NULL} or a \code{data.frame} with columns
 \code{id}, \code{from}, \code{tp} and \code{input} and \code{rm} is either \code{NULL} or a character
 vector of link IDs.

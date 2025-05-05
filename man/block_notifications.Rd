@@ -15,7 +15,7 @@ block_notification_server(id, board, ...)
 }
 \value{
 A \code{\link[shiny:reactiveVal]{shiny::reactiveVal()}} object that evaluates to \code{NULL} or a
-\code{board} obejct.
+\code{board} object.
 }
 \description{
 Object (de)serialization in a board server context.

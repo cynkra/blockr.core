@@ -30,14 +30,14 @@ pak::pak("BristolMyersSquibb/blockr.core")
 `blockr.core` is the entry point to blockr, providing the core
 functionality needed to get started. It can be run as a stand-alone app,
 but is designed with extensibility in mind. A rich **API** is provided
-to connect your own blocks and override the default behaviours (e.g.,
-you can add your own GUI layer or serialisation).
+to connect your own blocks and override the default behaviors (e.g., you
+can add your own GUI layer or serialization).
 
 ## What is a block?
 
 A **block** is a fundamental unit of a data analysis workflow. A single
 block performs a single **task**, such as loading or filtering or
-visualisation. Blocks can be joined together using a **DAG** (direct
+visualization. Blocks can be joined together using a **DAG** (direct
 acyclic graph) to create powerful data **workflows**.
 
 ## Who is it for?

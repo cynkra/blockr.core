@@ -1,6 +1,6 @@
 #' Board links
 #'
-#' Blocks on a board are linksed by board links.
+#' Blocks on a board are linked by board links.
 #'
 #' @param from,to Block ID(s)
 #' @param input Block argument

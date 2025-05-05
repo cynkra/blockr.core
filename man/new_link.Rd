@@ -63,5 +63,5 @@ validate_links(x)
 \item{x}{Links object}
 }
 \description{
-Blocks on a board are linksed by board links.
+Blocks on a board are linked by board links.
 }

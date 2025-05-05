@@ -59,7 +59,7 @@ knitr::include_url(empty_board_url, height = "800px")
 
 Each block is represented as a __card__ containing the block name, the __output__ data and a parameter icon on the top right side. The latter may be used to remove the block, change its name or append (add after) a new block. Some block can contain __inputs__. In our case, we can change the __output__ data.
 
-2. Click on `Add block` and add a new `Select block`, givin it `transform` as custom id.
+2. Click on `Add block` and add a new `Select block`, giving it `transform` as custom id.
 
 Notice the error message in red. You can also see that none of the select block field can be changed. This basically means no data is fed into this block. Let's change this.
 
@@ -180,7 +180,7 @@ serve(new_board())
 ```
 
 This single line of code spins up an ready-to-use blockr board. In some cases, it is 
-possible to initialise the board with few blocks, stacks and links:
+possible to initialize the board with few blocks, stacks and links:
 
 ```{r simple-board, eval = FALSE}
 serve(
@@ -249,4 +249,4 @@ If you had to develop custom blocks, you can read this [vignette](https://cynkra
 
 #### Extend blockr.core
 
-If you wish to customise the look and feel of block, look no further than this [article](https://cynkra.github.io/blockr.core/articles/extend-blockr.html).
+If you wish to customize the look and feel of block, look no further than this [article](https://cynkra.github.io/blockr.core/articles/extend-blockr.html).

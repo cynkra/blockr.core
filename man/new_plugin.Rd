@@ -83,5 +83,5 @@ validate_plugins(x)
 \item{...}{Plugin objects}
 }
 \description{
-Plugins are used to customize/enhance UX aspects of the board bodule.
+Plugins are used to customize/enhance UX aspects of the board module.
 }

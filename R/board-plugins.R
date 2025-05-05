@@ -1,6 +1,6 @@
 #' Board plugin
 #'
-#' Plugins are used to customize/enhance UX aspects of the board bodule.
+#' Plugins are used to customize/enhance UX aspects of the board module.
 #'
 #' @param server,ui Server/UI for the plugin module
 #' @param validator Validator function that validates server return values

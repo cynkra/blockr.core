@@ -8,7 +8,7 @@
 #' @param update Reactive value object to initiate board updates
 #' @param ... Extra arguments passed from parent scope
 #'
-#' @return A reactive value that evaualtes to `NULL` or a list with components
+#' @return A reactive value that evaluates to `NULL` or a list with components
 #' `add` and `rm`, where `add` is either `NULL` or a `stacks` object and `rm`
 #' is either `NULL` or a character vector of link IDs.
 #'

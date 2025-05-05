@@ -88,8 +88,8 @@ data to block B.
 - Preserve the __board__ state: save and restore the application state.
 - ...
 
-All of the above is fully customisable by yourself, `blockr.core` only provides resonable defaults to get you started.
-`blockr.ui` is an example of full customisation.
+All of the above is fully customizable by yourself, `blockr.core` only provides reasonable defaults to get you started.
+`blockr.ui` is an example of full customization.
 
 ```{mermaid}
 flowchart TD
@@ -351,7 +351,7 @@ custom_board_plugins <- function(which = NULL) {
 
 ### Testing the new plugin
 
-In the below example, you may click on the `Add block` button and see the scoubar opening and then select a block.
+In the below example, you may click on the `Add block` button and see the scoutbar opening and then select a block.
 
 ```{r custom-plugin-app, eval=FALSE}
 #| code-fold: true
@@ -560,7 +560,7 @@ add_rm_block_ui <- function(id, board) {
 }
 ```
 
-Since `blockr.core` blocks utilises `shiny`/`bslib` UI, you'd also have to rewrite the UI and/or server part whenever necessary. This [vignette](https://cynkra.github.io/blockr.core/articles/create-block.html) provides a starting point to authoring blocks.
+Since `blockr.core` blocks utilizes `shiny`/`bslib` UI, you'd also have to rewrite the UI and/or server part whenever necessary. This [vignette](https://cynkra.github.io/blockr.core/articles/create-block.html) provides a starting point to authoring blocks.
 
 As a final step, when you call `new_board()` don't forget to add it the `custom_board` class so that the custom S3 methods are invoked.
 

@@ -102,18 +102,18 @@ inherits from \code{block} or not.
 }
 \description{
 Steps in a data analysis pipeline are represented by blocks. Each block
-combines data input with user inpus to produce an output. In order to
+combines data input with user inputs to produce an output. In order to
 create a block, which is implemented as a shiny module, we require a server
 function, a function that produces some UI and a class vector.
 }
 \details{
 A block constructor may have arguments, which taken together define the
 block state. It is good practice to expose all user-selectable arguments of
-a block (i.e. everythig excluding the "data" input) as block arguments such
+a block (i.e. everything excluding the "data" input) as block arguments such
 that block can be fully initialized via the constructor. Some default values
 are required such that blocks can be constructed via constructor calls
 without arguments. Where it is sensible to do so, specific default values
-are acceptable, but if in any way data dependant, defaults should map to
+are acceptable, but if in any way data dependent, defaults should map to
 an "empty" input. For example, a block that provides \code{\link[utils:head]{utils::head()}}
 functionality, one such argument could be \code{n} and a reasonable default value
 could be \code{6L} (in line with corresponding default S3 method implementation).
@@ -132,11 +132,11 @@ constructor.
 The server function (passed as \code{server}) is expected to be a function that
 returns a \code{\link[shiny:moduleServer]{shiny::moduleServer()}}. This function is expected to have at
 least an argument \code{id} (string-valued), which will be used as the module ID.
-Further arguments may be used in the function sigature, one for each "data"
+Further arguments may be used in the function signature, one for each "data"
 input. A block implementing \code{\link[utils:head]{utils::head()}} for example could have a single
 extra argument \code{data}, while a block that performs \code{\link[base:merge]{base::merge()}} requires
 two extra arguments, e.g. \code{x} and \code{y}. Finally, a variadic block, e.g.
-a block implementing something like \code{\link[base:cbind]{base::rbind()}}, needs to accomodate for
+a block implementing something like \code{\link[base:cbind]{base::rbind()}}, needs to accommodate for
 an arbitrary number of inputs. This is achieved by passing a
 \code{\link[shiny:reactiveValues]{shiny::reactiveValues()}} object as \code{...args} and thus such a variadic block
 needs \code{...args} as part of the server function signature. All per-data input
@@ -145,7 +145,7 @@ objects.
 
 The server function may implement arbitrary shiny logic and is expected to
 return a list with components \code{expr} and \code{state}. The expression corresponds
-to the R code necessary to perform the block task and is exprected to be
+to the R code necessary to perform the block task and is expected to be
 a reactive quoted expression. It should contain user-chosen values for all
 user inputs and placeholders for all data inputs (using the same names for
 data inputs as in the server function signature). Such an expression for a
@@ -157,7 +157,7 @@ data inputs as in the server function signature). Such an expression for a
 \}
 }\if{html}{\out{</div>}}
 
-where \code{current_val()} is a reactive that evaulates to the current user
+where \code{current_val()} is a reactive that evaluates to the current user
 selection of the \code{by} columns. This should then be wrapped in a
 \code{\link[shiny:reactive]{shiny::reactive()}} call such that \code{current_val()} can be evaluated whenever
 the current expression is required.
@@ -199,7 +199,7 @@ In addition to the specific class of a block, the core package uses virtual
 classes to group together blocks with similar behavior (e.g.
 \code{transform_block}) and makes use of this inheritance structure in S3
 dispatch for methods like \code{\link[=block_output]{block_output()}} and \code{\link[=block_ui]{block_ui()}}. This pattern is
-not required but encuoraged.
+not required but encouraged.
 }
 
 \section{Initialization/evaluation}{
@@ -212,9 +212,9 @@ block expression will not be evaluated as long as this function throws an
 error.
 
 Other conditions (messages and warnings) may be thrown as will be caught
-and displayed to the user but they will not interrupt evaulation. Errors
-are safe in that they will be caught as well but the will interrup evaluation
-as long as block data input does not satisfy valiidation.
+and displayed to the user but they will not interrupt evaluation. Errors
+are safe in that they will be caught as well but the will interrupt
+evaluation as long as block data input does not satisfy validation.
 }
 
 \examples{

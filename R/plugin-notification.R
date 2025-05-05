@@ -7,7 +7,7 @@
 #' @param ... Extra arguments passed from parent scope
 #'
 #' @return A [shiny::reactiveVal()] object that evaluates to `NULL` or a
-#' `board` obejct.
+#' `board` object.
 #'
 #' @rdname block_notifications
 #' @export

@@ -3,7 +3,7 @@
 #' User settings at the board level.
 #'
 #' @param board_name String valued board name
-#' @param n_rows,page_size Numer of rows and page size to show for tabular
+#' @param n_rows,page_size Number of rows and page size to show for tabular
 #' block previews
 #' @param filter_rows Enable filtering of rows in tabular block previews
 #' @param dark_mode Toggle between dark and light modes

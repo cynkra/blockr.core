@@ -38,12 +38,12 @@ pak::pak("BristolMyersSquibb/blockr.core")
 
 `blockr.core` is the entry point to blockr, providing the core functionality needed to get started.
 It can be run as a stand-alone app, but is designed with extensibility in mind.
-A rich __API__ is provided to connect your own blocks and override the default behaviours (e.g., you can add your own GUI layer or serialisation).
+A rich __API__ is provided to connect your own blocks and override the default behaviors (e.g., you can add your own GUI layer or serialization).
 
 ## What is a block?
 
 A __block__ is a fundamental unit of a data analysis workflow.
-A single block performs a single __task__, such as loading or filtering or visualisation.
+A single block performs a single __task__, such as loading or filtering or visualization.
 Blocks can be joined together using a __DAG__ (direct acyclic graph) to create powerful data __workflows__.
 
 ## Who is it for?

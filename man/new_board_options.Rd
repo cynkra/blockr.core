@@ -41,7 +41,7 @@ board_option(opt, x)
 \arguments{
 \item{board_name}{String valued board name}
 
-\item{n_rows, page_size}{Numer of rows and page size to show for tabular
+\item{n_rows, page_size}{Number of rows and page size to show for tabular
 block previews}
 
 \item{filter_rows}{Enable filtering of rows in tabular block previews}
