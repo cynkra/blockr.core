@@ -1,9 +1,6 @@
-#' @import vctrs
+#' @import vctrs shiny
 #' @keywords internal
-"_PACKAGE"
-
 #' @importFrom rlang abort warn inform
-#' @import shiny
 NULL
 
 pkg_name <- function(env = parent.frame()) {
