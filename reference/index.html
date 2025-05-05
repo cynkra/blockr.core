@@ -26,6 +26,7 @@
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/BristolMyersSquibb/blockr.core/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch"><li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
@@ -44,99 +45,6 @@
     </div>
 
     <div class="section level2">
-      <h2 id="blocks">Blocks<a class="anchor" aria-label="anchor" href="#blocks"></a></h2>
-
-
-
-
-    </div><div class="section level2">
-
-      <h3 id="data-blocks">Data blocks<a class="anchor" aria-label="anchor" href="#data-blocks"></a></h3>
-      <div class="section-desc"><p>Blocks that provide access to datasets.</p></div>
-
-
-    </div><div class="section level2">
-
-
-
-
-      <dl><dt>
-
-          <code><a href="new_dataset_block.html">new_dataset_block()</a></code>
-
-        </dt>
-        <dd>Data block constructor</dd>
-      </dl><dl><dt>
-
-          <code><a href="new_static_block.html">new_static_block()</a></code>
-
-        </dt>
-        <dd>Data block constructor</dd>
-      </dl><dl><dt>
-
-          <code><a href="new_upload_block.html">new_upload_block()</a></code>
-
-        </dt>
-        <dd>Data upload block constructor</dd>
-      </dl><dl><dt>
-
-          <code><a href="new_csv_block.html">new_csv_block()</a></code>
-
-        </dt>
-        <dd>CSV parser block constructor</dd>
-      </dl></div><div class="section level2">
-
-      <h3 id="transform-blocks">Transform blocks<a class="anchor" aria-label="anchor" href="#transform-blocks"></a></h3>
-      <div class="section-desc"><p>Data tranformation blocks.</p></div>
-
-
-    </div><div class="section level2">
-
-
-
-
-      <dl><dt>
-
-          <code><a href="new_subset_block.html">new_subset_block()</a></code>
-
-        </dt>
-        <dd>Subset block constructor</dd>
-      </dl><dl><dt>
-
-          <code><a href="new_merge_block.html">new_merge_block()</a></code>
-
-        </dt>
-        <dd>Subset block constructor</dd>
-      </dl><dl><dt>
-
-          <code><a href="new_rbind_block.html">new_rbind_block()</a></code>
-
-        </dt>
-        <dd>Row-bind block constructor</dd>
-      </dl><dl><dt>
-
-          <code><a href="new_head_block.html">new_head_block()</a></code>
-
-        </dt>
-        <dd>Subset block constructor</dd>
-      </dl></div><div class="section level2">
-
-      <h3 id="plot-blocks">Plot blocks<a class="anchor" aria-label="anchor" href="#plot-blocks"></a></h3>
-      <div class="section-desc"><p>Blocks for data visualization.</p></div>
-
-
-    </div><div class="section level2">
-
-
-
-
-      <dl><dt>
-
-          <code><a href="new_scatter_block.html">new_scatter_block()</a></code>
-
-        </dt>
-        <dd>Scatter plot block constructor</dd>
-      </dl></div><div class="section level2">
       <h2 id="board-objects">Board objects<a class="anchor" aria-label="anchor" href="#board-objects"></a></h2>
 
 
@@ -144,8 +52,8 @@
 
     </div><div class="section level2">
 
-      <h3 id="blocks-1">Blocks<a class="anchor" aria-label="anchor" href="#blocks-1"></a></h3>
-      <div class="section-desc"><p>Utilities for creating an working with blocks</p></div>
+      <h3 id="blocks">Blocks<a class="anchor" aria-label="anchor" href="#blocks"></a></h3>
+      <div class="section-desc"><p>Data analysis pipelines are decomposed into steps, each represented by a block.</p></div>
 
 
     </div><div class="section level2">
@@ -155,16 +63,22 @@
 
       <dl><dt>
 
-          <code><a href="new_block.html">new_block()</a></code> <code><a href="new_block.html">is_block()</a></code> <code><a href="new_block.html">as_block()</a></code> <code><a href="new_block.html">block_name()</a></code> <code><a href="new_block.html">`block_name&lt;-`()</a></code> <code><a href="new_block.html">block_ctor()</a></code> <code><a href="new_block.html">block_expr_server()</a></code> <code><a href="new_block.html">block_expr_ui()</a></code> <code><a href="new_block.html">block_dat_valid()</a></code> <code><a href="new_block.html">block_has_data_validator()</a></code> <code><a href="new_block.html">validate_data_inputs()</a></code> <code><a href="new_block.html">block_inputs()</a></code> <code><a href="new_block.html">block_arity()</a></code> <code><a href="new_block.html">blocks()</a></code> <code><a href="new_block.html">is_blocks()</a></code> <code><a href="new_block.html">as_blocks()</a></code> <code><a href="new_block.html">new_data_block()</a></code> <code><a href="new_block.html">new_file_block()</a></code> <code><a href="new_block.html">new_parser_block()</a></code> <code><a href="new_block.html">new_plot_block()</a></code> <code><a href="new_block.html">new_transform_block()</a></code>
+          <code><a href="new_block.html">new_block()</a></code> <code><a href="new_block.html">is_block()</a></code> <code><a href="new_block.html">as_block()</a></code> <code><a href="new_block.html">validate_data_inputs()</a></code> <code><a href="new_block.html">blocks()</a></code> <code><a href="new_block.html">is_blocks()</a></code> <code><a href="new_block.html">as_blocks()</a></code> <code><a href="new_block.html">block_inputs.board()</a></code> <code><a href="new_block.html">new_data_block()</a></code> <code><a href="new_block.html">new_file_block()</a></code> <code><a href="new_block.html">new_parser_block()</a></code> <code><a href="new_block.html">new_plot_block()</a></code> <code><a href="new_block.html">new_transform_block()</a></code>
 
         </dt>
         <dd>Blocks</dd>
       </dl><dl><dt>
 
+          <code><a href="block_name.html">block_name()</a></code> <code><a href="block_name.html">`block_name&lt;-`()</a></code> <code><a href="block_name.html">block_inputs()</a></code> <code><a href="block_name.html">block_arity()</a></code>
+
+        </dt>
+        <dd>Block utilities</dd>
+      </dl><dl><dt>
+
           <code><a href="block_server.html">block_server()</a></code> <code><a href="block_server.html">expr_server()</a></code> <code><a href="block_server.html">block_eval()</a></code>
 
         </dt>
-        <dd>Generics for server generation</dd>
+        <dd>Block server</dd>
       </dl><dl><dt>
 
           <code><a href="block_ui.html">block_ui()</a></code> <code><a href="block_ui.html">expr_ui()</a></code> <code><a href="block_ui.html">block_output()</a></code>
@@ -341,6 +255,99 @@
         </dt>
         <dd>Serialization module</dd>
       </dl></div><div class="section level2">
+      <h2 id="blocks-1">Blocks<a class="anchor" aria-label="anchor" href="#blocks-1"></a></h2>
+
+
+
+
+    </div><div class="section level2">
+
+      <h3 id="data-blocks">Data blocks<a class="anchor" aria-label="anchor" href="#data-blocks"></a></h3>
+      <div class="section-desc"><p>Blocks that provide access to datasets.</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="new_dataset_block.html">new_dataset_block()</a></code>
+
+        </dt>
+        <dd>Data block constructor</dd>
+      </dl><dl><dt>
+
+          <code><a href="new_static_block.html">new_static_block()</a></code>
+
+        </dt>
+        <dd>Data block constructor</dd>
+      </dl><dl><dt>
+
+          <code><a href="new_upload_block.html">new_upload_block()</a></code>
+
+        </dt>
+        <dd>Data upload block constructor</dd>
+      </dl><dl><dt>
+
+          <code><a href="new_csv_block.html">new_csv_block()</a></code>
+
+        </dt>
+        <dd>CSV parser block constructor</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="transform-blocks">Transform blocks<a class="anchor" aria-label="anchor" href="#transform-blocks"></a></h3>
+      <div class="section-desc"><p>Data tranformation blocks.</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="new_subset_block.html">new_subset_block()</a></code>
+
+        </dt>
+        <dd>Subset block constructor</dd>
+      </dl><dl><dt>
+
+          <code><a href="new_merge_block.html">new_merge_block()</a></code>
+
+        </dt>
+        <dd>Subset block constructor</dd>
+      </dl><dl><dt>
+
+          <code><a href="new_rbind_block.html">new_rbind_block()</a></code>
+
+        </dt>
+        <dd>Row-bind block constructor</dd>
+      </dl><dl><dt>
+
+          <code><a href="new_head_block.html">new_head_block()</a></code>
+
+        </dt>
+        <dd>Subset block constructor</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="plot-blocks">Plot blocks<a class="anchor" aria-label="anchor" href="#plot-blocks"></a></h3>
+      <div class="section-desc"><p>Blocks for data visualization.</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="new_scatter_block.html">new_scatter_block()</a></code>
+
+        </dt>
+        <dd>Scatter plot block constructor</dd>
+      </dl></div><div class="section level2">
       <h2 id="utilities-1">Utilities<a class="anchor" aria-label="anchor" href="#utilities-1"></a></h2>
 
 
@@ -419,7 +426,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer></div>

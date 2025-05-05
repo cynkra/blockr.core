@@ -49,6 +49,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/BristolMyersSquibb/blockr.core/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
@@ -71,7 +72,7 @@
 
 
 
-
+      <small class="dont-index">Source: <a href="https://github.com/BristolMyersSquibb/blockr.core/blob/main/vignettes/extend-blockr.qmd" class="external-link"><code>vignettes/extend-blockr.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -85,11 +86,11 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/" class="external-link">shiny</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/bslib/" class="external-link">bslib</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">scoutbaR</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cynkra.github.io/blockr.core">blockr.core</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bristolmyerssquibb.github.io/blockr.core">blockr.core</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <section class="level2"><h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>In the <code>Create block</code> <a href="https://cynkra.github.io/blockr.core/articles/create-block.html">vignette</a>, you were taught how to design new blocks for blockr. Did you know that we could go much further?</p>
+<p>In the <code>Create block</code> <a href="https://cynkra.github.io/blockr.core/articles/create-block.html" class="external-link">vignette</a>, you were taught how to design new blocks for blockr. Did you know that we could go much further?</p>
 <p>Each major <code>blockr.core</code> feature belongs to its own <strong>plugin</strong>, materialized as a shiny module:</p>
 <ul>
 <li>Manage blocks (create/remove, append, …)</li>
@@ -221,10 +222,10 @@
 <span>  <span class="fu"><a href="../reference/new_plugin.html">new_plugin</a></span><span class="op">(</span><span class="va">server</span>, <span class="va">ui</span>, validator <span class="op">=</span> <span class="va">expect_null</span>, class <span class="op">=</span> <span class="st">"manage_blocks"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
-<p>In the following, we want to create a custom <code>manage_blocks</code> plugin that uses the <code>scoutbaR</code> package, described in <a href="https://cynkra.github.io/blockr.core/articles/blocks-registry.html">vignette</a></p>
+<p>In the following, we want to create a custom <code>manage_blocks</code> plugin that uses the <code>scoutbaR</code> package, described in <a href="https://cynkra.github.io/blockr.core/articles/blocks-registry.html" class="external-link">vignette</a></p>
 </section><section class="level3"><h3 id="a-custom-manage_blocks">A custom manage_blocks<a class="anchor" aria-label="anchor" href="#a-custom-manage_blocks"></a>
 </h3>
-<p>To create our custom manage blocks, we’ll first need to overwrite the <code>add_rm_block_server</code> and <code>add_rm_block_ui</code> functions. For sake of simplicity, on the UI side, we provide a <code>Add</code> block button as well as as scoutbar widget (<code>blk_choices()</code> is described in the following <a href="https://cynkra.github.io/blockr.core/articles/blocks-registry.html">vignette</a>):</p>
+<p>To create our custom manage blocks, we’ll first need to overwrite the <code>add_rm_block_server</code> and <code>add_rm_block_ui</code> functions. For sake of simplicity, on the UI side, we provide a <code>Add</code> block button as well as as scoutbar widget (<code>blk_choices()</code> is described in the following <a href="https://cynkra.github.io/blockr.core/articles/blocks-registry.html" class="external-link">vignette</a>):</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">add_rm_block_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">board</span><span class="op">)</span> <span class="op">{</span></span>
@@ -510,7 +511,7 @@
 <li>
 <code><a href="../reference/new_block.html">is_blocks()</a></code> check whether an object correspond to a list of blocks.</li>
 <li>
-<code>get_block_registry()</code> to get the current block metadata from the <a href="https://cynkra.github.io/blockr.core/articles/blocks-registry.html">registry</a>.</li>
+<code>get_block_registry()</code> to get the current block metadata from the <a href="https://cynkra.github.io/blockr.core/articles/blocks-registry.html" class="external-link">registry</a>.</li>
 </ul>
 <p><code><a href="../reference/add_rm_block.html">add_rm_block_ui()</a></code> now leverages <code>shinyNextUI::actionButton</code>:</p>
 <div class="cell">
@@ -532,7 +533,7 @@
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
-<p>Since <code>blockr.core</code> blocks utilises <code>shiny</code>/<code>bslib</code> UI, you’d also have to rewrite the UI and/or server part whenever necessary. This <a href="https://cynkra.github.io/blockr.core/articles/create-block.html">vignette</a> provides a starting point to authoring blocks.</p>
+<p>Since <code>blockr.core</code> blocks utilises <code>shiny</code>/<code>bslib</code> UI, you’d also have to rewrite the UI and/or server part whenever necessary. This <a href="https://cynkra.github.io/blockr.core/articles/create-block.html" class="external-link">vignette</a> provides a starting point to authoring blocks.</p>
 <p>As a final step, when you call <code><a href="../reference/new_board.html">new_board()</a></code> don’t forget to add it the <code>custom_board</code> class so that the custom S3 methods are invoked.</p>
 <div class="cell">
 <details class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
@@ -581,107 +582,89 @@
 </h2>
 <p>TBD</p>
 </section><script id="quarto-html-after-body" type="application/javascript">
-window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
-    }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
         }
       }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-    const config = {
-      allowHTML: true,
-      maxWidth: 500,
-      delay: 100,
-      arrow: false,
-      appendTo: function(el) {
-          return el.parentElement;
-      },
-      interactive: true,
-      interactiveBorder: 10,
-      theme: 'light-border',
-      placement: 'bottom-start',
-    };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
-    window.tippy(el, config);
-  }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
       }
-    } else {
-      return undefined;
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config);
     }
-  };
-  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-  for (var i=0; i<bibliorefs.length; i++) {
-    const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
         });
-        return popup.innerHTML;
-      });
+      }
     }
-  }
-});
-</script></main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+  });
+  </script></main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
@@ -691,7 +674,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer>
