@@ -8,3 +8,5 @@ _\.new\.png$
 ^pkgdown$
 ^vignettes/*_files$
 ^cran-comments\.md$
+^CRAN-SUBMISSION$
+^vignettes/\.quarto$

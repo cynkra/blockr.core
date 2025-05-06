@@ -65,24 +65,15 @@ reference:
   - gen_code_server
   - block_notification_server
   - ser_deser_server
-- title: Blocks
-- subtitle: Data blocks
-  desc: Blocks that provide access to datasets.
+- title: Block classes
   contents:
-    - new_dataset_block
-    - new_static_block
+    - new_data_block
     - new_upload_block
     - new_csv_block
-- subtitle: Transform blocks
-  desc: Data tranformation blocks.
-  contents:
     - new_subset_block
     - new_merge_block
     - new_rbind_block
     - new_head_block
-- subtitle: Plot blocks
-  desc: Blocks for data visualization.
-  contents:
     - new_scatter_block
 - title: Utilities
 - subtitle: Serialization
