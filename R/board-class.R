@@ -379,7 +379,6 @@ rm_blocks <- function(x, rm) {
   x
 }
 
-#' @rdname new_block
 #' @export
 block_inputs.board <- function(x, ...) {
   lapply(set_names(board_blocks(x), board_block_ids(x)), block_inputs)

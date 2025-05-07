@@ -3,6 +3,7 @@
 \name{block_name}
 \alias{block_name}
 \alias{block_name<-}
+\alias{validate_data_inputs}
 \alias{block_inputs}
 \alias{block_arity}
 \title{Block utilities}
@@ -10,6 +11,8 @@
 block_name(x)
 
 block_name(x) <- value
+
+validate_data_inputs(x, data)
 
 block_inputs(x)
 
@@ -19,6 +22,8 @@ block_arity(x)
 \item{x}{An object inheriting from \code{"block"}}
 
 \item{value}{New value}
+
+\item{data}{Data input values}
 }
 \value{
 Return types vary among the set of exported utilities:

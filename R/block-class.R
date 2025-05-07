@@ -147,7 +147,10 @@
 #'
 #' @return Both `new_block()` and `as_block` return an object inheriting from
 #' `block`, while `is_block()` returns a boolean indicating whether an object
-#' inherits from `block` or not.
+#' inherits from `block` or not. Block vectors, created using `blocks()`,
+#' `as_blocks()`, or by combining multiple blocks using [base::c()] all inherit
+#' frm `blocks` and `iss_block()` returns a boolean indicating whether an object
+#' inherits from `blocks` or not.
 #'
 #' @export
 new_block <- function(server, ui, class, ctor, ctor_pkg, dat_valid = NULL,
@@ -410,13 +413,11 @@ as_block <- function(x, ...) {
   UseMethod("as_block")
 }
 
-#' @rdname new_block
 #' @export
 as_block.block <- function(x, ...) {
   validate_block(x)
 }
 
-#' @rdname new_block
 #' @export
 as_block.list <- function(x, ...) {
 
@@ -594,7 +595,7 @@ block_allow_empty_state <- function(x) {
 }
 
 #' @param data Data input values
-#' @rdname new_block
+#' @rdname block_name
 #' @export
 validate_data_inputs <- function(x, data) {
 
