@@ -70,8 +70,17 @@ board_ui.board <- function(id, x, plugins = list(), ...) {
 #' @export
 board_ui.NULL <- function(id, x, ...) NULL
 
+#' @section Board-level block UI:
+#' While the contents of block-level UI are created by dispatching `block_ui()`
+#' on blocks another dispatch on [`board`](new_board) occurs as well. This can
+#' be used to control how blocks are integrated into the board UI. For the
+#' default board, this uses [bslib::card()] to represent blocks. For boards
+#' that extend the default `board` class, control is available for how blocks
+#' are displayed by providing a board-specific `block_ui()` method.
+#'
 #' @param blocks (Additional) blocks (or IDs) for which to generate the UI
 #' @param edit_ui Block edit plugin
+#'
 #' @rdname block_ui
 #' @export
 block_ui.board <- function(id, x, blocks = NULL, edit_ui = NULL, ...) {

@@ -2,25 +2,16 @@
 % Please edit documentation in R/block-ui.R, R/board-ui.R
 \name{block_ui}
 \alias{block_ui}
-\alias{block_ui.block}
 \alias{expr_ui}
-\alias{expr_ui.block}
 \alias{block_output}
-\alias{block_output.block}
 \alias{block_ui.board}
-\title{Generics for UI generation}
+\title{Block UI}
 \usage{
 block_ui(id, x, ...)
 
-\method{block_ui}{block}(id, x, ...)
-
 expr_ui(id, x, ...)
 
-\method{expr_ui}{block}(id, x, ...)
-
 block_output(x, result, session)
-
-\method{block_output}{block}(x, result, session)
 
 \method{block_ui}{board}(id, x, blocks = NULL, edit_ui = NULL, ...)
 }
@@ -31,7 +22,7 @@ block_output(x, result, session)
 
 \item{...}{Generic consistency}
 
-\item{result}{Reactive block result}
+\item{result}{Block result}
 
 \item{session}{Shiny session object}
 
@@ -39,6 +30,45 @@ block_output(x, result, session)
 
 \item{edit_ui}{Block edit plugin}
 }
-\description{
-Generics for creating fields and block UI containers.
+\value{
+Both \code{expr_ui()} and \code{block_ui()} are expected to return shiny UI
+(e.g. objects wrapped in a \code{\link[shiny:reexports]{shiny::tagList()}}). For rendering the UI,
+\code{block_output()} is required to return the result of a shiny render function.
+For example, a transform block might show the resulting \code{data.frame} as an
+HTML table using the DT package. The corresponding \code{block_ui()} function
+would then contain UI created by \code{\link[DT:dataTableOutput]{DT::dataTableOutput()}} and rendering in
+\code{block_output()} would then be handled by \code{\link[DT:dataTableOutput]{DT::renderDT()}}.
 }
+\description{
+The UI associated with a block is created via the generics \code{expr_ui()} and
+\code{block_ui()}. The former is mainly responsible for user inputs that are
+specific to every block type (i.e. a \href{new_subset_block}{\code{subset_block}}
+requires different user inputs compared to a \href{new_head_block}{\code{head_block}})
+and essentially calls the UI function passed as \code{ui} to \code{\link[=new_block]{new_block()}}. UI
+that represents block outputs typically is shared among similar block types
+(i.e. blocks with shared inheritance structure, such as
+\href{new_subset_block}{\code{subset_block}} and \href{new_head_block}{\code{head_block}}, which
+both inherit from \code{transform_block}). This type of UI us created by
+\code{block_ui()} and block inheritance is used to deduplicate shared
+functionality (i.e. by implementing a method for the \code{transform_block} class
+only instead of separate methods for \href{new_subset_block}{\code{subset_block}} and
+\href{new_head_block}{\code{head_block}}. Working in tandem with \code{block_ui()}, the
+generic \code{block_output()} generates the output to be displayed by the UI
+portion defined via \code{block_ui()}.
+}
+\details{
+The result of \code{block_output()}, which is evaluated in the \code{\link[=block_server]{block_server()}}
+context is assigned to \code{output$result}. Consequently, when referencing
+the block result in \code{block_ui()}, this naming convention has to be followed
+by referring to this as something like \code{shiny::NS(id, "result")}.
+}
+\section{Board-level block UI}{
+
+While the contents of block-level UI are created by dispatching \code{block_ui()}
+on blocks another dispatch on \href{new_board}{\code{board}} occurs as well. This can
+be used to control how blocks are integrated into the board UI. For the
+default board, this uses \code{\link[bslib:card]{bslib::card()}} to represent blocks. For boards
+that extend the default \code{board} class, control is available for how blocks
+are displayed by providing a board-specific \code{block_ui()} method.
+}
+
