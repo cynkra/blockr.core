@@ -7,7 +7,7 @@
 #' @param ... Forwarded to `new_data_block()` and [new_block()]
 #' @inheritParams new_block
 #'
-#' @returns All blocks constructed via `new_data_block()` inherit from
+#' @return All blocks constructed via `new_data_block()` inherit from
 #' `data_block`.
 #'
 #' @export

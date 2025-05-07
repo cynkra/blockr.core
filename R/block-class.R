@@ -145,7 +145,7 @@
 #' blk <- new_identity_block()
 #' is_block(blk)
 #'
-#' @returns Both `new_block()` and `as_block` return an object inheriting from
+#' @return Both `new_block()` and `as_block` return an object inheriting from
 #' `block`, while `is_block()` returns a boolean indicating whether an object
 #' inherits from `block` or not.
 #'
@@ -535,7 +535,7 @@ c.block <- function(...) {
 #' block_inputs(new_rbind_block())
 #' block_arity(new_rbind_block())
 #'
-#' @returns Return types vary among the set of exported utilities:
+#' @return Return types vary among the set of exported utilities:
 #' * `block_name()`: string valued block name,
 #' * `block_name<-()`: `x` (invisibly),
 #' * `validate_data_inputs()`: `NULL` if no validator is set and the result of
