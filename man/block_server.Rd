@@ -4,9 +4,7 @@
 \alias{block_server}
 \alias{block_server.block}
 \alias{expr_server}
-\alias{expr_server.block}
 \alias{block_eval}
-\alias{block_eval.block}
 \title{Block server}
 \usage{
 block_server(id, x, data = list(), ...)
@@ -24,11 +22,7 @@ block_server(id, x, data = list(), ...)
 
 expr_server(x, data, ...)
 
-\method{expr_server}{block}(x, data, ...)
-
 block_eval(x, expr, data, ...)
-
-\method{block_eval}{block}(x, expr, data, ...)
 }
 \arguments{
 \item{id}{Namespace ID}
@@ -48,6 +42,12 @@ block_eval(x, expr, data, ...)
 \item{update}{Reactive value object to initiate board updates}
 
 \item{expr}{Quoted expression to evaluate in the context of \code{data}}
+}
+\value{
+Both \code{block_server()} and \code{expr_server()} return shiny server module
+(i.e. a call to \code{\link[shiny:moduleServer]{shiny::moduleServer()}}), while \code{block_eval()} evaluates
+an interpolated (w.r.t. block "user" inputs) block expression in the context
+of block data inputs.
 }
 \description{
 A block is represented by several (nested) shiny modules and the top level

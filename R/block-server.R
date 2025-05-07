@@ -33,6 +33,11 @@
 #' @param data Input data (list of reactives)
 #' @param ... Generic consistency
 #'
+#' @return Both `block_server()` and `expr_server()` return shiny server module
+#' (i.e. a call to [shiny::moduleServer()]), while `block_eval()` evaluates
+#' an interpolated (w.r.t. block "user" inputs) block expression in the context
+#' of block data inputs.
+#'
 #' @export
 block_server <- function(id, x, data = list(), ...) {
   UseMethod("block_server", x)
@@ -136,20 +141,18 @@ expr_server <- function(x, data, ...) {
   UseMethod("expr_server")
 }
 
-#' @rdname block_server
 #' @export
 expr_server.block <- function(x, data, ...) {
   do.call(block_expr_server(x), c(list(id = "expr"), data))
 }
 
+#' @param expr Quoted expression to evaluate in the context of `data`
 #' @rdname block_server
 #' @export
 block_eval <- function(x, expr, data, ...) {
   UseMethod("block_eval")
 }
 
-#' @param expr Quoted expression to evaluate in the context of `data`
-#' @rdname block_server
 #' @export
 block_eval.block <- function(x, expr, data, ...) {
   eval(expr, data)

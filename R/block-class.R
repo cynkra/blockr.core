@@ -145,7 +145,7 @@
 #' blk <- new_identity_block()
 #' is_block(blk)
 #'
-#' @return Both `new_block()` and `as_block` return an object inheriting from
+#' @return Both `new_block()` and `as_block()` return an object inheriting from
 #' `block`, while `is_block()` returns a boolean indicating whether an object
 #' inherits from `block` or not. Block vectors, created using `blocks()`,
 #' `as_blocks()`, or by combining multiple blocks using [base::c()] all inherit

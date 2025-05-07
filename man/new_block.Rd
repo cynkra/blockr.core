@@ -56,7 +56,7 @@ constructor name or \code{NULL}}
 \item{x}{An object inheriting from \code{"block"}}
 }
 \value{
-Both \code{new_block()} and \code{as_block} return an object inheriting from
+Both \code{new_block()} and \code{as_block()} return an object inheriting from
 \code{block}, while \code{is_block()} returns a boolean indicating whether an object
 inherits from \code{block} or not. Block vectors, created using \code{blocks()},
 \code{as_blocks()}, or by combining multiple blocks using \code{\link[base:c]{base::c()}} all inherit
