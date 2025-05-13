@@ -43,7 +43,8 @@ Imports:
     vctrs,
     generics,
     rlang,
-    htmltools
+    htmltools,
+    shinyFiles
 Suggests:
     testthat (>= 3.0.0),
     memuse,

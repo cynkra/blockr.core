@@ -173,8 +173,8 @@ create_block <- function(id, ...) {
 register_core_blocks <- function(which = blockr_option("blocks", "all")) {
 
   blocks <- paste0(
-    c("dataset", "subset", "merge", "rbind", "scatter", "upload", "csv",
-      "static", "head"),
+    c("dataset", "subset", "merge", "rbind", "scatter", "upload", "filebrowser",
+      "csv", "static", "head"),
     "_block"
   )
 
@@ -194,6 +194,7 @@ register_core_blocks <- function(which = blockr_option("blocks", "all")) {
       "new_rbind_block",
       "new_scatter_block",
       "new_upload_block",
+      "new_filebrowser_block",
       "new_csv_block",
       "new_static_block",
       "new_head_block"
@@ -205,6 +206,7 @@ register_core_blocks <- function(which = blockr_option("blocks", "all")) {
       "rbind block",
       "scatter plot block",
       "data upload block",
+      "file browser block",
       "csv parser block",
       "static data block",
       "head/tail block"
@@ -216,6 +218,7 @@ register_core_blocks <- function(which = blockr_option("blocks", "all")) {
       "Row-binding of datasets",
       "Scatter plotting",
       "Upload data",
+      "Browse local files",
       "Read CSV file",
       "Static data",
       "Data head/tail"
@@ -226,6 +229,7 @@ register_core_blocks <- function(which = blockr_option("blocks", "all")) {
       "transform",
       "transform",
       "plot",
+      "file",
       "file",
       "parse",
       "data",
