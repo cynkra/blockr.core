@@ -3,7 +3,7 @@
 \name{notify_user}
 \alias{notify_user}
 \alias{notify_user_server}
-\title{User notification module}
+\title{User notification plugin module}
 \usage{
 notify_user(server = notify_user_server, ui = NULL)
 

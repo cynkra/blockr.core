@@ -4,7 +4,7 @@
 \alias{generate_code}
 \alias{generate_code_server}
 \alias{generate_code_ui}
-\title{Code generation module}
+\title{Code generation plugin module}
 \usage{
 generate_code(server = generate_code_server, ui = generate_code_ui)
 

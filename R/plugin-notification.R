@@ -1,4 +1,4 @@
-#' User notification module
+#' User notification plugin module
 #'
 #' During the evaluation cycle of each block, user notifications may be
 #' generated to inform in case of issues such as errors or warnings. These

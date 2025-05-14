@@ -1,4 +1,4 @@
-#' Code generation module
+#' Code generation plugin module
 #'
 #' All code necessary for reproducing a data analysis as set up in blockr can
 #' be made available to the user. Several ways of providing such a script or
