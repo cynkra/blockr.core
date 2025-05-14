@@ -55,7 +55,7 @@ available_stack_blocks(
 
 \item{add}{Links/stacks to add}
 
-\item{mod}{Link/stack IDs to modify}
+\item{mod}{Link/stacks to modify}
 
 \item{blocks, stacks}{Sets of blocks/stacks}
 }

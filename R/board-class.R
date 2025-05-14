@@ -377,7 +377,7 @@ board_link_ids <- function(x) {
 }
 
 #' @param add Links/stacks to add
-#' @param mod Link/stack IDs to modify
+#' @param mod Link/stacks to modify
 #' @rdname board_blocks
 #' @export
 modify_board_links <- function(x, add = NULL, rm = NULL, mod = NULL) {

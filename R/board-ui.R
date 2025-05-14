@@ -1,10 +1,33 @@
 #' Board UI
 #'
-#' Shiny UI function for `board` objects.
+#' As counterpart to [board_server()], `board_ui()` is responsible for rendering
+#' UI for a board module. This top-level entry point for customizing board
+#' appearance and functionality can be overridden by sub-classing the boar
+#' object and providing an implementation for this sub-class. Such an
+#' implementation is expected to handle UI for plugins and all board
+#' components, including blocks, links and stacks, but may rely on
+#' functionality that generates UI for these components, such as [block_ui()]
+#' or [stack_ui()], as well as already available UI provided by plugins
+#' themselves.
+#'
+#' Dynamic UI updates are handled by functions `insert_block_ui()` and
+#' `remove_block_ui()` for adding and removing block-level UI elements to and
+#' from `board` UI, whenever blocks are added or removed. The lightly more
+#' nondescript updated function `update_ui()` is intended for board-level UI
+#' updates, which is currently only needed when restoring from a saved state and
+#' board option UI needs to be adjusted accordingly. All these update functions
+#' are provided as S3 generics with implementations for `board` and can be
+#' extended if so desired.
 #'
 #' @param id Namespace ID
 #' @param x Board
 #' @param ... Generic consistency
+#'
+#' @return A `board_ui()` implementation is expected to return [shiny::tag] or
+#' [shiny::tagList()] objects, while updater functions (`insert_block_ui()`,
+#' `remove_block_ui()` and `update_ui()`) are called for their side effects
+#' (which includes UI updates such as [shiny::insertUI()], [shiny::removeUI()])
+#' and return the board object passed as `x` invisibly.
 #'
 #' @export
 board_ui <- function(id, x, ...) {
@@ -156,6 +179,8 @@ insert_block_ui.board <- function(id, x, blocks = NULL, ...) {
     block_ui(id, x, blocks, ...),
     immediate = TRUE
   )
+
+  invisible(x)
 }
 
 #' @rdname board_ui
@@ -189,6 +214,8 @@ remove_block_ui.board <- function(id, x, blocks = NULL, ...) {
       )
     }
   }
+
+  invisible(x)
 }
 
 #' @param session Shiny session
@@ -202,4 +229,5 @@ update_ui <- function(x, session, ...) {
 #' @export
 update_ui.board <- function(x, session, ...) {
   update_ui(board_options(x), session)
+  invisible(x)
 }
