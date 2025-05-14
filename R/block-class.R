@@ -609,6 +609,11 @@ validate_data_inputs <- function(x, data) {
 #' @rdname block_name
 #' @export
 block_inputs <- function(x) {
+  UseMethod("block_inputs", x)
+}
+
+#' @export
+block_inputs.block <- function(x) {
   setdiff(block_expr_inputs(x), "...args")
 }
 

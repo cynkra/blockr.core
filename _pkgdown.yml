@@ -45,6 +45,7 @@ reference:
   desc: Utilities for creating an working with boards
   contents:
     - new_board
+    - board_blocks
     - board_server
     - board_ui
     - new_board_options

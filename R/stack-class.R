@@ -155,6 +155,14 @@ validate_stack.stack <- function(x) {
 }
 
 #' @export
+validate_stack.default <- function(x) {
+  abort(
+    "Expecting a stack to inherit from `stack`.",
+    class = "stack_class_invalid"
+  )
+}
+
+#' @export
 format.stack <- function(x, ...) {
 
   out <- paste0("[", length(x), "]")
