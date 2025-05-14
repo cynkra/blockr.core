@@ -1,6 +1,15 @@
 #' Board options
 #'
-#' User settings at the board level.
+#' User settings at the board level are managed by a `board_options` object.
+#' This can be constructed via `new_board_options()` and in case the set of
+#' user options is to be extended, the constructor is designed with sub-classing
+#' in mind. Consequently, the associated validator `validate_board_options()`
+#' is available as S3 generic. Inheritance checking is available as
+#' `is_board_options()` and coercion as `as_board_options()`. The currently set
+#' options for a board object can be retrieved with `board_options()` and option
+#' names are available as `list_board_options()`, which is short for
+#' `names(board_options(.))`. Finally, in order to extract the value of a
+#' specific option, `board_option()` can be used.
 #'
 #' @param board_name String valued board name
 #' @param n_rows,page_size Number of rows and page size to show for tabular
@@ -9,6 +18,24 @@
 #' @param dark_mode Toggle between dark and light modes
 #' @param ... Further options
 #' @param class Optional sub-class
+#'
+#' @examples
+#' opt <- new_board_options()
+#'
+#' is_board_options(opt)
+#' list_board_options(opt)
+#'
+#' board_option("page_size", opt)
+#'
+#' @return All of `new_board_options()`, `as_board_options()` and
+#' `board_options()` return a `board_options` object, as does the validator
+#' `validate_board_options()`, which is typically called for side effects of
+#' throwing errors is validation does not pass. Inheritance checking as
+#' `is_board_options()` returns a scalar logical, while `list_board_options()`
+#' returns a character vector of option names. Finally, `board_option()` returns
+#' the current value for a specific board option, which in principle may be any
+#' R object, but typically we have values such as strings or scalar integers
+#' and logicals.
 #'
 #' @export
 new_board_options <- function(board_name = "Board",

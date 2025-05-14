@@ -59,6 +59,35 @@ block previews}
 
 \item{opt}{Board option}
 }
+\value{
+All of \code{new_board_options()}, \code{as_board_options()} and
+\code{board_options()} return a \code{board_options} object, as does the validator
+\code{validate_board_options()}, which is typically called for side effects of
+throwing errors is validation does not pass. Inheritance checking as
+\code{is_board_options()} returns a scalar logical, while \code{list_board_options()}
+returns a character vector of option names. Finally, \code{board_option()} returns
+the current value for a specific board option, which in principle may be any
+R object, but typically we have values such as strings or scalar integers
+and logicals.
+}
 \description{
-User settings at the board level.
+User settings at the board level are managed by a \code{board_options} object.
+This can be constructed via \code{new_board_options()} and in case the set of
+user options is to be extended, the constructor is designed with sub-classing
+in mind. Consequently, the associated validator \code{validate_board_options()}
+is available as S3 generic. Inheritance checking is available as
+\code{is_board_options()} and coercion as \code{as_board_options()}. The currently set
+options for a board object can be retrieved with \code{board_options()} and option
+names are available as \code{list_board_options()}, which is short for
+\code{names(board_options(.))}. Finally, in order to extract the value of a
+specific option, \code{board_option()} can be used.
+}
+\examples{
+opt <- new_board_options()
+
+is_board_options(opt)
+list_board_options(opt)
+
+board_option("page_size", opt)
+
 }
