@@ -45,7 +45,7 @@ an error.
 \description{
 Two blocks can be connected via a (directed) link. This means the result from
 one block is passed as (data) input to the next. Source and destination are
-identfied by \code{from} and \code{to} attributes and in case of polyadic receiving
+identified by \code{from} and \code{to} attributes and in case of polyadic receiving
 blocks, the \code{input} attribute identified which of the data inputs is the
 intended destination. In principle, the \code{link} object may be extended via
 sub-classing and passing further attributes, but this has not been properly
@@ -61,7 +61,7 @@ detected and disallowed.
 A links is created via the \code{new_link()} constructor and for a vector of
 links, the container object \code{links} is provided and a corresponding
 constructor \code{links()} exported from the package. Testing whether an object
-inherits from \code{link} (or \code{links}) is avaiable via \code{is_link()} (or
+inherits from \code{link} (or \code{links}) is available via \code{is_link()} (or
 \code{is_links()}, respectively). Coercion to \code{link} (and \code{links}) objects is
 implemented as \code{as_link()} (and \code{as_links()}, respectively). Finally, links
 can be validated by calling \code{validate_links()}.

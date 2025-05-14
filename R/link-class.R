@@ -2,7 +2,7 @@
 #'
 #' Two blocks can be connected via a (directed) link. This means the result from
 #' one block is passed as (data) input to the next. Source and destination are
-#' identfied by `from` and `to` attributes and in case of polyadic receiving
+#' identified by `from` and `to` attributes and in case of polyadic receiving
 #' blocks, the `input` attribute identified which of the data inputs is the
 #' intended destination. In principle, the `link` object may be extended via
 #' sub-classing and passing further attributes, but this has not been properly
@@ -11,7 +11,7 @@
 #' A links is created via the `new_link()` constructor and for a vector of
 #' links, the container object `links` is provided and a corresponding
 #' constructor `links()` exported from the package. Testing whether an object
-#' inherits from `link` (or `links`) is avaiable via `is_link()` (or
+#' inherits from `link` (or `links`) is available via `is_link()` (or
 #' `is_links()`, respectively). Coercion to `link` (and `links`) objects is
 #' implemented as `as_link()` (and `as_links()`, respectively). Finally, links
 #' can be validated by calling `validate_links()`.

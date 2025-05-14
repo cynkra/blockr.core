@@ -117,7 +117,7 @@ server <- function(id, data) {
 Many options exist to build expressions, such as using tools offered by the `rlang` package or by passing a string to `base::parse()`.
 As a block developer you are free to choose the tools that your prefer, as long as the evaluated expression returns non-reactive R code which can be executed outside of blockr.
 
-The state is needed for __serialisation__ and __deserialization__ to respectively save and restore the state of a blockr application.
+The state is needed for __serialization__ and __deserialization__ to respectively save and restore the state of a blockr application.
 
 ### Constructor function
 
