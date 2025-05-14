@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">blockr.core</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +44,7 @@
     <li><a class="dropdown-item" href="../articles/testing-blocks.html">Testing blocks</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -83,7 +84,7 @@
 
     <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bristolmyerssquibb.github.io/blockr.core">blockr.core</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bristolmyerssquibb.github.io/blockr.core/">blockr.core</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <section class="level2"><h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -159,9 +160,10 @@
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/register_block.html">available_blocks</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "csv_block"     "dataset_block" "head_block"    "merge_block"  </span></span>
-<span><span class="co">#&gt; [5] "rbind_block"   "scatter_block" "static_block"  "subset_block" </span></span>
-<span><span class="co">#&gt; [9] "upload_block"</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] "csv_block"         "dataset_block"     "filebrowser_block"</span></span>
+<span><span class="co">#&gt;  [4] "head_block"        "merge_block"       "rbind_block"      </span></span>
+<span><span class="co">#&gt;  [7] "scatter_block"     "static_block"      "subset_block"     </span></span>
+<span><span class="co">#&gt; [10] "upload_block"</span></span></code></pre></div>
 </div>
 </section><section class="level2"><h2 id="register-a-block">Register a block<a class="anchor" aria-label="anchor" href="#register-a-block"></a>
 </h2>
@@ -178,7 +180,7 @@
 <div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ./R/dummy-block.R</span></span>
 <span><span class="va">new_dummy_block</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">text</span> <span class="op">=</span> <span class="st">"Hello World"</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="../reference/new_block.html">new_data_block</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/new_data_block.html">new_data_block</a></span><span class="op">(</span></span>
 <span>    <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
 <span>      <span class="fu">moduleServer</span><span class="op">(</span><span class="va">id</span>, <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span></span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -247,9 +249,10 @@
 <span></span>
 <span><span class="co"># Check it out</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/register_block.html">available_blocks</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "csv_block"     "dataset_block" "head_block"    "merge_block"  </span></span>
-<span><span class="co">#&gt; [5] "rbind_block"   "scatter_block" "static_block"  "subset_block" </span></span>
-<span><span class="co">#&gt; [9] "upload_block"</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] "csv_block"         "dataset_block"     "filebrowser_block"</span></span>
+<span><span class="co">#&gt;  [4] "head_block"        "merge_block"       "rbind_block"      </span></span>
+<span><span class="co">#&gt;  [7] "scatter_block"     "static_block"      "subset_block"     </span></span>
+<span><span class="co">#&gt; [10] "upload_block"</span></span></code></pre></div>
 </div>
 <p>where <strong>uid</strong> is/are the block(s) class(s) passed in the constructor.</p>
 </section><section class="level2"><h2 id="create-your-own-registry-ui">Create your own registry UI<a class="anchor" aria-label="anchor" href="#create-your-own-registry-ui"></a>
@@ -261,7 +264,7 @@
 <span>  <span class="st">"Select block from registry"</span>,</span>
 <span>  choices <span class="op">=</span> <span class="fu"><a href="../reference/register_block.html">list_blocks</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>In the <code>blockr.ui</code> <a href="">package</a>, we designed a more sophisticated UI for the registry. We leverage our <code>scoutbaR</code> <a href="https://cynkra.github.io/scoutbaR/" class="external-link">package</a> that provides a React-powered contextual menu with search and nicer metadata display. Block <strong>categories</strong> are first extracted to create the widget <strong>sections</strong> with <code><a href="https://rdrr.io/pkg/scoutbaR/man/scout_section.html" class="external-link">scout_section()</a></code> and passing the right <code>label</code>. Within each section (ie block category) we create one <code><a href="https://rdrr.io/pkg/scoutbaR/man/scout_action.html" class="external-link">scout_action()</a></code> per block. Each <code><a href="https://rdrr.io/pkg/scoutbaR/man/scout_action.html" class="external-link">scout_action()</a></code> display the block icon for better user experience, the block name and its description.</p>
+<p>In the <code>blockr.ui</code> <a href="https://cynkra.github.io/blockr.ui/" class="external-link">package</a>, we designed a more sophisticated UI for the registry. We leverage our <code>scoutbaR</code> <a href="https://cynkra.github.io/scoutbaR/" class="external-link">package</a> that provides a React-powered contextual menu with search and nicer metadata display. Block <strong>categories</strong> are first extracted to create the widget <strong>sections</strong> with <code><a href="https://rdrr.io/pkg/scoutbaR/man/scout_section.html" class="external-link">scout_section()</a></code> and passing the right <code>label</code>. Within each section (ie block category) we create one <code><a href="https://rdrr.io/pkg/scoutbaR/man/scout_action.html" class="external-link">scout_action()</a></code> per block. Each <code><a href="https://rdrr.io/pkg/scoutbaR/man/scout_action.html" class="external-link">scout_action()</a></code> display the block icon for better user experience, the block name and its description.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># pak::pak("scoutbaR")</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">scoutbaR</span><span class="op">)</span></span>

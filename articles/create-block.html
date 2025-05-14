@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">blockr.core</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +44,7 @@
     <li><a class="dropdown-item" href="../articles/testing-blocks.html">Testing blocks</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -83,7 +84,7 @@
 
     <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bristolmyerssquibb.github.io/blockr.core">blockr.core</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bristolmyerssquibb.github.io/blockr.core/">blockr.core</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <section class="level2"><h2 id="creating-blocks">Creating blocks<a class="anchor" aria-label="anchor" href="#creating-blocks"></a>
 </h2>
@@ -204,7 +205,7 @@
 </h3>
 <p>The <strong>constructor</strong> function wraps the UI and server functions and initializes the block. Note that both <code>server</code> and <code>ui</code> are <a href="https://adv-r.hadley.nz/environments.html#function-environments" class="external-link">closures</a> and therefore may refer to names bound in the constructor scope (e.g. <code>dataset</code> and <code>choices</code>).</p>
 <p>It should expose as arguments anything the user might set via the UI to control the block <strong>state</strong>. In other words, any inputs in the UI function, should have a corresponding argument in the constructor function. On the other hand, inputs from other blocks should not be exposed as arguments, as these are dynamically provided in the server function.</p>
-<p>The return value should be a call to <code><a href="../reference/new_block.html">new_block()</a></code> (or if applicable a call to the more specific <em>virtual</em> constructors <code><a href="../reference/new_block.html">new_data_block()</a></code>, <code><a href="../reference/new_block.html">new_transform_block()</a></code>, etc.).</p>
+<p>The return value should be a call to <code><a href="../reference/new_block.html">new_block()</a></code> (or if applicable a call to the more specific <em>virtual</em> constructors <code><a href="../reference/new_data_block.html">new_data_block()</a></code>, <code><a href="../reference/new_transform_block.html">new_transform_block()</a></code>, etc.).</p>
 <p>We can finish our block template:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>example_constructor <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">ui_state =</span> <span class="fu">character</span>(), ...) {</span>
@@ -239,11 +240,11 @@
 <p>The <code>...</code> is forwarded to <code>new_block</code> or any <code>new_*_block</code>.</p>
 </section><section class="level3"><h3 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h3>
-<p>Putting this all together, we can create a <code><a href="https://rdrr.io/r/utils/head.html" class="external-link">utils::head()</a></code> block, such as the one offered as <code><a href="../reference/new_head_block.html">new_head_block()</a></code>:</p>
+<p>Putting this all together, we can create a <code><a href="https://rdrr.io/r/utils/head.html" class="external-link">utils::head()</a></code> block, such as the one offered as <code><a href="../reference/new_transform_block.html">new_head_block()</a></code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">new_head_block</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">6L</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="../reference/new_block.html">new_transform_block</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/new_transform_block.html">new_transform_block</a></span><span class="op">(</span></span>
 <span>    <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
 <span>      <span class="fu">moduleServer</span><span class="op">(</span></span>
 <span>        <span class="va">id</span>,</span>
@@ -296,17 +297,17 @@
 <p>An app containing such a head block can be spun up as</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/serve.html">serve</a></span><span class="op">(</span><span class="fu"><a href="../reference/new_head_block.html">new_head_block</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10L</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/serve.html">serve</a></span><span class="op">(</span><span class="fu"><a href="../reference/new_transform_block.html">new_head_block</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10L</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
-<p>For an example with multiple data inputs, refer to examples such as <code><a href="../reference/new_merge_block.html">new_merge_block()</a></code>. Such a binary block (with arguments <code>x</code> and <code>y</code>) can be explored in a standalone app (with nonsensical inputs) as</p>
+<p>For an example with multiple data inputs, refer to examples such as <code><a href="../reference/new_transform_block.html">new_merge_block()</a></code>. Such a binary block (with arguments <code>x</code> and <code>y</code>) can be explored in a standalone app (with nonsensical inputs) as</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/serve.html">serve</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="../reference/new_merge_block.html">new_merge_block</a></span><span class="op">(</span>by <span class="op">=</span> <span class="st">"Time"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/new_transform_block.html">new_merge_block</a></span><span class="op">(</span>by <span class="op">=</span> <span class="st">"Time"</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/BOD.html" class="external-link">BOD</a></span>, y <span class="op">=</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/ChickWeight.html" class="external-link">ChickWeight</a></span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
-<p>The <code>data</code> argument to <code><a href="../reference/serve.html">serve()</a></code> expects a list with names components that match the server function signature, i.e. <code>data</code> for <code><a href="../reference/new_head_block.html">new_head_block()</a></code> and <code>x</code>, <code>y</code> for <code><a href="../reference/new_merge_block.html">new_merge_block()</a></code>. Such names can be chosen freely by the block implementer (with the exception of integer-valued names, such as <code>`1`</code>, <code>`2`</code>, etc. which are reserved as positional arguments in <code>...args</code>).</p>
+<p>The <code>data</code> argument to <code><a href="../reference/serve.html">serve()</a></code> expects a list with names components that match the server function signature, i.e. <code>data</code> for <code><a href="../reference/new_transform_block.html">new_head_block()</a></code> and <code>x</code>, <code>y</code> for <code><a href="../reference/new_transform_block.html">new_merge_block()</a></code>. Such names can be chosen freely by the block implementer (with the exception of integer-valued names, such as <code>`1`</code>, <code>`2`</code>, etc. which are reserved as positional arguments in <code>...args</code>).</p>
 </section><section class="level3"><h3 id="more-complex-examples">More complex examples<a class="anchor" aria-label="anchor" href="#more-complex-examples"></a>
 </h3>
 <p>The above example showed how to embed a typical R function into a block. However, <code>blockr.core</code> can do much more. What about creating an entire block around an existing complex Shiny module?</p>
@@ -416,7 +417,7 @@
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/serve.html">serve</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/new_board.html">new_board</a></span><span class="op">(</span></span>
 <span>    blocks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      a <span class="op">=</span> <span class="fu"><a href="../reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span>,</span>
+<span>      a <span class="op">=</span> <span class="fu"><a href="../reference/new_data_block.html">new_dataset_block</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span>,</span>
 <span>      b <span class="op">=</span> <span class="fu">new_esquisse_block</span><span class="op">(</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    links <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>

@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">blockr.core</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +44,7 @@
     <li><a class="dropdown-item" href="../articles/testing-blocks.html">Testing blocks</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -83,7 +84,7 @@
 
     <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bristolmyerssquibb.github.io/blockr.core">blockr.core</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bristolmyerssquibb.github.io/blockr.core/">blockr.core</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <section class="level2"><h2 id="blockr-for-non-coders">{blockr} for non coders<a class="anchor" aria-label="anchor" href="#blockr-for-non-coders"></a>
 </h2>
@@ -182,27 +183,27 @@
 </div>
 </div>
 </div>
-<p>At the top level, a blockr app is made of a <strong>board</strong> object. That board may contains <strong>blocks</strong>, <strong>stacks</strong> or group of blocks, and connections between blocks, also known as <strong>links</strong>. You may find interesting to read more about block metadata in this <a href="https://cynkra.github.io/blockr.core/articles/blocks-registry.html" class="external-link">vignette</a>.</p>
+<p>At the top level, a blockr app is made of a <strong>board</strong> object. That board may contains <strong>blocks</strong>, <strong>stacks</strong> or group of blocks, and connections between blocks, also known as <strong>links</strong>. You may find interesting to read more about block metadata in this <a href="https://bristolmyerssquibb.github.io/blockr.core/articles/blocks-registry.html">vignette</a>.</p>
 </section><section class="level3"><h3 id="serve-blocks">Serve blocks<a class="anchor" aria-label="anchor" href="#serve-blocks"></a>
 </h3>
 <p>This is mostly available for testing, you can serve a block as an entire application. Below is all what you need to spin up an app with a single block:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/serve.html">serve</a></span><span class="op">(</span><span class="fu"><a href="../reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span><span class="st">"iris"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/serve.html">serve</a></span><span class="op">(</span><span class="fu"><a href="../reference/new_data_block.html">new_dataset_block</a></span><span class="op">(</span><span class="st">"iris"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <p>For a block that requires input, additionally pass static data:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/serve.html">serve</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="../reference/new_merge_block.html">new_merge_block</a></span><span class="op">(</span>by <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/new_transform_block.html">new_merge_block</a></span><span class="op">(</span>by <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/BOD.html" class="external-link">BOD</a></span>, y <span class="op">=</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/ChickWeight.html" class="external-link">ChickWeight</a></span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
-<p>Notice that in the above example, data is a named list with <code>x</code> and <code>y</code>. How to name this list is given by the signature of the corresponding block server function (see truncated example below with <code><a href="../reference/new_merge_block.html">new_merge_block()</a></code>):</p>
+<p>Notice that in the above example, data is a named list with <code>x</code> and <code>y</code>. How to name this list is given by the signature of the corresponding block server function (see truncated example below with <code><a href="../reference/new_transform_block.html">new_merge_block()</a></code>):</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">new_merge_block</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">all_x</span> <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">all_y</span> <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span></span>
-<span>  <span class="fu"><a href="../reference/new_block.html">new_transform_block</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/new_transform_block.html">new_transform_block</a></span><span class="op">(</span></span>
 <span>    server <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
 <span>      <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/moduleServer.html" class="external-link">moduleServer</a></span><span class="op">(</span></span>
 <span>        <span class="va">id</span>,</span>
@@ -224,9 +225,9 @@
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/serve.html">serve</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/new_board.html">new_board</a></span><span class="op">(</span></span>
 <span>    blocks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>      a <span class="op">=</span> <span class="fu"><a href="../reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span><span class="st">"BOD"</span><span class="op">)</span>,</span>
-<span>      b <span class="op">=</span> <span class="fu"><a href="../reference/new_dataset_block.html">new_dataset_block</a></span><span class="op">(</span><span class="st">"ChickWeight"</span><span class="op">)</span>,</span>
-<span>      c <span class="op">=</span> <span class="fu"><a href="../reference/new_merge_block.html">new_merge_block</a></span><span class="op">(</span><span class="st">"Time"</span><span class="op">)</span></span>
+<span>      a <span class="op">=</span> <span class="fu"><a href="../reference/new_data_block.html">new_dataset_block</a></span><span class="op">(</span><span class="st">"BOD"</span><span class="op">)</span>,</span>
+<span>      b <span class="op">=</span> <span class="fu"><a href="../reference/new_data_block.html">new_dataset_block</a></span><span class="op">(</span><span class="st">"ChickWeight"</span><span class="op">)</span>,</span>
+<span>      c <span class="op">=</span> <span class="fu"><a href="../reference/new_transform_block.html">new_merge_block</a></span><span class="op">(</span><span class="st">"Time"</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    links <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>      ac <span class="op">=</span> <span class="fu"><a href="../reference/new_link.html">new_link</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"c"</span>, <span class="st">"x"</span><span class="op">)</span>,</span>
@@ -263,10 +264,10 @@
 </h3>
 <section class="level4"><h4 id="develop-new-blocks">Develop new blocks<a class="anchor" aria-label="anchor" href="#develop-new-blocks"></a>
 </h4>
-<p>If you had to develop custom blocks, you can read this <a href="https://cynkra.github.io/blockr.core/articles/create-block.html" class="external-link">vignette</a>.</p>
+<p>If you had to develop custom blocks, you can read this <a href="https://bristolmyerssquibb.github.io/blockr.core/articles/create-block.html">vignette</a>.</p>
 </section><section class="level4"><h4 id="extend-blockr-core">Extend blockr.core<a class="anchor" aria-label="anchor" href="#extend-blockr-core"></a>
 </h4>
-<p>If you wish to customize the look and feel of block, look no further than this <a href="https://cynkra.github.io/blockr.core/articles/extend-blockr.html" class="external-link">article</a>.</p>
+<p>If you wish to customize the look and feel of block, look no further than this <a href="https://bristolmyerssquibb.github.io/blockr.core/articles/extend-blockr.html">article</a>.</p>
 </section></section></section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);

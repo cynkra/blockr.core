@@ -23,7 +23,7 @@ respectively.'><script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.5.
 
     <a class="navbar-brand me-2" href="../index.html">blockr.core</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,6 +40,7 @@ respectively.'><script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.5.
     <li><a class="dropdown-item" href="../articles/extend-blockr.html">Extend blockr</a></li>
     <li><a class="dropdown-item" href="../articles/testing-blocks.html">Testing blocks</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/BristolMyersSquibb/blockr.core/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -58,7 +59,7 @@ respectively.'><script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.5.
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Block server</h1>
-      <small class="dont-index">Source: <a href="https://github.com/BristolMyersSquibb/blockr.core/blob/main/R/block-server.R" class="external-link"><code>R/block-server.R</code></a>, <a href="https://github.com/BristolMyersSquibb/blockr.core/blob/main/R/plot-block.R" class="external-link"><code>R/plot-block.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/BristolMyersSquibb/blockr.core/blob/main/R/block-server.R" class="external-link"><code>R/block-server.R</code></a></small>
       <div class="d-none name"><code>block_server.Rd</code></div>
     </div>
 
@@ -92,15 +93,6 @@ respectively.</p>
 <span></span>
 <span><span class="fu">expr_server</span><span class="op">(</span><span class="va">x</span>, <span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'block'</span></span>
-<span><span class="fu">expr_server</span><span class="op">(</span><span class="va">x</span>, <span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">block_eval</span><span class="op">(</span><span class="va">x</span>, <span class="va">expr</span>, <span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for class 'block'</span></span>
-<span><span class="fu">block_eval</span><span class="op">(</span><span class="va">x</span>, <span class="va">expr</span>, <span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for class 'plot_block'</span></span>
 <span><span class="fu">block_eval</span><span class="op">(</span><span class="va">x</span>, <span class="va">expr</span>, <span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -145,6 +137,13 @@ respectively.</p>
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>Both <code>block_server()</code> and <code>expr_server()</code> return shiny server module
+(i.e. a call to <code><a href="https://rdrr.io/pkg/shiny/man/moduleServer.html" class="external-link">shiny::moduleServer()</a></code>), while <code>block_eval()</code> evaluates
+an interpolated (w.r.t. block "user" inputs) block expression in the context
+of block data inputs.</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The module returned from <code>block_server()</code>, at least in the default
 implementation, provides much of the essential but block-type agnostic
@@ -153,7 +152,7 @@ of the block expression server (handling the block-specific functionality,
 i.e. block user inputs and expression), and instantiation of the
 <code>edit_block</code> module (if passed from the parent scope).</p>
 <p>A block is considered ready for evaluation whenever input data is available
-that satisfies validation (<code><a href="new_block.html">validate_data_inputs()</a></code>) and nonempty state
+that satisfies validation (<code><a href="block_name.html">validate_data_inputs()</a></code>) and nonempty state
 values are available (unless otherwise instructed via <code>allow_empty_state</code>
 in <code><a href="new_block.html">new_block()</a></code>). Conditions raised during validation and evaluation are
 caught and returned in order to be surfaced to the app user.</p>
