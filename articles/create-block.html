@@ -200,7 +200,7 @@
 <span><span class="op">}</span></span></code></pre></div>
 </div>
 <p>Many options exist to build expressions, such as using tools offered by the <code>rlang</code> package or by passing a string to <code><a href="https://rdrr.io/r/base/parse.html" class="external-link">base::parse()</a></code>. As a block developer you are free to choose the tools that your prefer, as long as the evaluated expression returns non-reactive R code which can be executed outside of blockr.</p>
-<p>The state is needed for <strong>serialisation</strong> and <strong>deserialization</strong> to respectively save and restore the state of a blockr application.</p>
+<p>The state is needed for <strong>serialization</strong> and <strong>deserialization</strong> to respectively save and restore the state of a blockr application.</p>
 </section><section class="level3"><h3 id="constructor-function">Constructor function<a class="anchor" aria-label="anchor" href="#constructor-function"></a>
 </h3>
 <p>The <strong>constructor</strong> function wraps the UI and server functions and initializes the block. Note that both <code>server</code> and <code>ui</code> are <a href="https://adv-r.hadley.nz/environments.html#function-environments" class="external-link">closures</a> and therefore may refer to names bound in the constructor scope (e.g. <code>dataset</code> and <code>choices</code>).</p>
