@@ -1,3 +1,5 @@
+skip_on_os("windows")
+
 test_that("filebrowser block constructor", {
 
   file <- normalizePath(withr::local_tempfile(lines = "abc"))
