@@ -63,9 +63,9 @@ by referring to this as something like \code{shiny::NS(id, "result")}.
 \section{Board-level block UI}{
 
 While the contents of block-level UI are created by dispatching \code{block_ui()}
-on blocks another dispatch on \href{new_board}{\code{board}} occurs as well. This can
-be used to control how blocks are integrated into the board UI. For the
-default board, this uses \code{\link[bslib:card]{bslib::card()}} to represent blocks. For boards
+on blocks another dispatch on \code{board} (see \code{\link[=new_board]{new_board()}}) occurs as well.
+This can be used to control how blocks are integrated into the board UI. For
+the default board, this uses \code{\link[bslib:card]{bslib::card()}} to represent blocks. For boards
 that extend the default \code{board} class, control is available for how blocks
 are displayed by providing a board-specific \code{block_ui()} method.
 }

@@ -95,9 +95,9 @@ board_ui.NULL <- function(id, x, ...) NULL
 
 #' @section Board-level block UI:
 #' While the contents of block-level UI are created by dispatching `block_ui()`
-#' on blocks another dispatch on [`board`](new_board) occurs as well. This can
-#' be used to control how blocks are integrated into the board UI. For the
-#' default board, this uses [bslib::card()] to represent blocks. For boards
+#' on blocks another dispatch on `board` (see [new_board()]) occurs as well.
+#' This can be used to control how blocks are integrated into the board UI. For
+#' the default board, this uses [bslib::card()] to represent blocks. For boards
 #' that extend the default `board` class, control is available for how blocks
 #' are displayed by providing a board-specific `block_ui()` method.
 #'
