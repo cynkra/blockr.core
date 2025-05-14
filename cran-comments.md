@@ -10,4 +10,6 @@
 
 0 errors | 0 warnings | 1 notes
 
+* Re-submission with expanded documentation, including requested `\value{}`
+  entries.
 * Initial release
