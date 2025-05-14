@@ -54,18 +54,17 @@ reference:
   desc: Tools for creating and working with board plugins.
   contents:
   - new_plugin
-  - board_plugins
 - subtitle: Instances
   desc: Plugin implementations provided by the core.
   contents:
-  - add_rm_block_server
-  - add_rm_link_server
-  - add_rm_stack_server
-  - edit_block_server
-  - edit_stack_server
-  - gen_code_server
-  - block_notification_server
-  - ser_deser_server
+  - manage_blocks
+  - manage_links
+  - manage_stacks
+  - edit_block
+  - edit_stack
+  - generate_code
+  - notify_user
+  - preserve_board
 - title: Block classes
   contents:
     - new_data_block
@@ -88,3 +87,4 @@ reference:
   - topo_sort
   - rand_names
   - blockr_option
+  - serve
