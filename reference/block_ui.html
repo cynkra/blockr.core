@@ -153,9 +153,9 @@ by referring to this as something like <code>shiny::NS(id, "result")</code>.</p>
 
 
 <p>While the contents of block-level UI are created by dispatching <code>block_ui()</code>
-on blocks another dispatch on <a href="new_board"><code>board</code></a> occurs as well. This can
-be used to control how blocks are integrated into the board UI. For the
-default board, this uses <code><a href="https://rstudio.github.io/bslib/reference/card.html" class="external-link">bslib::card()</a></code> to represent blocks. For boards
+on blocks another dispatch on <code>board</code> (see <code><a href="new_board.html">new_board()</a></code>) occurs as well.
+This can be used to control how blocks are integrated into the board UI. For
+the default board, this uses <code><a href="https://rstudio.github.io/bslib/reference/card.html" class="external-link">bslib::card()</a></code> to represent blocks. For boards
 that extend the default <code>board</code> class, control is available for how blocks
 are displayed by providing a board-specific <code>block_ui()</code> method.</p>
     </div>
