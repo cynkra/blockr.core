@@ -42,19 +42,17 @@ would then contain UI created by \code{\link[DT:dataTableOutput]{DT::dataTableOu
 \description{
 The UI associated with a block is created via the generics \code{expr_ui()} and
 \code{block_ui()}. The former is mainly responsible for user inputs that are
-specific to every block type (i.e. a \href{new_subset_block}{\code{subset_block}}
-requires different user inputs compared to a \href{new_head_block}{\code{head_block}})
-and essentially calls the UI function passed as \code{ui} to \code{\link[=new_block]{new_block()}}. UI
-that represents block outputs typically is shared among similar block types
-(i.e. blocks with shared inheritance structure, such as
-\href{new_subset_block}{\code{subset_block}} and \href{new_head_block}{\code{head_block}}, which
-both inherit from \code{transform_block}). This type of UI us created by
-\code{block_ui()} and block inheritance is used to deduplicate shared
+specific to every block type (i.e. a \code{subset_block} requires different user
+inputs compared to a \code{head_block}, see \code{\link[=new_transform_block]{new_transform_block()}}) and
+essentially calls the UI function passed as \code{ui} to \code{\link[=new_block]{new_block()}}. UI that
+represents block outputs typically is shared among similar block types (i.e.
+blocks with shared inheritance structure, such as \code{subset_block} and
+\code{head_block}, which both inherit from \code{transform_block}). This type of UI us
+created by \code{block_ui()} and block inheritance is used to deduplicate shared
 functionality (i.e. by implementing a method for the \code{transform_block} class
-only instead of separate methods for \href{new_subset_block}{\code{subset_block}} and
-\href{new_head_block}{\code{head_block}}. Working in tandem with \code{block_ui()}, the
-generic \code{block_output()} generates the output to be displayed by the UI
-portion defined via \code{block_ui()}.
+only instead of separate methods for \code{subset_block} and \code{head_block}.
+Working in tandem with \code{block_ui()}, the generic \code{block_output()} generates
+the output to be displayed by the UI portion defined via \code{block_ui()}.
 }
 \details{
 The result of \code{block_output()}, which is evaluated in the \code{\link[=block_server]{block_server()}}

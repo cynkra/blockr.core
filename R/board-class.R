@@ -7,8 +7,8 @@
 #' structure can be extended by adding further attributes and sub-classes. S3
 #' dispatch is used in many places to control how the UI looks and feels and
 #' using this extension mechanism, UI aspects can be customized to user
-#' requirements. Several [utilities](board_blocks()) are available for
-#' retrieving and modifying block attributes.
+#' requirements. Several utilities are available for retrieving and modifying
+#' block attributes (see [board_blocks()]).
 #'
 #' @param blocks Set of blocks
 #' @param links Set of links

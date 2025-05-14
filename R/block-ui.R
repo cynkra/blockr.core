@@ -2,19 +2,17 @@
 #'
 #' The UI associated with a block is created via the generics `expr_ui()` and
 #' `block_ui()`. The former is mainly responsible for user inputs that are
-#' specific to every block type (i.e. a [`subset_block`](new_subset_block)
-#' requires different user inputs compared to a [`head_block`](new_head_block))
-#' and essentially calls the UI function passed as `ui` to [new_block()]. UI
-#' that represents block outputs typically is shared among similar block types
-#' (i.e. blocks with shared inheritance structure, such as
-#' [`subset_block`](new_subset_block) and [`head_block`](new_head_block), which
-#' both inherit from `transform_block`). This type of UI us created by
-#' `block_ui()` and block inheritance is used to deduplicate shared
+#' specific to every block type (i.e. a `subset_block` requires different user
+#' inputs compared to a `head_block`, see [new_transform_block()]) and
+#' essentially calls the UI function passed as `ui` to [new_block()]. UI that
+#' represents block outputs typically is shared among similar block types (i.e.
+#' blocks with shared inheritance structure, such as `subset_block` and
+#' `head_block`, which both inherit from `transform_block`). This type of UI us
+#' created by `block_ui()` and block inheritance is used to deduplicate shared
 #' functionality (i.e. by implementing a method for the `transform_block` class
-#' only instead of separate methods for [`subset_block`](new_subset_block) and
-#' [`head_block`](new_head_block). Working in tandem with `block_ui()`, the
-#' generic `block_output()` generates the output to be displayed by the UI
-#' portion defined via `block_ui()`.
+#' only instead of separate methods for `subset_block` and `head_block`.
+#' Working in tandem with `block_ui()`, the generic `block_output()` generates
+#' the output to be displayed by the UI portion defined via `block_ui()`.
 #'
 #' The result of `block_output()`, which is evaluated in the [block_server()]
 #' context is assigned to `output$result`. Consequently, when referencing
