@@ -411,13 +411,14 @@ check_expr_val <- function(val, x) {
 
       expected <- block_ctor_inputs(x)
       current <- names(val[["state"]])
+      missing <- setdiff(expected, current)
 
-      if (!setequal(current, expected)) {
+      if (length(missing)) {
         abort(
           paste0(
             "The `state` component of the return value for ", cls,
             " is expected to additionally return ",
-            paste_enum(setdiff(expected, current))
+            paste_enum(missing)
           ),
           class = "expr_server_return_state_invalid"
         )
