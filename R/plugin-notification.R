@@ -19,7 +19,7 @@
 #' "warning" or "error").
 #'
 #' @export
-notify_user <- function(server = notify_user_server, ui = NULL) {
+notify_user <- function(server = notify_user_server, ui = notify_user_ui) {
   new_plugin(server, ui, validator = check_block_notifications_val,
              class = "notify_user")
 }
@@ -86,6 +86,16 @@ notify_user_server <- function(id, board, ...) {
   )
 }
 
+#' @rdname notify_user
+#' @export
+notify_user_ui <- function(id, board) {
+  tagList(
+    if (requireNamespace("cli", quietly = TRUE)) {
+      tags$style(HTML(paste(format(cli::ansi_html_style()), collapse = "\n")))
+    }
+  )
+}
+
 create_block_notifications <- function(notf, blk,
                                        session = getDefaultReactiveDomain()) {
 
@@ -98,7 +108,7 @@ create_block_notifications <- function(notf, blk,
         id <- session_to_id(attr(msg, "id"), session)
 
         showNotification(
-          paste0("Block ", blk, ": ", msg),
+          HTML(paste0("Block ", blk, ": ", ansi_html(msg))),
           duration = NULL,
           id = id,
           type = cnd

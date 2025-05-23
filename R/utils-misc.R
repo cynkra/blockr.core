@@ -238,3 +238,12 @@ exprs_to_lang <- function(exprs) {
 starts_with <- function(x, prefix) {
   x[startsWith(x, prefix)]
 }
+
+ansi_html <- function(x, ...) {
+
+  if (requireNamespace("cli", quietly = TRUE)) {
+    return(cli::ansi_html(x, ...))
+  }
+
+  x
+}

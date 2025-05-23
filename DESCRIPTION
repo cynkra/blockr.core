@@ -55,6 +55,7 @@ Suggests:
     knitr,
     rmarkdown,
     quarto,
-    scoutbaR
+    scoutbaR,
+    cli
 Config/testthat/edition: 3
 VignetteBuilder: quarto

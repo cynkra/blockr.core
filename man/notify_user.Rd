@@ -3,11 +3,14 @@
 \name{notify_user}
 \alias{notify_user}
 \alias{notify_user_server}
+\alias{notify_user_ui}
 \title{User notification plugin module}
 \usage{
-notify_user(server = notify_user_server, ui = NULL)
+notify_user(server = notify_user_server, ui = notify_user_ui)
 
 notify_user_server(id, board, ...)
+
+notify_user_ui(id, board)
 }
 \arguments{
 \item{server, ui}{Server/UI for the plugin module}

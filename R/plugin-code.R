@@ -65,7 +65,6 @@ generate_code_server <- function(id, board, ...) {
   )
 }
 
-#' @param board The initial `board` object
 #' @rdname generate_code
 #' @export
 generate_code_ui <- function(id, board) {

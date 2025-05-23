@@ -119,6 +119,22 @@ block_server.block <- function(id, x, data = list(), block_id = id,
         )
       )
 
+      block_cond <- reactive(
+        {
+          if ("cond" %in% names(exp)) {
+            lapply(
+              reactiveValuesToList(exp[["cond"]]),
+              lapply,
+              new_condition,
+              session = session,
+              as_list = FALSE
+            )
+          } else {
+            empty_block_condition
+          }
+        }
+      )
+
       list(
         result = res,
         expr = lang,
@@ -127,7 +143,8 @@ block_server.block <- function(id, x, data = list(), block_id = id,
           list(
             data = rv$data_cond,
             state = rv$state_cond,
-            eval = rv$eval_cond
+            eval = rv$eval_cond,
+            block = block_cond()
           )
         )
       )
@@ -184,7 +201,7 @@ reorder_dots_observer <- function(data, sess) {
   }
 }
 
-new_condition <- function(x, ...) {
+new_condition <- function(x, ..., as_list = TRUE) {
 
   id <- get_globals(...) + 1L
   set_globals(id, ...)
@@ -193,9 +210,13 @@ new_condition <- function(x, ...) {
     x <- conditionMessage(x)
   }
 
-  list(
-    structure(x, id = id, class = "block_cnd")
-  )
+  res <- structure(x, id = id, class = "block_cnd")
+
+  if (!isTRUE(as_list)) {
+    return(res)
+  }
+
+  list(res)
 }
 
 empty_block_condition <- list(
@@ -379,11 +400,11 @@ check_expr_val <- function(val, x) {
 
       required <- c("expr", "state")
 
-      if (!setequal(required, names(val))) {
+      if (!all(required %in% names(val))) {
         abort(
           paste0(
-            "The block server for ", cls, " is expected to ",
-            "return values ", paste_enum(required), "."
+            "The block server for ", cls, " is expected to return ",
+            "values ", paste_enum(setdiff(required, names(val))), "."
           ),
           class = "expr_server_return_component_missing"
         )
@@ -407,6 +428,32 @@ check_expr_val <- function(val, x) {
           ),
           class = "expr_server_return_type_invalid"
         )
+      }
+
+      if ("cond" %in% names(val)) {
+
+        if (!is.reactivevalues(val[["cond"]])) {
+          abort(
+            paste(
+              "The `cond` component of the return value for", cls,
+              "is expected to be a `reactiveValues` object."
+            ),
+            class = "expr_server_return_type_invalid"
+          )
+        }
+
+        conds <- c("message", "warning", "error")
+
+        if (!all(names(val[["cond"]]) %in% conds)) {
+          abort(
+            paste0(
+              "The `cond` component of the return value for ", cls,
+              " is expected to contain components ",
+              paste_enum(conds), "."
+            ),
+            class = "expr_server_return_type_invalid"
+          )
+        }
       }
 
       expected <- block_ctor_inputs(x)

@@ -17,7 +17,7 @@ generate_code_ui(id, board)
 
 \item{id}{Namespace ID}
 
-\item{board}{The initial \code{board} object}
+\item{board}{Reactive values object}
 
 \item{...}{Extra arguments passed from parent scope}
 }
